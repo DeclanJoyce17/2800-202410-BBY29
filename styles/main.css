@@ -10,7 +10,6 @@ footer{
 .footerButton {
     margin-left: 25px;
     margin-right: 25px;
-    size: 10px;
     margin-bottom: 10px;
     margin-top: 10px;
     padding: 0;
@@ -29,13 +28,11 @@ nav {
     margin-right: 18px;
     text-align: center;
     vertical-align: middle;
-    size: 10px;
 }
 
 .navText {
-    position: relative; top: 20;
+    position: relative; top: 20px;
     padding: 14px 0;
-    
     margin-left: 20px;
     font-size: 30px;
 }

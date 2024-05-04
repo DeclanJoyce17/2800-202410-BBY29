@@ -20,3 +20,63 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
+const { getDatabase } = require('firebase-admin/database');
+
+
+//NOT WORKING YET IDK FIREBASE BEING ANNOYING
+
+// Get a database reference to our blog
+const db = getDatabase();
+const ref = db.ref('server/saving-data/fireblog');  var database = firebase.database()
+  
+  function save() {
+    var email = document.getElementById('email').value
+    var password = document.getElementById('password').value
+    var username = document.getElementById('name').value
+    
+  
+    database.ref('users/' + username).set({
+      email : email,
+      password : password,
+      username : username
+      
+    })
+  
+    alert('Saved')
+  }
+  
+  function get() {
+    var username = document.getElementById('name').value
+  
+    var user_ref = database.ref('users/' + username)
+    user_ref.on('value', function(snapshot) {
+      var data = snapshot.val()
+  
+      alert(data.email)
+  
+    })
+  
+  }
+  
+  function update() {
+    var username = document.getElementById('username').value
+    var email = document.getElementById('email').value
+    var password = document.getElementById('password').value
+  
+    var updates = {
+      email : email,
+      password : password
+    }
+  
+    database.ref('users/' + username).update(updates)
+  
+    alert('updated')
+  }
+  
+  function remove() {
+    var username = document.getElementById('name').value
+  
+    database.ref('users/' + username).remove()
+  
+    alert('deleted')
+  }
