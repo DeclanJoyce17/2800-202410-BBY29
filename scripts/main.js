@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <h4>${task.title || 'No Title'}</h4>
                         <p>${task.content}</p>
                     </div>
-                    <button class="btn btn-info delete-btn" data-task-id="${taskId}">Delete</button>
+                    <button class="btn btn-info delete-btn" data-task-id="${taskId}">done</button>
                 `;
             });
     
