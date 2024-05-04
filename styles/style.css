@@ -1,0 +1,36 @@
+
+.button {
+    margin-top: 20px;
+    width: 40%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    text-decoration: none;
+    margin-left: 125px;
+    margin-right: 810px;
+    color: black;
+    font-size: 40px;
+    background-color: #d4d5d6;
+    border: none;
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+.button:hover {
+    background-color: #9fa5a7;
+}
+
+.title {
+    margin-top: 140px;
+    margin-left: 10px;
+    margin-right: 17px;
+    padding: 10px 0;
+    text-align: center;
+    color: black;
+    font-size: 50px;
+    margin-bottom: 60px;
+}
+
+body {
+    background-image: url(/img/Comp2800BG.png);
+}
