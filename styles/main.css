@@ -24,6 +24,34 @@ nav {
     font-size: 30px;
 }
 
+#chart{
+    align-content: center;
+    text-align: center;
+    align-items: center;
+}
+
+#tropohy{
+    width: 20%;
+}
+
+
+.task-list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.task-entry {
+    width: 80%; 
+    min-height: 100px; 
+    background-color: #f9f9f9; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    padding: 15px;
+    margin-bottom: 20px; 
+    border-radius: 5px; 
+}
+
 footer{
     position: fixed;
     bottom: 0px;
