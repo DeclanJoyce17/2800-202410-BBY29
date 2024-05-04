@@ -1,1 +1,7 @@
+.DS_Store
+*.logs
+node_modules/
+.vscode/
 firebaseAPI_TEAMBBY29.js
+firestore.rules
+storage.rules;
