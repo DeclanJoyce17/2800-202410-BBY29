@@ -5,3 +5,5 @@ node_modules/
 firebaseAPI_TEAMBBY29.js
 firestore.rules
 storage.rules;
+openai_secretkey.js
+package-lock.json

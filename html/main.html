@@ -2,62 +2,185 @@
 <html lang="en">
 
 <head>
-    <meta name="Comp 2800 Template" content="Comp 2800">
+  <title>Welcome to FitUp</title>
+  <meta name="Comp2800 template" content="FitUp">
 
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Other libraries go here -->
+  <!-- Bootstrap Library CSS CDN go here -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
-    <!-- Link to styles of your own -->
+  <!-- Boostrap Library JS CDN  go here -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+    </script>
 
-    <!-- Google Icons-->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-------------------------------------------------------->
+  <!-- Firebase 8 Library related CSS, JS, JQuery go here -->
+  <!-------------------------------------------------------->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/ui/4.8.1/firebase-ui-auth.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.1/firebase-ui-auth.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
+  <!-- Other libraries go here -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Protest+Revolution&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/5.5.3/css/ionicons.min.css">
 
-    <!-- <style sheet> -->
-    <link rel="stylesheet" type="text/css" href="/styles/main.css">
+  <!-- Link to styles of your own -->
+  <link rel="stylesheet" href="../styles/style.css">
+
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav>
-        <div>
-            <strong class="navText">
-                Points: 5
-            </strong>
+
+  <nav id="top-navbar-container" class="navbar fixed-top">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+        aria-controls="offcanvasNavbar" aria-label="Toggle navigation" style="float:left;">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <p class="offcanvas-title" id="offcanvasNavbarLabel">More Information</p>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <br>
-        <a href="index.html">
-            <input type="image" class="navButton" src="/img/FitnessButton.png">
-        </a>
-        <a href="index.html">
-            <input type="image" class="navButton" src="/img/EcoButton.png">
-        </a>
-        <a href="index.html">
-            <input type="image" class="navButton" src="/img/DietButton.png">
-        </a>
-    </nav>
+        <div class="offcanvas-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="AboutUs.html">About Us</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                More
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Account Setting</a></li>
+                <li><a class="dropdown-item" href="#">Activities</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="contactus.html">Contact Us</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- Initially hide this search bar and display it only when scrolling -->
+      <div id="search-bar-scroll" class="d-flex1 mt-0" role="search">
+        <input id="search-field-scroll" class="form-control me-1" type="search" placeholder="Search"
+          aria-label="Search">
+        <ion-icon id="search-icon-scroll" name="search-outline" size="large"></ion-icon>
+      </div>
+      <ion-icon id="cart-icon-home" class="cart" name="cart" size="large"></ion-icon>
+    </div>
+    </div>
+  </nav>
 
-    <!-- Body -->
+  <!-- Default search bar -->
+  <div id="search-bar" class="d-flex mt-1" role="search">
+    <input id="search-field" class="form-control me-1" type="search" placeholder="Search" aria-label="Search">
+    <ion-icon id="search-icon" name="search-outline" size="large"></ion-icon>
+  </div>
+
+  <!-- Categories NAV -->
+  <!-- <nav id="categories">
+    <a id="veggies-category" class="nav-link" href="#"><img class="cat" src="./images/collard.png" alt="veggies"
+        style="width: 50%;"></a>
+    <a id="fruits-category" class="nav-link" href="fruits.html"><img class="cat" src="./images/strawberry.png"
+        alt="fruits" style="width: 50%;"></a>
+    <a id="dairy-category" class="nav-link" href="#"><img class="cat" src="./images/milk.png" alt="dairy"
+        style="width: 50%;"></a>
+    <a id="nuts-category" class="nav-link" href="#"><img class="cat" src="./images/macadamia.png" alt="nuts"
+        style="width: 50%;"></a>
+    <a id="plants-category" class="nav-link" href="#"><img class="cat" src="./images/tomato.png" alt="nuts"
+        style="width: 50%;"></a>
+    <a id="farmer-category" class="nav-link" href="#"><img class="cat" src="./images/farmer.png" alt="farmer"
+        style="width: 50%;"></a>
+  </nav> -->
+
+  <!-- Content -->
+  <div class="container" style="padding-bottom: 60px;">
+    <!-- Here is the container for cards  -->
+    <div class="container">
+      <div id="posts-go-here" class="row row-col customed-card">
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates for general use, not displayed -->
+  <template id="postCardTemplate">
+    <div class="card py-2 mx-1">
+      <img class="card-image card-img-top" src=" ..." alt="..." />
+      <div class="card-body">
+        <h5 class="card-title">Card title</h5>
+        <p class="card-farm"></p>
+        <p class="card-text">
+          Some quick example text to build on the card title and make up the
+          bulk of the card's content.
+        </p>
+        <p class="card-footer"></p>
+        <a id="view-btn" class="btn btn-primary card-href">View</a>
+      </div>
+    </div>
+  </template>
+
+  <!-- our own footer goes here-->
+  <footer id="bottom-navbar-main" class="navbar fixed-bottom">
+    <div class="container">
+      <div id="home-container">
+        <ion-icon id="home-btn" class="buttons" name="home-outline" size="large"></ion-icon>
+        <span id="home-sig">Home</span>
+      </div>
+      <div id="message-container">
+          <ion-icon id="chat-btn" class="buttons" name="chatbubble-ellipses-outline" size="large"></ion-icon>
+        <span id="chat-sig">Message</span>
+      </div>
+      <div id="create-post-container">
+        <ion-icon id="create-post-btn" class="buttons" name="add-circle-outline" size="large"></ion-icon>
+        <span id="create-post-sig">Post</span>
+      </div>
+      <div id="notification-container">
+        <ion-icon id="notification-btn" class="buttons" name="notifications-outline" size="large"></ion-icon>
+        <span id="notification-sig">Notification</span>
+      </div>
+      <div id="account-container">
+        <ion-icon id="account-btn" class="buttons" name="person-outline" size="large"></ion-icon>
+        <span id="account-sig">Account</span>
+      </div>
+    </div>
+  </footer>
 
 
-    <!-- Footer -->
-    <footer>
-        <a href="index.html">
-            <input type="image" class="footerButton" src="/img/CommunityButton.png">
-        </a>
-        <a href="index.html">
-            <input type="image" class="footerButton" src="/img/HomeButton.png">
-        </a>
-        <a href="index.html">
-            <input type="image" class="footerButton" src="/img/ProfileButton.png">
-        </a>
-    </footer>
+  <!-- Your own JavaScript functions go here    -->
+  <!---------------------------------------------->
+  <script src="./scripts/firebaseAPI_TEAM99.js"></script>
+  <script src="./scripts/skeleton.js"></script>
+  <script src="./scripts/main.js"></script>
+  <script src="./scripts/filter_categories.js"></script>
+  <script src="./scripts/home.js"></script>
+  <script src="./scripts/create_post.js"></script>
+  <script src="./scripts/search_firestore.js"></script>
+  <script src="./scripts/searchbar-scroll.js"></script>
 
-    <!-- Link to scripts of our own -->
-    <script src="../scripts/skeleton.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
 </body>
 
 </html>
