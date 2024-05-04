@@ -1,0 +1,41 @@
+footer{
+    position: fixed;
+    bottom: 0px;
+    left: 0px;  
+    width: 100%;
+    
+    background-color: #d9d9d9;
+}
+
+.footerButton {
+    margin-left: 25px;
+    margin-right: 25px;
+    size: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    padding: 0;
+    border: none;
+    text-decoration: none;
+}
+
+nav {
+    width: 100%;
+    position: fixed;
+    top: 20px;
+}
+
+.navButton {
+    margin-left: 19px;
+    margin-right: 18px;
+    text-align: center;
+    vertical-align: middle;
+    size: 10px;
+}
+
+.navText {
+    position: relative; top: 20;
+    padding: 14px 0;
+    
+    margin-left: 20px;
+    font-size: 30px;
+}
