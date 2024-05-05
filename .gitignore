@@ -7,3 +7,4 @@ firestore.rules
 storage.rules;
 openai_secretkey.js
 package-lock.json
+.env

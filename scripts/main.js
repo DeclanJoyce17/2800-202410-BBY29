@@ -88,4 +88,5 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error("Error fetching task: ", error);
             taskContainer.innerHTML = '<p>Error loading tasks. Please try again later.</p>'; // Error feedback
         });
+    }
 });

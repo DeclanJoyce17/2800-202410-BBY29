@@ -9,6 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "firebase": "^10.11.1",
+    "firebaseui": "^6.1.0",
+    "groq-sdk": "^0.3.3",
     "openai": "^4.40.2"
   }
 }

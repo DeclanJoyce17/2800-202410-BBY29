@@ -1,14 +1,15 @@
 //---------------------------------------------------
 // This code is reused from the previous project 1800.
 // Credit: Course Comp1800 - Instructor: Ms Carly Orr
+
 // This function loads the parts of your skeleton 
 // (navbar, footer, and other things) into html doc. 
 //---------------------------------------------------
-function loadSkeleton(){
-    console.log($('#navbarPlaceholder').load('../text/nav.html'));
-    console.log($('#footerPlaceholder').load('../text/footer.html'));
-}
-loadSkeleton();  //invoke the function
+// function loadSkeleton(){
+//     console.log($('#navbarPlaceholder').load('../text/nav.html'));
+//     console.log($('#footerPlaceholder').load('../text/footer.html'));
+// }
+// loadSkeleton();  //invoke the function
 
 //---------------------------------------------------
 // This function loads the parts of your skeleton 
@@ -31,14 +32,14 @@ function loadSkeleton() {
 }
 loadSkeleton(); //invoke the function
 
-//------------------------------------------------
-// Call this function when the "logout" button is clicked
-//-------------------------------------------------
-function logout() {
-    firebase.auth().signOut().then(() => {
-        // Sign-out successful.
-        console.log("logging out user");
-      }).catch((error) => {
-        // An error happened.
-      });
-}
+// //------------------------------------------------
+// // Call this function when the "logout" button is clicked
+// //-------------------------------------------------
+// function logout() {
+//     firebase.auth().signOut().then(() => {
+//         // Sign-out successful.
+//         console.log("logging out user");
+//       }).catch((error) => {
+//         // An error happened.
+//       });
+// }
