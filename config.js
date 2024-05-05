@@ -1,3 +1,8 @@
+//---------------------------------------------------
+// This code is provided by the Groq API library with
+// modification for our own project
+//---------------------------------------------------
+
 "use strict";
 require('dotenv').config();
 const fs = require("fs");
@@ -7,6 +12,7 @@ const app = express();
 
 const port = process.env.PORT || 3000;
 app.use("/scripts", express.static("./scripts"));
+app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
 
 
 const Groq = require("groq-sdk");
@@ -19,9 +25,11 @@ app.get('/', (req, res) => {
     res.send(doc);
 })
 
-app.get('/GroqChatCompletion', async (req, res) => {
+app.post('/GroqChatCompletion', async (req, res) => {
+
+    const userInput = req.body.question;
     try {
-      const chatCompletion = await getGroqChatCompletion();
+      const chatCompletion = await getGroqChatCompletion(userInput);
       res.json({
         message: chatCompletion.choices[0]?.message?.content,
       });
@@ -30,21 +38,13 @@ app.get('/GroqChatCompletion', async (req, res) => {
     }
   });
 
-  
-  
-// async function main() {
-//     // console.log(groq);
-//     const chatCompletion = await getGroqChatCompletion();
-//     // console.log(chatCompletion)
-//     // Print the completion returned by the LLM.
-//     process.stdout.write(chatCompletion.choices[0]?.message?.content || "");
-// }
-async function getGroqChatCompletion() {
+
+async function getGroqChatCompletion(userInput) {
     return groq.chat.completions.create({
         messages: [
             {
                 role: "user",
-                content: "Tell a legend that is not well known"
+                content: userInput
             }
         ],
         model: "mixtral-8x7b-32768"
