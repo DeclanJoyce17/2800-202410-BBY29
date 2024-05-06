@@ -2,144 +2,141 @@
 <html lang="en">
 
 <head>
-    <title>Welcome to FitUp</title>
-    <meta name="Comp2800 template" content="FitUp">
+  <title>Welcome to FitUp</title>
+  <meta name="Comp2800 template" content="FitUp">
 
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap Library CSS CDN go here -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <!-- Boostrap Library JS CDN  go here -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
-        </script>
+  <!-- Bootstrap Library CSS CDN go here -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
-    <!-- Other Library go here -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/ui/4.8.1/firebase-ui-auth.js"></script>
-    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.1/firebase-ui-auth.css" />
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+  <!-- Boostrap Library JS CDN  go here -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+    </script>
 
-    <!-- Boostrap Library JS CDN  go here -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
-        </script>
+  <!-- Other libraries CSS CDN go here -->
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500&display=swap" rel="stylesheet" />
 
+  <!-- Other Libraries JS CDN go here -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Google Icons-->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Google Icons-->
 
-    <!-- Other libraries go here -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400..700;1,400..700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Protest+Revolution&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/5.5.3/css/ionicons.min.css"> 
+  <!-- Google Fonts-->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Link to styles of your own -->
-    <link rel="stylesheet" href="../styles/style.css">
+  <!-- Link to styles of our own -->
+  <link rel="stylesheet" href="../styles/style.css">
 
-    <!-- <style sheet> -->
-    <link rel="stylesheet" type="text/css" href="/styles/main.css">
+  <!-- <style sheet> -->
+  <link rel="stylesheet" type="text/css" href="/styles/main.css">
 
-    <head></head>
+</head>
 
 <body>
+  <!-- nav bar -->
+  <nav>
+    <br>
+    <a href="index.html">
+      <input type="image" class="navButton" src="../img/FitnessButton.png">
+    </a>
+    <a href="index.html">
+      <input type="image" class="navButton" src="../img/EcoButton.png">
+    </a>
+    <a href="index.html">
+      <input type="image" class="navButton" src="../img/DietButton.png">
+    </a>
+  </nav>
 
-    <!-- This container will hold the dynamically loaded diary entries -->
-    <!-- <div class="row row-cols-4 row-cols-md-4 g-4" id="diaryEntriesContainer"></div> -->
+  <!-- Chatbot -->
+  <form id="form">
+    <label for="chatbot">Ask me</label>
+    <input type="text" id="question" name="chatbot">
+    <button type="submit">Send</button>
+  </form>
+  <div id='response'></div>
 
-    <nav>
-        <div>
-            <strong class="navText">
-                Points: 5
-            </strong>
-        </div>
-        <br>
-        <a href="index.html">
-            <input type="image" class="navButton" src="../img/FitnessButton.png">
-        </a>
-        <a href="index.html">
-            <input type="image" class="navButton" src="../img/EcoButton.png">
-        </a>
-        <a href="index.html">
-            <input type="image" class="navButton" src="../img/DietButton.png">
-        </a>
-    </nav> 
+  <!-- Welcome messsge -->
+  <div class="px-4 py-5 my-5 text-center">
+    <h4 style="margin-bottom: 5%;" class="display-4">Are you ready to tackle the day,
+      <span id="name-goes-here"></span>?
+    </h4>
+    <div class="col-lg-6 mx-auto">
+      <div class="navText">
+        Points: 258.244
+      </div>
+    </div>
 
-    <form id="form">
-        <label for="chatbot">Ask me</label>
-        <input type="text" id="question" name="chatbot">
-        <button type="submit">Send</button>
-    </form>
-    <div id='response'></div>
-
-    <!-- Body -->
-    <!-- Welcome messsge-->
-    <div  class="px-4 py-5 my-5 text-center">
-        <h4 style="margin-bottom: 5%;" class="display-4">Are you ready to tackle the day, <span id="name-goes-here"></span>?</h4>
-        <div class="col-lg-6 mx-auto">
-    </div>  
-
-    <table id="chart">
+  <!-- Leader board -->
+  <div id="main">
+    <div id="header">
+      <h1>Ranking</h1>
+      <button class="share">
+        <i class="ph ph-share-network"></i>
+      </button>
+    </div>
+    <div id="leaderboard">
+      <div class="ribbon"></div>
+      <table>
         <tr>
-            <td>1</td>
-            <td><input type="image" class="players" src="../img/player1.png"></td>
-            <td>player 1</td>
-            <td><img id="tropohy" src="../img/Trophy icon.png"></td>
-            <td>1,373</td>
+          <td class="number">1</td>
+          <td class="name">Lee Taeyong</td>
+          <td class="points">
+            258.244 <img class="gold-medal"
+              src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true"
+              alt="gold medal" />
+          </td>
         </tr>
         <tr>
-            <td>2</td>
-            <td><input type="image" class="players" src="../img/player2.png"></td>
-            <td>player 2</td>
-            <td></td>
-            <td>5</td>
+          <td class="number">2</td>
+          <td class="name">Mark Lee</td>
+          <td class="points">258.242</td>
         </tr>
         <tr>
-            <td>3</td>
-            <td><input type="image" class="players" src="../img/player3.png"></td>
-            <td>player 3</td>
-            <td></td>
-            <td>1</td>
+          <td class="number">3</td>
+          <td class="name">Xiao Dejun</td>
+          <td class="points">258.223</td>
         </tr>
         <tr>
-            <td>4</td>
-            <td><input type="image" class="players" src="../img/player4.png"></td>
-            <td>player 4</td>
-            <td></td>
-            <td>0</td>
+          <td class="number">4</td>
+          <td class="name">Qian Kun</td>
+          <td class="points">258.212</td>
         </tr>
-    </table>
-    
-    <div class="row row-cols-4 row-cols-md-4 g-4" id="taskEntriesContainer"></div>
+        <tr>
+          <td class="number">5</td>
+          <td class="name">Johnny Suh</td>
+          <td class="points">258.208</td>
+        </tr>
+      </table>
+    </div>
+  </div>
 
-    <!-- Footer -->
-    <footer>
-        <a href="index.html">
-            <input type="image" class="footerButton" src="../img/CommunityButton.png">
-        </a>
-        <a href="index.html">
-            <input type="image" class="footerButton" src="../img/HomeButton.png">
-        </a>
-        <a href="index.html">
-            <input type="image" class="footerButton" src="../img/ProfileButton.png">
-        </a>
-    </footer>
+  <!-- task container -->
+  <div class="row row-cols-4 row-cols-md-4 g-4" id="taskEntriesContainer"></div>
+  
+  <!-- Footer -->
+  <footer>
+    <a href="index.html">
+      <input type="image" class="footerButton" src="../img/23-user-group.svg">
+    </a>
+    <a href="index.html">
+      <input type="image" class="footerButton" src="../img/35-home-general.svg">
+    </a>
+    <a href="index.html">
+      <input type="image" class="footerButton" src="../img/22-user.svg">
+    </a>
+  </footer>
 
-    <!-- Link to scripts of our own -->
-    <script src="/scripts/firebaseAPI_TEAMBBY29.js"></script> 
-    <script src="/scripts/authentication.js"></script>
-    <script src="/scripts/main.js"></script>
-    <script src="/scripts/skeleton.js"></script>
+  <!-- Link to scripts of our own -->
+  <script src="/scripts/firebaseAPI_TEAMBBY29.js"></script>
+  <script src="/scripts/authentication.js"></script>
+  <script src="/scripts/main.js"></script>
+  <script src="/scripts/skeleton.js"></script>
 
 </body>
 
