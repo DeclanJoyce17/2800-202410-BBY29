@@ -11,9 +11,9 @@ const MongoStore = require('connect-mongo');
 const path = require('path');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
-
+const saltRounds = 12;
 const app = express();
-
+const expireTime = 60 * 60 * 1000;
 app.set('view engine', 'ejs')
 
 // Load environment variables from .env file
@@ -73,6 +73,22 @@ async function connectToMongo() {
       apiKey: process.env.GROQ_API_KEY
     });
 
+    function isValidSession(req) {
+      if (req.session.authenticated) {
+        return true;
+      }
+      return false;
+    }
+
+    function sessionValidation(req, res, next) {
+      if (isValidSession(req)) {
+        next();
+      }
+      else {
+        res.redirect('/login');
+      }
+    }
+
     app.get('/', (req, res) => {
       let doc = fs.readFileSync("./html/index.html", "utf8");
       res.send(doc);
@@ -84,35 +100,50 @@ async function connectToMongo() {
     });
 
     app.post('/signup', async (req, res) => {
-      const { username, email, password } = req.body;
+      const usersCollection = db.collection('users');
+      var username = req.body.username;
+    var email = req.body.email;
+    var password = req.body.password;
+    
+    if (username.length == 0 || username == null) {
+        res.send(`Name is required. <br> <a href='/signup'>Try Again</a>`);
+        return;
+    }
+    else if (email.length == 0 || email == null) {
+        res.send(`Email is required. <br> <a href='/signup'>Try Again</a>`);
+        return;
+    }
+    else if(password.length == 0 || password == null) {
+        res.send(`Password is required. <br> <a href='/signup'>Try Again</a>`);
+        return;
+    }
 
-      // Validate input using Joi
-      const schema = Joi.object({
-        username: Joi.string().alphanum().min(3).max(30).required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(6).required()
-      });
+    const d = new Date();   
+    var time = d.getTime();
+	const schema = Joi.object(
+		{
+			username: Joi.string().alphanum().max(20).required(),
+            email: Joi.string().max(35).required(),
+			password: Joi.string().max(20).required()
+		});
+	
+	const validationResult = schema.validate({username, email, password});
+	if (validationResult.error != null) {
+	   console.log(validationResult.error);
+	   res.redirect("/signup");
+	   return;
+   }
 
-      try {
-        await schema.validateAsync({ username, email, password });
-      } catch (error) {
-        return res.status(401).send('All fields must be filled. <br><a href="/signup">Try again</a>');
-      }
-
-      // Hash the password using bcrypt
-      const hashedPassword = await bcrypt.hash(password, 10); // Use salt rounds of 10
-
-      const usersCollection = db.collection('users'); // Use the 'users' collection in BBY29 database
-      try {
-        await usersCollection.insertOne({ username, email, password: hashedPassword, points: 0});
-        req.session.user = { username, email }; // Store user in session
-        req.session.points = 0;
-        res.redirect('/main'); // Redirect to members area
-      } catch (err) {
-        console.error("Error registering user:", err);
-        res.status(500).send('Failed to register user');
-      }
-    });
+    var hashedPassword = await bcrypt.hash(password, saltRounds);
+	
+	await usersCollection.insertOne({username: username, email: email, password: hashedPassword, time: time, points: 0});
+	console.log("Inserted user");
+    req.session.authenticated = true;
+	req.session.username = username;
+    req.session.points = 0;
+	req.session.cookie.maxAge = expireTime;
+    res.redirect('/main');
+});
 
     app.get('/login', (req, res) => {
       let doc = fs.readFileSync('./html/login.html', 'utf8');
@@ -120,40 +151,41 @@ async function connectToMongo() {
     });
 
     app.post('/login', async (req, res) => {
-      const { email, password } = req.body;
-
-      // Validate input using Joi
-      const schema = Joi.object({
-        email: Joi.string().email().required(),
-        password: Joi.string().required()
-      });
-
-      try {
-        await schema.validateAsync({ email, password });
-      } catch (error) {
-        return res.status(401).send('Invalid email/password. <br><a href="/login">Try again</a>');
-      }
-
-      const usersCollection = db.collection('users'); // Use the 'users' collection in BBY29 database
-      const user = await usersCollection.findOne({ email });
-
-      if (!user) {
-        console.log('User not found');
-        return res.status(401).send('Invalid email/password. <br><a href="/login">Try again</a>');
-      }
-
-      // Compare hashed password with provided password using bcrypt
-      const passwordMatch = await bcrypt.compare(password, user.password);
-
-      if (!passwordMatch) {
-        console.log('Incorrect password');
-        return res.status(401).send('Invalid email/password. <br><a href="/login">Try again</a>');
-      }
-
-      // If login is successful, store user in session and redirect
-      req.session.user = { username: user.username };
-      return res.redirect('/main');
-    });
+      const usersCollection = db.collection('users');
+      var email = req.body.email;
+      var password = req.body.password;
+  
+    const schema = Joi.string().max(35).required();
+    const validationResult = schema.validate(email);
+    if (validationResult.error != null) {
+          res.send(`Invalid email or password combination. 1<br> <a href='/login'>Try Again</a>`);
+      return;
+       return;
+    }
+  
+    const result = await usersCollection.find({email: email}).project({email: 1, username: 1, password: 1, points: 1, _id: 1}).toArray();
+  
+    console.log(result);
+    if (result.length != 1) {
+      res.send(`Invalid email or password combination. 2<br> <a href='/login'>Try Again</a>`);
+      return;
+    }
+    if (await bcrypt.compare(password, result[0].password)) {
+      console.log("correct password");
+      req.session.authenticated = true;
+          req.session.username = result[0].username;
+          req.session.points = result[0].points;
+      req.session.email = email;
+      req.session.cookie.maxAge = expireTime;
+  
+      res.redirect('/main');
+      return;
+    }
+    else {
+      res.send(`Invalid email or password combination. 3<br> <a href='/login'>Try Again</a>`);
+      return;
+    }
+  });
 
     app.get('/logout', (req, res) => {
             //destroy session
@@ -165,12 +197,12 @@ async function connectToMongo() {
             });
         });
 
-    app.get('/main', (req, res) => {
+    app.get('/main', sessionValidation, (req, res) => {
       var point = req.session.points;
       res.render('main', {points: point});
     });
 
-    app.post('/addPoint',async (req,res) => {
+    app.post('/addPoint', sessionValidation, async (req,res) => {
       
       var currentPoints = req.session.points;
       const filter = { username: req.session.username };
@@ -187,8 +219,8 @@ async function connectToMongo() {
       const usersCollection = db.collection('users');
       const result = await usersCollection.updateOne(filter, updateDoc);
       req.session.points = currentPoints+5;
-      console.log(req.session.points);
-      res.redirect('/main');
+      console.log(result);
+      res.redirect('/main'); 
   });
 
     app.get('/post', (req, res) => {
