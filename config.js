@@ -90,16 +90,26 @@ async function connectToMongo() {
     }
 
     app.get('/', (req, res) => {
+      if (req.session.authenticated) {
+        res.redirect('/main');
+      }
+      else {
       let doc = fs.readFileSync("./html/index.html", "utf8");
       res.send(doc);
+      }
     });
 
     app.get('/signup', (req, res) => {
+      if (req.session.authenticated) {
+        res.redirect('/main');
+      }
+      else {
       let doc = fs.readFileSync('./html/signup.html', 'utf8');
       res.send(doc);
+      }
     });
 
-    app.get('/fitTasks', async (req, res) => {
+    app.get('/fitTasks', sessionValidation, async (req, res) => {
       var point = req.session.points;
       const usersCollection = db.collection('users');
       const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
@@ -107,6 +117,8 @@ async function connectToMongo() {
     });
 
     app.post('/signup', async (req, res) => {
+      
+      
       const usersCollection = db.collection('users');
       var username = req.body.username;
       var email = req.body.email;
@@ -153,8 +165,13 @@ async function connectToMongo() {
     });
 
     app.get('/login', (req, res) => {
+      if (req.session.authenticated) {
+        res.redirect('/main');
+      }
+      else {
       let doc = fs.readFileSync('./html/login.html', 'utf8');
       res.send(doc);
+      }
     });
 
     app.post('/login', async (req, res) => {
