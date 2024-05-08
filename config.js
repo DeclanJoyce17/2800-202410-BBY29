@@ -94,8 +94,7 @@ async function connectToMongo() {
         res.redirect('/main');
       }
       else {
-      let doc = fs.readFileSync("./html/index.html", "utf8");
-      res.send(doc);
+      res.render('index');
       }
     });
 
