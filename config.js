@@ -14,6 +14,8 @@ const bcrypt = require('bcrypt');
 
 const app = express();
 
+app.set('view engine', 'ejs')
+
 // Load environment variables from .env file
 require('dotenv').config();
 
@@ -102,8 +104,9 @@ async function connectToMongo() {
 
       const usersCollection = db.collection('users'); // Use the 'users' collection in BBY29 database
       try {
-        await usersCollection.insertOne({ username, email, password: hashedPassword });
+        await usersCollection.insertOne({ username, email, password: hashedPassword, points: 0});
         req.session.user = { username, email }; // Store user in session
+        req.session.points = 0;
         res.redirect('/main'); // Redirect to members area
       } catch (err) {
         console.error("Error registering user:", err);
@@ -163,9 +166,30 @@ async function connectToMongo() {
         });
 
     app.get('/main', (req, res) => {
-      let doc = fs.readFileSync('./html/main.html', 'utf8');
-      res.send(doc);
+      var point = req.session.points;
+      res.render('main', {points: point});
     });
+
+    app.post('/addPoint',async (req,res) => {
+      
+      var currentPoints = req.session.points;
+      const filter = { username: req.session.username };
+      /* Set the upsert option to insert a document if no documents match
+      the filter */
+      
+      // Specify the update to set a value for the plot field
+      const updateDoc = {
+        $set: {
+          points: currentPoints+5
+        },
+      };
+      // Update the first document that matches the filter
+      const usersCollection = db.collection('users');
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      req.session.points = currentPoints+5;
+      console.log(req.session.points);
+      res.redirect('/main');
+  });
 
     app.get('/post', (req, res) => {
       let doc = fs.readFileSync('./html/post.html', 'utf8');
