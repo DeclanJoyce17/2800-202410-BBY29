@@ -73,6 +73,10 @@ async function connectToMongo() {
       apiKey: process.env.GROQ_API_KEY
     });
 
+
+
+
+    //Valid Session Function
     function isValidSession(req) {
       if (req.session.authenticated) {
         return true;
@@ -80,6 +84,7 @@ async function connectToMongo() {
       return false;
     }
 
+    //Session Validation Middleware
     function sessionValidation(req, res, next) {
       if (isValidSession(req)) {
         next();
@@ -89,6 +94,7 @@ async function connectToMongo() {
       }
     }
 
+    //Index Page
     app.get('/', (req, res) => {
       if (req.session.authenticated) {
         res.redirect('/main');
@@ -98,6 +104,7 @@ async function connectToMongo() {
       }
     });
 
+    //Sign up page
     app.get('/signup', (req, res) => {
       if (req.session.authenticated) {
         res.redirect('/main');
@@ -108,6 +115,7 @@ async function connectToMongo() {
       }
     });
 
+    //FitTasks Page
     app.get('/fitTasks', sessionValidation, async (req, res) => {
       var point = req.session.points;
       const usersCollection = db.collection('users');
@@ -115,6 +123,7 @@ async function connectToMongo() {
       res.render('fitTasks', {points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2]});
     });
 
+    //Signup POST
     app.post('/signup', async (req, res) => {
       
       
@@ -154,15 +163,17 @@ async function connectToMongo() {
 
       var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, time: time, points: 0 });
+      await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0 , user_rank: 'Bronze'});
       console.log("Inserted user");
       req.session.authenticated = true;
       req.session.username = username;
       req.session.points = 0;
+      req.session.rank = 'Bronze';
       req.session.cookie.maxAge = expireTime;
       res.redirect('/main');
     });
 
+    //Login Page
     app.get('/login', (req, res) => {
       if (req.session.authenticated) {
         res.redirect('/main');
@@ -173,6 +184,7 @@ async function connectToMongo() {
       }
     });
 
+    //Login POST
     app.post('/login', async (req, res) => {
       const usersCollection = db.collection('users');
       var email = req.body.email;
@@ -186,7 +198,7 @@ async function connectToMongo() {
         return;
       }
 
-      const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1 }).toArray();
+      const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, user_rank: 1, _id: 1 }).toArray();
 
       console.log(result);
       if (result.length != 1) {
@@ -198,6 +210,7 @@ async function connectToMongo() {
         req.session.authenticated = true;
         req.session.username = result[0].username;
         req.session.points = result[0].points;
+        req.session.rank = result[0].user_rank;
         req.session.email = email;
         req.session.cookie.maxAge = expireTime;
 
@@ -210,6 +223,7 @@ async function connectToMongo() {
       }
     });
 
+    //Log Out Page
     app.get('/logout', (req, res) => {
       //destroy session
       req.session.destroy(err => {
@@ -220,11 +234,48 @@ async function connectToMongo() {
       });
     });
 
-    app.get('/main', sessionValidation, (req, res) => {
-      var point = req.session.points;
-      res.render('main', { points: point });
+    //Main Page
+    app.get('/main', sessionValidation, async (req, res) => {
+      var currentPoints = req.session.points;
+      console.log(currentPoints);
+        if (currentPoints < 50 && currentPoints >=0) {
+          req.session.rank = 'Bronze';
+          console.log('bronze');
+        }
+        else if(currentPoints > 49 && currentPoints < 100) {
+          req.session.rank = 'Silver';
+          console.log('silver');
+        }
+        else if(currentPoints > 99 && currentPoints < 150) {
+          req.session.rank = 'Gold';
+          console.log('gold');
+        }
+        else if(currentPoints > 149 && currentPoints < 200) {
+          req.session.rank = 'Platinum';
+          console.log('platinum');
+        }
+        else if(currentPoints > 199 && currentPoints < 250) {
+          req.session.rank = 'Diamond';
+          console.log('diamond');
+        }
+        else {
+          req.session.rank = 'Limit Reached';
+        }
+        const filter = { username: req.session.username };
+     
+      const updateDoc = {
+        $set: {
+          user_rank: req.session.rank
+        },
+      };
+      
+      const usersCollection = db.collection('users');
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      console.log(result);
+      res.render('main', { points: currentPoints, rank: req.session.rank });
     });
 
+    //Adding points POST
     app.post('/addPoint', sessionValidation, async (req, res) => {
 
       var currentPoints = req.session.points;
@@ -246,20 +297,22 @@ async function connectToMongo() {
       res.redirect('/main');
     });
 
+
+ 
+    
+
+    //Adding points to Fitness Page
     app.post('/addPointFit', sessionValidation, async (req, res) => {
 
       var currentPoints = req.session.points;
       const filter = { username: req.session.username };
-      /* Set the upsert option to insert a document if no documents match
-      the filter */
-
-      // Specify the update to set a value for the plot field
+     
       const updateDoc = {
         $set: {
           points: currentPoints + 5
         },
       };
-      // Update the first document that matches the filter
+      
       const usersCollection = db.collection('users');
       const result = await usersCollection.updateOne(filter, updateDoc);
       req.session.points = currentPoints + 5;
@@ -267,11 +320,15 @@ async function connectToMongo() {
       res.redirect('/fitTasks');
     });
 
+    /*
     app.get('/post', (req, res) => {
       let doc = fs.readFileSync('./html/post.html', 'utf8');
       res.send(doc);
     });
+    */
 
+
+    //Groq Chat bot POST (not working rn)
     app.post('/GroqChatCompletion', async (req, res) => {
 
       const userInput = req.body.question;
