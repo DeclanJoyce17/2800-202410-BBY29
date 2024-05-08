@@ -94,8 +94,8 @@ async function connectToMongo() {
         res.redirect('/main');
       }
       else {
-      let doc = fs.readFileSync("./html/index.html", "utf8");
-      res.send(doc);
+        let doc = fs.readFileSync("./html/index.html", "utf8");
+        res.send(doc);
       }
     });
 
@@ -104,21 +104,24 @@ async function connectToMongo() {
         res.redirect('/main');
       }
       else {
-      let doc = fs.readFileSync('./html/signup.html', 'utf8');
-      res.send(doc);
+        let doc = fs.readFileSync('./html/signup.html', 'utf8');
+        res.send(doc);
       }
     });
 
     app.get('/fitTasks', sessionValidation, async (req, res) => {
+
       var point = req.session.points;
       const usersCollection = db.collection('users');
       const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
-      res.render('fitTasks', {points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2]});
+      res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
+
+
     });
 
     app.post('/signup', async (req, res) => {
-      
-      
+
+
       const usersCollection = db.collection('users');
       var username = req.body.username;
       var email = req.body.email;
@@ -169,8 +172,8 @@ async function connectToMongo() {
         res.redirect('/main');
       }
       else {
-      let doc = fs.readFileSync('./html/login.html', 'utf8');
-      res.send(doc);
+        let doc = fs.readFileSync('./html/login.html', 'utf8');
+        res.send(doc);
       }
     });
 
@@ -286,7 +289,7 @@ async function connectToMongo() {
       }
     });
 
-    
+
 
     async function getGroqChatCompletion(userInput) {
       return groq.chat.completions.create({
