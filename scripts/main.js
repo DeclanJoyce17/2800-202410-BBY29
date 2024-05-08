@@ -20,6 +20,12 @@ function getNameFromAuth() {
 }
 getNameFromAuth(); //run the function
 
+function redirectToLogout(event) {
+    console.log("redirecting");
+    event.preventDefault();
+    window.location.href = '/logout';
+}
+
 
 
 
