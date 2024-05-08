@@ -254,8 +254,8 @@ footer {
 }
 
 .title {
-    padding-top: 120px;
-    padding-left: 132px;
+    padding-top: 90px;
+    padding-left: 135px;
     padding-bottom: 20px;
 }
 
@@ -273,8 +273,15 @@ footer {
 }
 
 .btn {
+    display: inline;
     width: 50px;
     position:relative;
     left: 185px;
     font-size: 10px;
+    bottom: 5px;
+    
+}
+
+.inline {
+    display: inline;
 }
