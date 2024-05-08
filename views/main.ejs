@@ -1,48 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Welcome to FitUp</title>
-  <meta name="Comp2800 template" content="FitUp">
-
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Bootstrap Library CSS CDN go here -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-
-  <!-- Boostrap Library JS CDN  go here -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
-    </script>
-
-  <!-- Other libraries CSS CDN go here -->
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500&display=swap" rel="stylesheet" />
-
-  <!-- Other Libraries JS CDN go here -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-  <!-- Google Icons-->
-
-  <!-- Google Fonts-->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-  <!-- Link to styles of our own -->
-  <link rel="stylesheet" href="../styles/style.css">
-
-  <!-- <style sheet> -->
-  <link rel="stylesheet" type="text/css" href="/styles/main.css">
-
-</head>
-
-<body>
+<%- include("templates/header") %>
   <!-- nav bar -->
   <nav>
     <br>
-    <a href="index.html">
+    <a href="fitTasks">
       <input type="image" class="navButton" src="../img/FitnessButton.png">
     </a>
     <a href="index.html">
@@ -68,11 +28,9 @@
     </h4>
     <div class="col-lg-6 mx-auto">
       <div class="navText">
-        Points: <p><%= points %></p>
+        <h1>Points:<%= points %></h1>
       </div>
-      <form method="post" action="/addPoint">
-        <button>Add Points</button>
-      </form>
+      
     </div>
 
   <!-- Leader board -->
@@ -122,26 +80,6 @@
   <!-- task container -->
   <div class="row row-cols-4 row-cols-md-4 g-4" id="taskEntriesContainer"></div>
   
-  <br><button onclick="redirectToLogout(event)" class="btn">Logout</button>
+  <br><a href="/logout"><button class="btn btn-secondary float-right" type="submit">Log Out</button></a>
   <!-- Footer -->
-  <footer>
-    <a href="index.html">
-      <input type="image" class="footerButton" src="../img/23-user-group.svg">
-    </a>
-    <a href="index.html">
-      <input type="image" class="footerButton" src="../img/35-home-general.svg">
-    </a>
-    <a href="index.html">
-      <input type="image" class="footerButton" src="../img/22-user.svg">
-    </a>
-  </footer>
-
-  <!-- Link to scripts of our own -->
-  <script src="/scripts/firebaseAPI_TEAMBBY29.js"></script>
-  <script src="/scripts/authentication.js"></script>
-  <script src="/scripts/main.js"></script>
-  <script src="/scripts/skeleton.js"></script>
-
-</body>
-
-</html>
+  <%- include("templates/footer") %>

@@ -100,9 +100,10 @@ async function connectToMongo() {
     });
 
     app.get('/fitTasks', async (req, res) => {
+      var point = req.session.points;
       const usersCollection = db.collection('users');
       const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
-      res.render('fitTasks', {task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2]});
+      res.render('fitTasks', {points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2]});
     });
 
     app.post('/signup', async (req, res) => {
@@ -229,6 +230,27 @@ async function connectToMongo() {
       res.redirect('/main');
     });
 
+    app.post('/addPointFit', sessionValidation, async (req, res) => {
+
+      var currentPoints = req.session.points;
+      const filter = { username: req.session.username };
+      /* Set the upsert option to insert a document if no documents match
+      the filter */
+
+      // Specify the update to set a value for the plot field
+      const updateDoc = {
+        $set: {
+          points: currentPoints + 5
+        },
+      };
+      // Update the first document that matches the filter
+      const usersCollection = db.collection('users');
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      req.session.points = currentPoints + 5;
+      console.log(result);
+      res.redirect('/fitTasks');
+    });
+
     app.get('/post', (req, res) => {
       let doc = fs.readFileSync('./html/post.html', 'utf8');
       res.send(doc);
@@ -247,6 +269,7 @@ async function connectToMongo() {
       }
     });
 
+    
 
     async function getGroqChatCompletion(userInput) {
       return groq.chat.completions.create({
