@@ -99,51 +99,57 @@ async function connectToMongo() {
       res.send(doc);
     });
 
+    app.get('/fitTasks', async (req, res) => {
+      const usersCollection = db.collection('users');
+      const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
+      res.render('fitTasks', {task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2]});
+    });
+
     app.post('/signup', async (req, res) => {
       const usersCollection = db.collection('users');
       var username = req.body.username;
-    var email = req.body.email;
-    var password = req.body.password;
-    
-    if (username.length == 0 || username == null) {
+      var email = req.body.email;
+      var password = req.body.password;
+
+      if (username.length == 0 || username == null) {
         res.send(`Name is required. <br> <a href='/signup'>Try Again</a>`);
         return;
-    }
-    else if (email.length == 0 || email == null) {
+      }
+      else if (email.length == 0 || email == null) {
         res.send(`Email is required. <br> <a href='/signup'>Try Again</a>`);
         return;
-    }
-    else if(password.length == 0 || password == null) {
+      }
+      else if (password.length == 0 || password == null) {
         res.send(`Password is required. <br> <a href='/signup'>Try Again</a>`);
         return;
-    }
+      }
 
-    const d = new Date();   
-    var time = d.getTime();
-	const schema = Joi.object(
-		{
-			username: Joi.string().alphanum().max(20).required(),
-            email: Joi.string().max(35).required(),
-			password: Joi.string().max(20).required()
-		});
-	
-	const validationResult = schema.validate({username, email, password});
-	if (validationResult.error != null) {
-	   console.log(validationResult.error);
-	   res.redirect("/signup");
-	   return;
-   }
+      const d = new Date();
+      var time = d.getTime();
+      const schema = Joi.object(
+        {
+          username: Joi.string().alphanum().max(20).required(),
+          email: Joi.string().max(35).required(),
+          password: Joi.string().max(20).required()
+        });
 
-    var hashedPassword = await bcrypt.hash(password, saltRounds);
-	
-	await usersCollection.insertOne({username: username, email: email, password: hashedPassword, time: time, points: 0});
-	console.log("Inserted user");
-    req.session.authenticated = true;
-	req.session.username = username;
-    req.session.points = 0;
-	req.session.cookie.maxAge = expireTime;
-    res.redirect('/main');
-});
+      const validationResult = schema.validate({ username, email, password });
+      if (validationResult.error != null) {
+        console.log(validationResult.error);
+        res.redirect("/signup");
+        return;
+      }
+
+      var hashedPassword = await bcrypt.hash(password, saltRounds);
+
+      await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, time: time, points: 0 });
+      console.log("Inserted user");
+      req.session.authenticated = true;
+      req.session.username = username;
+      req.session.points = 0;
+      req.session.cookie.maxAge = expireTime;
+      res.redirect('/main');
+    });
 
     app.get('/login', (req, res) => {
       let doc = fs.readFileSync('./html/login.html', 'utf8');
@@ -154,74 +160,74 @@ async function connectToMongo() {
       const usersCollection = db.collection('users');
       var email = req.body.email;
       var password = req.body.password;
-  
-    const schema = Joi.string().max(35).required();
-    const validationResult = schema.validate(email);
-    if (validationResult.error != null) {
-          res.send(`Invalid email or password combination. 1<br> <a href='/login'>Try Again</a>`);
-      return;
-       return;
-    }
-  
-    const result = await usersCollection.find({email: email}).project({email: 1, username: 1, password: 1, points: 1, _id: 1}).toArray();
-  
-    console.log(result);
-    if (result.length != 1) {
-      res.send(`Invalid email or password combination. 2<br> <a href='/login'>Try Again</a>`);
-      return;
-    }
-    if (await bcrypt.compare(password, result[0].password)) {
-      console.log("correct password");
-      req.session.authenticated = true;
-          req.session.username = result[0].username;
-          req.session.points = result[0].points;
-      req.session.email = email;
-      req.session.cookie.maxAge = expireTime;
-  
-      res.redirect('/main');
-      return;
-    }
-    else {
-      res.send(`Invalid email or password combination. 3<br> <a href='/login'>Try Again</a>`);
-      return;
-    }
-  });
+
+      const schema = Joi.string().max(35).required();
+      const validationResult = schema.validate(email);
+      if (validationResult.error != null) {
+        res.send(`Invalid email or password combination. 1<br> <a href='/login'>Try Again</a>`);
+        return;
+        return;
+      }
+
+      const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1 }).toArray();
+
+      console.log(result);
+      if (result.length != 1) {
+        res.send(`Invalid email or password combination. 2<br> <a href='/login'>Try Again</a>`);
+        return;
+      }
+      if (await bcrypt.compare(password, result[0].password)) {
+        console.log("correct password");
+        req.session.authenticated = true;
+        req.session.username = result[0].username;
+        req.session.points = result[0].points;
+        req.session.email = email;
+        req.session.cookie.maxAge = expireTime;
+
+        res.redirect('/main');
+        return;
+      }
+      else {
+        res.send(`Invalid email or password combination. 3<br> <a href='/login'>Try Again</a>`);
+        return;
+      }
+    });
 
     app.get('/logout', (req, res) => {
-            //destroy session
-            req.session.destroy(err => {
-                if (err) {
-                    console.error('Error destroying session:', err);
-                }
-                res.redirect('/');
-            });
-        });
+      //destroy session
+      req.session.destroy(err => {
+        if (err) {
+          console.error('Error destroying session:', err);
+        }
+        res.redirect('/');
+      });
+    });
 
     app.get('/main', sessionValidation, (req, res) => {
       var point = req.session.points;
-      res.render('main', {points: point});
+      res.render('main', { points: point });
     });
 
-    app.post('/addPoint', sessionValidation, async (req,res) => {
-      
+    app.post('/addPoint', sessionValidation, async (req, res) => {
+
       var currentPoints = req.session.points;
       const filter = { username: req.session.username };
       /* Set the upsert option to insert a document if no documents match
       the filter */
-      
+
       // Specify the update to set a value for the plot field
       const updateDoc = {
         $set: {
-          points: currentPoints+5
+          points: currentPoints + 5
         },
       };
       // Update the first document that matches the filter
       const usersCollection = db.collection('users');
       const result = await usersCollection.updateOne(filter, updateDoc);
-      req.session.points = currentPoints+5;
+      req.session.points = currentPoints + 5;
       console.log(result);
-      res.redirect('/main'); 
-  });
+      res.redirect('/main');
+    });
 
     app.get('/post', (req, res) => {
       let doc = fs.readFileSync('./html/post.html', 'utf8');
@@ -260,9 +266,9 @@ async function connectToMongo() {
     // };
 
     // Route for handling 404 Not Found
-        app.get('*', (req, res) => {
-            res.status(404).send('Page not found - 404');
-        });
+    app.get('*', (req, res) => {
+      res.status(404).send('Page not found - 404');
+    });
 
     app.listen(port, () => {
       console.log("Node appplication listening on port " + port);

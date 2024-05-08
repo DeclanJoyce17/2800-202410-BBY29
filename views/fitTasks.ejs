@@ -1,0 +1,35 @@
+<%- include("templates/header") %>
+    <!-- Chatbot -->
+    <form id="Chatter">
+        <input type="text" id="question" name="chatbot" placeholder="Ask Me Anything!">
+        <button type="submit">Send</button>
+    </form>
+
+    <!--Contents in the body tag-->
+    <img class="title" src="/img/FitnessLogo.png" alt="logo">
+    <div class="container taskCards">
+
+        <div class="card">
+            <div class="card-body">
+                <%= task1 %>
+            </div>
+            <p><button class="btn btn-secondary float-right" type="submit">Done</button> <button
+                    class="btn btn-secondary float-right" type="submit">Reroll</button></p>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <%= task2 %>
+            </div>
+            <p><button class="btn btn-secondary float-right" type="submit">Done</button> <button
+                    class="btn btn-secondary float-right" type="submit">Reroll</button></p>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <%= task3 %>
+            </div>
+            <p><button class="btn btn-secondary float-right" type="submit">Done</button> <button
+                    class="btn btn-secondary float-right" type="submit">Reroll</button></p>
+        </div>
+
+    </div>
+    <%- include("templates/footer") %>
