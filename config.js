@@ -200,7 +200,7 @@ async function connectToMongo() {
         return;
       }
 
-      const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, user_rank: 1, _id: 1 }).toArray();
+      const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1 }).toArray();
 
       console.log(result);
       if (result.length != 1) {
@@ -236,6 +236,45 @@ async function connectToMongo() {
       });
     });
 
+    //Main Page
+    app.get('/main', sessionValidation, async (req, res) => {
+      var currentPoints = req.session.points;
+      console.log(currentPoints);
+        if (currentPoints < 50 && currentPoints >=0) {
+          req.session.rank = 'Bronze';
+          console.log('bronze');
+        }
+        else if(currentPoints > 49 && currentPoints < 100) {
+          req.session.rank = 'Silver';
+          console.log('silver');
+        }
+        else if(currentPoints > 99 && currentPoints < 150) {
+          req.session.rank = 'Gold';
+          console.log('gold');
+        }
+        else if(currentPoints > 149 && currentPoints < 200) {
+          req.session.rank = 'Platinum';
+          console.log('platinum');
+        }
+        else if(currentPoints > 199 && currentPoints < 250) {
+          req.session.rank = 'Diamond';
+          console.log('diamond');
+        }
+        else {
+          req.session.rank = 'Limit Reached';
+        }
+        const filter = { username: req.session.username };
+     
+      const updateDoc = {
+        $set: {
+          user_rank: req.session.rank
+        },
+      };
+      
+      const usersCollection = db.collection('users');
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      console.log(result);
+      res.render('main', { points: currentPoints, rank: req.session.rank });
     //Main Page
     app.get('/main', sessionValidation, async (req, res) => {
       var currentPoints = req.session.points;
