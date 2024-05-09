@@ -1,113 +1,52 @@
-"use strict";
+This is dev."use strict";
 // Load environment variables from .env file
 require('dotenv').config();
 const fs = require("fs");
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const { MongoClient } = require('mongodb').MongoClient;
-const { GridFSBucket } = require('mongodb');
+const { MongoClient, GridFSBucket } = require('mongodb');
 const path = require('path');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const multer = require('multer')
 
+// Load utility functions from utils.js
 require("./utils.js");
 
+// initialize Express app
 const app = express();
 const port = process.env.PORT || 3000;
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
 
+// Set EJS as the templating engine
+app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
+
 // first, store files in memory as Buffer objects by using multer
 const storage = multer.memoryStorage()
 // telling multer to use the previously defined memory storage for storing the files.
-const upload = multer({storage:storage});
+const upload = multer({ storage: storage });
 
 
-/************ uploading images ****************/
+/*********** connecting mongo ***************/
+/************ uploading images link with the user ID ****************/
 
-let db, bucket;
-// Initialize MongoDB and GridFS
-// ensuring that the MongoDB connection 
-// and GridFS initialization are completed before proceeding further.
-async function initMongoDB() {
-  const client = new MongoClient(mongoUri);
+async function connectToMongo() {
+  const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  // MongoDB and GridFS Initialization
   try {
     await client.connect();
     db = client.db('BBY29');
     bucket = new GridFSBucket(db, { bucketName: 'profileImg' });
     console.log('Connected to MongoDB and GridFS initialized!');
   } catch (err) {
-    console.error("Connection error:", err);
+    console.error("Failed to connect to MongoDB:", err);
     process.exit(1);
   }
-}
-initMongoDB();
-
-// Save image to MongoDB using GridFS
-async function saveImageToMongoDB(fileBuffer, contentType, filename) {
-  try {
-    const uploadStream = bucket.openUploadStream(filename, { metadata: { contentType } });
-    uploadStream.write(fileBuffer);
-    uploadStream.end(fileBuffer);
-    return new Promise((resolve, reject) => {
-      uploadStream.on('finish', () => resolve(uploadStream.id));
-      uploadStream.on('error', error);
-    });
-  } catch (error) {
-    console.error('Failed to save image:', error);
-    throw error;
-  }
-}
-
-// Express route to get an image by filename
-app.get('/images/:filename', async (req, res) => {
-  try {
-      // Assuming 'userId' is the key where the user ID is stored in the session
-      const userId = req.session.userId; 
-      const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
-
-      // Set the proper content type before sending the stream
-      downloadStream.on('file', (file) => {
-          res.type(file.contentType);
-      });
-      // Pipe the image data to the response
-      downloadStream.pipe(res);
-  } catch (error) {
-      console.error('Failed to retrieve image:', error);
-      res.status(404).send('Image not found');
-  }
-});
-
-// Route to upload images
-app.post('/upload', upload.single('image'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).send('No file uploaded.');
-  }
-  try {
-    const filename = req.file.originalname;
-    const fileId = await saveImageToMongoDB(req.file.buffer, req.file.mimetype, filename);
-    // res.send(`Image uploaded successfully with ID: ${fileId}`);
-    alert("Image uploaded successfully with ID: ${fileId}");
-    res.redirect('/main');
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).send(`Failed to upload image: ${error.message}`);
-  }
-});
-
-app.get('')
-
-/*********** connecting mongo ***************/
-
-async function connectToMongo() {
-  const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
-  try {
-    await client.connect();
     console.log('Connected to MongoDB!');
     // Configure session middleware
     app.use(session({
@@ -117,6 +56,8 @@ async function connectToMongo() {
       store: MongoStore.create({
         mongoUrl: mongoUri,
         dbName: 'BBY29',
+        collection: 'sessions',
+        stringify: false,
         crypto: {
           secret: nodeSessionSecret,
           algorithm: 'aes-256-cbc',
@@ -130,6 +71,12 @@ async function connectToMongo() {
         maxAge: 1 * 60 * 60 * 1000 // Session expiration (1 hour)
       }
     }));
+
+    // Logging session data for debugging
+    app.use((req, res, next) => {
+      console.log(`Session data: ${JSON.stringify(req.session)}`);
+      next();
+    });
 
     app.use("/scripts", express.static("./scripts"));
     app.use('/html', express.static('./html'));
@@ -151,7 +98,7 @@ async function connectToMongo() {
       res.send(doc);
     });
 
-  
+
     app.get('/signup', (req, res) => {
       let doc = fs.readFileSync('./html/signup.html', 'utf8');
       res.send(doc);
@@ -230,14 +177,14 @@ async function connectToMongo() {
     });
 
     app.get('/logout', (req, res) => {
-            //destroy session
-            req.session.destroy(err => {
-                if (err) {
-                    console.error('Error destroying session:', err);
-                }
-                res.redirect('/');
-            });
-        });
+      //destroy session
+      req.session.destroy(err => {
+        if (err) {
+          console.error('Error destroying session:', err);
+        }
+        res.redirect('/');
+      });
+    });
 
     app.get('/main', (req, res) => {
       let doc = fs.readFileSync('./html/main.html', 'utf8');
@@ -261,7 +208,7 @@ async function connectToMongo() {
         res.status(500).json({ error: error.message });
       }
     });
-    
+
 
     async function getGroqChatCompletion(userInput) {
       return groq.chat.completions.create({
@@ -275,25 +222,97 @@ async function connectToMongo() {
       });
     }
 
-    // module.exports = {
-    //     main,
-    //     getGroqChatCompletion
-    // };
+    // Route to upload images
+    app.post('/upload', upload.single('image'), async (req, res) => {
+      if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+      }
+      if (!req.session || !req.session.user) {
+        return res.status(401).send('Unauthorized access.');
+      }
 
-    // Route for handling 404 Not Found
-        app.get('*', (req, res) => {
-            res.status(404).send('Page not found - 404');
-        });
+      const userId = req.session.user._id;
+      const filename = req.file.originalname;
+      const contentType = req.file.mimetype;
+      const fileBuffer = req.file.buffer;
 
-    app.listen(port, () => {
-      console.log("Node appplication listening on port " + port);
+      try {
+        const metadata = { contentType, userId };
+        const fileId = await saveImageToMongoDB(fileBuffer, metadata, filename);
+        console.log("File uploaded successfully with ID:", fileId);
+        res.redirect('/main');
+      } catch (error) {
+        console.error('Upload error:', error);
+        res.status(500).send(`Failed to upload image: ${error.message}`);
+      }
     });
 
-  } catch (err) {
-    console.error("Connection error:", err);
-    process.exit(1); // Exit with error if connection fails
+    app.get('/user-images', async (req, res) => {
+      if (!req.session || !req.session.user) {
+        return res.status(401).send('Unauthorized access');
+      }
+
+      const userId = req.session.user._id;  // Assuming user's ID is stored in session
+      try {
+        const imagesCursor = bucket.find({ "metadata.userId": userId });
+        const images = await imagesCursor.toArray();
+        res.render('userImages', { images });  // Passing images to a template
+      } catch (error) {
+        console.error('Failed to retrieve images:', error);
+        res.status(500).send('Failed to retrieve images due to an internal error');
+      }
+    });
+
+    async function saveImageToMongoDB(fileBuffer, metadata, filename) {
+      const uploadStream = bucket.openUploadStream(filename, { metadata });
+      uploadStream.write(fileBuffer);
+      uploadStream.end();
+
+      return new Promise((resolve, reject) => {
+        uploadStream.on('finish', () => resolve(uploadStream.id));
+        uploadStream.on('error', reject);
+      });
+
+  } catch (error) {
+    console.error('Failed to retrieve image:', error);
+    res.status(404).send('Image not found');
   }
+};
 
-}
+// Route to serve images from GridFS
+app.get('/images/:filename', async (req, res) => {
+  const filename = req.params.filename;
+  try {
+    const downloadStream = bucket.openDownloadStreamByName(filename);
+    res.setHeader('Content-Type', 'image/jpeg');  // Set the content type based on the image type, you might need to store this information or detect it
+    downloadStream.pipe(res);  // Stream the image from GridFS directly to the response
+  } catch (error) {
+    console.error('Error serving image:', error);
+    res.status(404).send('Image not found');
+  }
+});
 
+// module.exports = {
+//     main,
+//     getGroqChatCompletion
+// };
+
+// Route for handling 404 Not Found
+app.get('*', (req, res) => {
+  res.status(404).send('Page not found - 404');
+});
+
+app.listen(port, () => {
+  console.log(`Node application listening on port ${port}`);
+  initMongoDB().catch(err => {
+    console.error("Failed to connect to MongoDB:", err);
+    process.exit(1);
+  });
+});
 connectToMongo().catch(console.error);
+
+
+/*---------------------------------------------------------------------------
+
+Eventually want to add "user id" when user upload the image into Mongo DB */
+

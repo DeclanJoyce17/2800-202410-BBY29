@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Images</title>
+</head>
+<body>
+    <h1>Uploaded Images</h1>
+    <% if (images.length > 0) { %>
+        <% images.forEach(function(image) { %>
+            <img src="/images/<%= image.filename %>" alt="User Image" style="width: 150px; height: auto;">
+        <% }); %>
+    <% } else { %>
+        <p>No images to display.</p>
+    <% } %>
+</body>
+</html>
