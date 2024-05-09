@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>User Images</title>
-</head>
-<body>
+<%- include ("tempates/header")%
     <h1>Uploaded Images</h1>
     <% if (images.length > 0) { %>
         <% images.forEach(function(image) { %>
@@ -13,5 +7,4 @@
     <% } else { %>
         <p>No images to display.</p>
     <% } %>
-</body>
-</html>
+<%- include ("tempates/footer")%

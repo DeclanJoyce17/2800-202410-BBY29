@@ -5,8 +5,7 @@ const fs = require("fs");
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const { MongoClient } = require('mongodb').MongoClient;
-const { GridFSBucket } = require('mongodb');
+const { MongoClient, GridFSBucket } = require('mongodb');
 const path = require('path');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
@@ -24,8 +23,10 @@ app.use(express.urlencoded({ extended: true })); // Middleware to parse form dat
 // first, store files in memory as Buffer objects by using multer
 const storage = multer.memoryStorage()
 // telling multer to use the previously defined memory storage for storing the files.
-const upload = multer({storage:storage});
-
+const upload = multer({ storage: storage });
+//to use EJS to render our ejs files as HTML
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 /************ uploading images ****************/
 
@@ -52,33 +53,36 @@ async function saveImageToMongoDB(fileBuffer, contentType, filename) {
   try {
     const uploadStream = bucket.openUploadStream(filename, { metadata: { contentType } });
     uploadStream.write(fileBuffer);
-    uploadStream.end(fileBuffer);
+    uploadStream.end();
     return new Promise((resolve, reject) => {
       uploadStream.on('finish', () => resolve(uploadStream.id));
-      uploadStream.on('error', error);
+      uploadStream.on('error', (error) => {
+        console.error('Failed to save image:', error);
+        reject(error);
+      });
     });
   } catch (error) {
-    console.error('Failed to save image:', error);
-    throw error;
+      console.error('Failed to save image:', error);
+      throw error;
   }
 }
 
 // Express route to get an image by filename
 app.get('/images/:filename', async (req, res) => {
   try {
-      // Assuming 'userId' is the key where the user ID is stored in the session
-      const userId = req.session.userId; 
-      const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
+    // Assuming 'userId' is the key where the user ID is stored in the session
+    const userId = req.session.userId;
+    const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
 
-      // Set the proper content type before sending the stream
-      downloadStream.on('file', (file) => {
-          res.type(file.contentType);
-      });
-      // Pipe the image data to the response
-      downloadStream.pipe(res);
+    // Set the proper content type before sending the stream
+    downloadStream.on('file', (file) => {
+      res.type(file.contentType);
+    });
+    // Pipe the image data to the response
+    downloadStream.pipe(res);
   } catch (error) {
-      console.error('Failed to retrieve image:', error);
-      res.status(404).send('Image not found');
+    console.error('Failed to retrieve image:', error);
+    res.status(404).send('Image not found');
   }
 });
 
@@ -90,16 +94,12 @@ app.post('/upload', upload.single('image'), async (req, res) => {
   try {
     const filename = req.file.originalname;
     const fileId = await saveImageToMongoDB(req.file.buffer, req.file.mimetype, filename);
-    // res.send(`Image uploaded successfully with ID: ${fileId}`);
-    alert("Image uploaded successfully with ID: ${fileId}");
-    res.redirect('/main');
+    res.send(`Image uploaded successfully with ID: ${fileId}`);
   } catch (error) {
     console.error('Upload error:', error);
     res.status(500).send(`Failed to upload image: ${error.message}`);
   }
 });
-
-app.get('')
 
 /*********** connecting mongo ***************/
 
@@ -151,7 +151,7 @@ async function connectToMongo() {
       res.send(doc);
     });
 
-  
+
     app.get('/signup', (req, res) => {
       let doc = fs.readFileSync('./html/signup.html', 'utf8');
       res.send(doc);
@@ -230,24 +230,49 @@ async function connectToMongo() {
     });
 
     app.get('/logout', (req, res) => {
-            //destroy session
-            req.session.destroy(err => {
-                if (err) {
-                    console.error('Error destroying session:', err);
-                }
-                res.redirect('/');
-            });
-        });
-
-    app.get('/main', (req, res) => {
-      let doc = fs.readFileSync('./html/main.html', 'utf8');
-      res.send(doc);
+      //destroy session
+      req.session.destroy(err => {
+        if (err) {
+          console.error('Error destroying session:', err);
+        }
+        res.redirect('/');
+      });
     });
 
-    app.get('/post', (req, res) => {
-      let doc = fs.readFileSync('./html/post.html', 'utf8');
-      res.send(doc);
-    });
+    //main page - check the user, display the remained tasks, display the user name in the current session;
+    app.get('/main', async (req, res) => {
+
+      if (!req.session.user || !req.session.user.username) {
+          res.redirect('/login');  // Redirect to login if no user session
+          return;
+      }
+  
+      let doc = fs.readFileSync('./html/main.html', 'utf8'); // Ensure this path is correct
+  
+      try {
+          const usersCollection = db.collection('users');
+          const user = await usersCollection.findOne({ username: req.session.user.username });
+  
+          if (!user || !user.fitTasks) {
+              console.error('User not found or no tasks available');
+              doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', '<p>No tasks on your list</p>');
+              res.status(404).send(doc);
+              return;
+          }
+  
+        // Generate tasks HTML
+        let tasksHtml = user.fitTasks.map(task => `<li>${task}</li>`).join('');
+        
+        // written in comment form, because those will be in HTML
+        doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', tasksHtml);
+        doc = doc.replace('<!-- USERNAME_PLACEHOLDER -->', `${req.session.user.username}`);
+  
+          res.send(doc);
+      } catch (err) {
+          console.error("Error fetching user or tasks:", err);
+          res.status(500).send('Failed to fetch user data');
+      }
+  });
 
     app.post('/GroqChatCompletion', async (req, res) => {
 
@@ -261,7 +286,6 @@ async function connectToMongo() {
         res.status(500).json({ error: error.message });
       }
     });
-    
 
     async function getGroqChatCompletion(userInput) {
       return groq.chat.completions.create({
@@ -281,9 +305,9 @@ async function connectToMongo() {
     // };
 
     // Route for handling 404 Not Found
-        app.get('*', (req, res) => {
-            res.status(404).send('Page not found - 404');
-        });
+    app.get('*', (req, res) => {
+      res.status(404).send('Page not found - 404');
+    });
 
     app.listen(port, () => {
       console.log("Node appplication listening on port " + port);
@@ -295,5 +319,4 @@ async function connectToMongo() {
   }
 
 }
-
 connectToMongo().catch(console.error);
