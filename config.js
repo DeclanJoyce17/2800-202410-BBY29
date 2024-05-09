@@ -333,7 +333,8 @@ async function connectToMongo() {
 		//main page - check the user, display the remained tasks, display the user name in the current session;
 		app.get('/main', async (req, res) => {
 
-			if (!req.session.user || !req.session.user.username) {
+			if (!req.session.authenticated) {
+				console.log("nope");
 				res.redirect('/login');  // Redirect to login if no user session
 				return;
 			}
@@ -377,7 +378,7 @@ async function connectToMongo() {
 			let doc = fs.readFileSync('./html/main.html', 'utf8'); // Ensure this path is correct
 
 			try {
-				const user = await usersCollection.findOne({ username: req.session.user.username });
+				const user = await usersCollection.findOne({ username: req.session.username });
 
 				if (!user || !user.fitTasks) {
 					console.error('User not found or no tasks available');
@@ -391,7 +392,7 @@ async function connectToMongo() {
 
 				// written in comment form, because those will be in HTML
 				doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', tasksHtml);
-				doc = doc.replace('<!-- USERNAME_PLACEHOLDER -->', `${req.session.user.username}`);
+				doc = doc.replace('<!-- USERNAME_PLACEHOLDER -->', `${req.session.username}`);
 
 				res.send(doc);
 			} catch (err) {
@@ -532,36 +533,24 @@ async function connectToMongo() {
 			});
 		}
 
-	async function getGroqChatCompletion(userInput) {
-		return groq.chat.completions.create({
-			messages: [
-				{
-					role: "user",
-					content: userInput
-				}
-			],
-			model: "mixtral-8x7b-32768"
+		// module.exports = {
+		//     main,
+		//     getGroqChatCompletion
+		// };
+
+		// Route for handling 404 Not Found
+		app.get('*', (req, res) => {
+			res.status(404).send('Page not found - 404');
 		});
+
+		app.listen(port, () => {
+			console.log("Node appplication listening on port " + port);
+		});
+
+	} catch (err) {
+		console.error("Connection error:", err);
+		process.exit(1); // Exit with error if connection fails
 	}
-
-	// module.exports = {
-	//     main,
-	//     getGroqChatCompletion
-	// };
-
-	// Route for handling 404 Not Found
-	app.get('*', (req, res) => {
-		res.status(404).send('Page not found - 404');
-	});
-
-	app.listen(port, () => {
-		console.log("Node appplication listening on port " + port);
-	});
-
-} catch (err) {
-	console.error("Connection error:", err);
-	process.exit(1); // Exit with error if connection fails
-}
 
 }
 connectToMongo().catch(console.error);

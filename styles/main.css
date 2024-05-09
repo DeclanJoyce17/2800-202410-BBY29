@@ -244,3 +244,7 @@ footer {
     border: none;
     text-decoration: none;
 }
+
+.taskplace_holder {
+    font-size: 30px;
+}
