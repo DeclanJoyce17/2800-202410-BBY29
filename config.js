@@ -23,6 +23,8 @@ const port = process.env.PORT || 3000;
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
 
+const taskBank = ["Do 20 pushups", "Do 20 situps", "Do 20 squats", "Do 20 crunches", "Do 10 burpees", "Plank for 1 minute", "Do 30 jumping jacks", "Run 2 kilometers", "Hold a L sit for 15 seconds"];
+
 async function connectToMongo() {
   const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -297,7 +299,20 @@ async function connectToMongo() {
       res.redirect('/main');
     });
 
-
+    app.post('/rerollFit1', sessionValidation, async (req, res) => {
+      const usersCollection = db.collection('users');
+      var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
+      
+      const updateDoc = {
+        $set: {
+          fitTasks: [taskBank[Math.floor(Math.random() * taskBank.length)], result[0].fitTasks[1], result[0].fitTasks[2]]
+        },
+      };
+      
+      result = await usersCollection.updateOne(result[0], updateDoc);
+      console.log(result);
+      res.redirect('/fitTasks');
+    });
  
     
 
