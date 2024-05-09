@@ -1,17 +1,19 @@
-
 "use strict";
+// Load environment variables from .env file
+require('dotenv').config();
 const fs = require("fs");
-
-require("./utils.js");
-
-const { MongoClient } = require('mongodb');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const { MongoClient, GridFSBucket } = require('mongodb');
 const path = require('path');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
+const multer = require('multer')
+
+require("./utils.js");
+
 const app = express();
 const expireTime = 60 * 60 * 1000;
 app.set('view engine', 'ejs')
@@ -23,13 +25,101 @@ const port = process.env.PORT || 3000;
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
 
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
+// first, store files in memory as Buffer objects by using multer
+const storage = multer.memoryStorage()
+// telling multer to use the previously defined memory storage for storing the files.
+const upload = multer({ storage: storage });
+//to use EJS to render our ejs files as HTML
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+/************ uploading images ****************/
+
+let db, bucket;
+// Initialize MongoDB and GridFS
+// ensuring that the MongoDB connection 
+// and GridFS initialization are completed before proceeding further.
+async function initMongoDB() {
+	const client = new MongoClient(mongoUri);
+	try {
+		await client.connect();
+		db = client.db('BBY29');
+		bucket = new GridFSBucket(db, { bucketName: 'profileImg' });
+		console.log('Connected to MongoDB and GridFS initialized!');
+	} catch (err) {
+		console.error("Connection error:", err);
+		process.exit(1);
+	}
+}
+initMongoDB();
+
+// Save image to MongoDB using GridFS
+async function saveImageToMongoDB(fileBuffer, contentType, filename) {
+	try {
+		const uploadStream = bucket.openUploadStream(filename, { metadata: { contentType } });
+		uploadStream.write(fileBuffer);
+		uploadStream.end();
+		return new Promise((resolve, reject) => {
+			uploadStream.on('finish', () => resolve(uploadStream.id));
+			uploadStream.on('error', (error) => {
+				console.error('Failed to save image:', error);
+				reject(error);
+			});
+		});
+	} catch (error) {
+		console.error('Failed to save image:', error);
+		throw error;
+	}
+}
+
+// Express route to get an image by filename
+app.get('/images/:filename', async (req, res) => {
+	try {
+		// Assuming 'userId' is the key where the user ID is stored in the session
+		const userId = req.session.userId;
+		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
+
+		// Set the proper content type before sending the stream
+		downloadStream.on('file', (file) => {
+			res.type(file.contentType);
+		});
+		// Pipe the image data to the response
+		downloadStream.pipe(res);
+	} catch (error) {
+		console.error('Failed to retrieve image:', error);
+		res.status(404).send('Image not found');
+	}
+});
+
+// Route to upload images
+app.post('/upload', upload.single('image'), async (req, res) => {
+	if (!req.file) {
+		return res.status(400).send('No file uploaded.');
+	}
+	try {
+		const filename = req.file.originalname;
+		const fileId = await saveImageToMongoDB(req.file.buffer, req.file.mimetype, filename);
+		res.send(`Image uploaded successfully with ID: ${fileId}`);
+	} catch (error) {
+		console.error('Upload error:', error);
+		res.status(500).send(`Failed to upload image: ${error.message}`);
+	}
+});
+
+/*********** connecting mongo ***************/
+
+
 const taskBank = ["Do 20 pushups", "Do 40 situps", "Do 60 squats", "Do 20 crunches", "Do 10 burpees",
 	"Plank for 1.5 minute", "Do 60 jumping jacks", "Run 1 kilometers", "Hold a L sit for 15 seconds", "Hold wallsit for 1 minute",
 	"30 seconds of non-stop mountain climbers", "30 tricep dips"];
 
 //if ur wondering why everything is inside this async connect-mongo call, blame davin, but at the same time it works?
+
 async function connectToMongo() {
 	const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+
 
 	try {
 		await client.connect();
@@ -78,6 +168,7 @@ async function connectToMongo() {
 			apiKey: process.env.GROQ_API_KEY
 		});
 
+
 		//Valid Session Function
 		function isValidSession(req) {
 			if (req.session.authenticated) {
@@ -124,7 +215,6 @@ async function connectToMongo() {
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
 			res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
 		});
-
 		//Signup POST
 		app.post('/signup', async (req, res) => {
 
@@ -164,15 +254,19 @@ async function connectToMongo() {
 			}
 
 			var hashedPassword = await bcrypt.hash(password, saltRounds);
-
-			await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, user_rank: 'Bronze' });
-			console.log("Inserted user");
-			req.session.authenticated = true;
-			req.session.username = username;
-			req.session.points = 0;
-			req.session.rank = 'Bronze';
-			req.session.cookie.maxAge = expireTime;
-			res.redirect('/main');
+			try {
+				await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, user_rank: 'Bronze' });
+				console.log("Inserted user");
+				req.session.authenticated = true;
+				req.session.username = username;
+				req.session.points = 0;
+				req.session.rank = 'Bronze';
+				req.session.cookie.maxAge = expireTime;
+				res.redirect('/main');
+			} catch (err) {
+				console.error("Error registering user:", err);
+				res.status(500).send('Failed to register user');
+			}
 		});
 
 		//Login Page
@@ -236,9 +330,14 @@ async function connectToMongo() {
 			});
 		});
 
-		//Main Page
+		//main page - check the user, display the remained tasks, display the user name in the current session;
+		app.get('/main', async (req, res) => {
 
-		app.get('/main', sessionValidation, async (req, res) => {
+			if (!req.session.user || !req.session.user.username) {
+				res.redirect('/login');  // Redirect to login if no user session
+				return;
+			}
+
 			var currentPoints = req.session.points;
 			console.log(currentPoints);
 			if (currentPoints < 50 && currentPoints >= 0) {
@@ -274,8 +373,31 @@ async function connectToMongo() {
 
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.updateOne(filter, updateDoc);
-			console.log(result);
-			res.render('main', { points: currentPoints, rank: req.session.rank });
+
+			let doc = fs.readFileSync('./html/main.html', 'utf8'); // Ensure this path is correct
+
+			try {
+				const user = await usersCollection.findOne({ username: req.session.user.username });
+
+				if (!user || !user.fitTasks) {
+					console.error('User not found or no tasks available');
+					doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', '<p>No tasks on your list</p>');
+					res.status(404).send(doc);
+					return;
+				}
+
+				// Generate tasks HTML
+				let tasksHtml = user.fitTasks.map(task => `<li>${task}</li>`).join('');
+
+				// written in comment form, because those will be in HTML
+				doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', tasksHtml);
+				doc = doc.replace('<!-- USERNAME_PLACEHOLDER -->', `${req.session.user.username}`);
+
+				res.send(doc);
+			} catch (err) {
+				console.error("Error fetching user or tasks:", err);
+				res.status(500).send('Failed to fetch user data');
+			}
 		});
 
 		//Adding points POST
@@ -304,9 +426,9 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
 			var temp = '';
-			while(true) {
+			while (true) {
 				temp = Math.floor(Math.random() * taskBank.length);
-				if (taskBank[temp] != result[0].fitTasks[0] && taskBank[temp] != result[0].fitTasks[1] && taskBank[temp] != result[0].fitTasks[2])  {
+				if (taskBank[temp] != result[0].fitTasks[0] && taskBank[temp] != result[0].fitTasks[1] && taskBank[temp] != result[0].fitTasks[2]) {
 					break;
 				}
 			}
@@ -326,9 +448,9 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
 			var temp = '';
-			while(true) {
+			while (true) {
 				temp = Math.floor(Math.random() * taskBank.length);
-				if ( taskBank[temp] != result[0].fitTasks[0] && taskBank[temp] != result[0].fitTasks[1] && taskBank[temp] != result[0].fitTasks[2])  {
+				if (taskBank[temp] != result[0].fitTasks[0] && taskBank[temp] != result[0].fitTasks[1] && taskBank[temp] != result[0].fitTasks[2]) {
 					break;
 				}
 			}
@@ -348,9 +470,9 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
 			var temp = '';
-			while(true) {
+			while (true) {
 				temp = Math.floor(Math.random() * taskBank.length);
-				if ( taskBank[temp] != result[0].fitTasks[0] && taskBank[temp] != result[0].fitTasks[1] && taskBank[temp] != result[0].fitTasks[2])  {
+				if (taskBank[temp] != result[0].fitTasks[0] && taskBank[temp] != result[0].fitTasks[1] && taskBank[temp] != result[0].fitTasks[2]) {
 					break;
 				}
 			}
@@ -385,15 +507,6 @@ async function connectToMongo() {
 			res.redirect('/fitTasks');
 		});
 
-		/*
-		app.get('/post', (req, res) => {
-		  let doc = fs.readFileSync('./html/post.html', 'utf8');
-		  res.send(doc);
-		});
-		*/
-
-
-		//Groq Chat bot POST (not working rn)
 		app.post('/GroqChatCompletion', async (req, res) => {
 
 			const userInput = req.body.question;
@@ -407,8 +520,6 @@ async function connectToMongo() {
 			}
 		});
 
-
-
 		async function getGroqChatCompletion(userInput) {
 			return groq.chat.completions.create({
 				messages: [
@@ -421,25 +532,36 @@ async function connectToMongo() {
 			});
 		}
 
-		// module.exports = {
-		//     main,
-		//     getGroqChatCompletion
-		// };
-
-		// Route for handling 404 Not Found
-		app.get('*', (req, res) => {
-			res.status(404).send('Page not found - 404');
+	async function getGroqChatCompletion(userInput) {
+		return groq.chat.completions.create({
+			messages: [
+				{
+					role: "user",
+					content: userInput
+				}
+			],
+			model: "mixtral-8x7b-32768"
 		});
-
-		app.listen(port, () => {
-			console.log("Node appplication listening on port " + port);
-		});
-
-	} catch (err) {
-		console.error("Connection error:", err);
-		process.exit(1); // Exit with error if connection fails
 	}
 
+	// module.exports = {
+	//     main,
+	//     getGroqChatCompletion
+	// };
+
+	// Route for handling 404 Not Found
+	app.get('*', (req, res) => {
+		res.status(404).send('Page not found - 404');
+	});
+
+	app.listen(port, () => {
+		console.log("Node appplication listening on port " + port);
+	});
+
+} catch (err) {
+	console.error("Connection error:", err);
+	process.exit(1); // Exit with error if connection fails
 }
 
+}
 connectToMongo().catch(console.error);
