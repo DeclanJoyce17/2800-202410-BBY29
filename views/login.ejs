@@ -1,3 +1,20 @@
 <%- include("templates/header") %>
 
-<%- include("templates/end") %>
+    <div class="title" class="center">
+        <img src="/img/Logo.png" alt="logo" width="250" height="250">
+    </div>
+
+
+    <div class="bg-light">
+        <br><br>
+        <form action="/login" method="POST" class="center index-form">
+            <h1 class="">Login</h1>
+            <input type="email" name="email" placeholder="Email">
+            <br><br>
+            <input type="password" name="password" placeholder="Password">
+            <br><br>
+            <button class="index-btn btn" type="submit">Login</button>
+        </form>
+    </div>
+
+    <%- include("templates/end") %>
