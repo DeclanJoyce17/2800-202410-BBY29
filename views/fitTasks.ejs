@@ -8,27 +8,38 @@
     <!--Contents in the body tag-->
     <img class="title" src="/img/FitnessLogo.png" alt="logo">
     <div class="container taskCards">
-        <h1>Points: <%= points %></h1>
+        <h1>Points: <%= points %>
+        </h1>
         <div class="card">
             <div class="card-body">
                 <%= task1 %>
             </div>
-            <p><form method="post" action="/addPointFit"><button class="btn btn-secondary float-right" type="submit">Done</button></form><button
-                    class="btn btn-secondary float-right" type="submit">Reroll</button></p>
+            <span>
+                <form method="post" action="/addPointFit" style="display: inline">
+                    <button class="btn btn-secondary float-right" type="submit">Done</button>
+                </form>
+                <form style="display: inline">
+                    <button class="btn btn-secondary float-right" type="submit">Reroll</button>
+                </form>
+            </span>
         </div>
         <div class="card">
             <div class="card-body">
                 <%= task2 %>
             </div>
-            <p><form method="post" action="/addPointFit"><button class="btn btn-secondary float-right" type="submit">Done</button></form> <button
-                    class="btn btn-secondary float-right" type="submit">Reroll</button></p>
+            <p>
+            <form method="post" action="/addPointFit"><button class="btn btn-secondary float-right"
+                    type="submit">Done</button></form> <button class="btn btn-secondary float-right"
+                type="submit">Reroll</button></p>
         </div>
         <div class="card">
             <div class="card-body">
                 <%= task3 %>
             </div>
-            <p><form method="post" action="/addPointFit"><button class="btn btn-secondary float-right" type="submit">Done</button></form> <button
-                    class="btn btn-secondary float-right" type="submit">Reroll</button></p>
+            <p>
+            <form method="post" action="/addPointFit"><button class="btn btn-secondary float-right"
+                    type="submit">Done</button></form> <button class="btn btn-secondary float-right"
+                type="submit">Reroll</button></p>
         </div>
 
     </div>
