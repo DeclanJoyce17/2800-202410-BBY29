@@ -335,6 +335,7 @@ async function connectToMongo() {
 				res.redirect('/login');  // Redirect to login if no user session
 				return;
 			}
+	
 
 			var currentPoints = req.session.points;
 			console.log(currentPoints);

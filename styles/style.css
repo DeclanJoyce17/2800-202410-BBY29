@@ -66,3 +66,16 @@
     transition-duration: 0.4s;
 }
 
+.task-nav {
+    padding-left: 10%;
+    padding-right: 10%;
+    height: 100%;
+    width: 80%;
+    display: flex; /* Use flexbox */
+    justify-content: space-between; /* Space items evenly */
+}
+
+.resize {
+    font-size: 10px;
+
+}

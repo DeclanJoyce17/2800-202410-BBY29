@@ -40,8 +40,7 @@
 
 <body>
   <!-- nav bar -->
-  <nav>
-    <br>
+  <nav class="task-nav">
     <a href="fitTasks">
       <input type="image" class="navButton" src="../img/FitnessButton.png">
     </a>
@@ -51,10 +50,10 @@
   </nav>
 
   <!-- Chatbot -->
-  <form id="form">
+  <form id="form" class="center index-form">
     <label for="chatbot">Ask me</label>
     <input type="text" id="question" name="chatbot">
-    <button type="submit">Send</button>
+    <button type="submit" class="index-btn">Send</button>
   </form>
   <div id='response'></div>
 
@@ -63,14 +62,14 @@
     <h4 style="margin-bottom: 5%;" class="display-4">Are you ready to tackle the day, <!-- USERNAME_PLACEHOLDER -->?
     </h4>
 
-
+    <br>
     <!-- upload images and display it -->
     <h1>Upload Image to Server</h1>
-    <form action="/upload" method="post" enctype="multipart/form-data">
+    <form action="/upload" method="post" enctype="multipart/form-data" class="resize">
       <input type="file" name="image" required>
       <button type="submit">Upload</button>
     </form>
-
+    <br>
     <!-- display images -->
     <div id="image-container">
       <!-- Images will be loaded here -->
@@ -86,7 +85,7 @@
         </button>
       </div>
       <div id="leaderboard">
-        <div class="ribbon"></div>
+        <div class="ribbon "></div>
         <table>
           <tr>
             <td class="number">1</td>
@@ -121,11 +120,17 @@
       </div>
     </div>
 
+    <br><br>
+
     <!-- TASKS_PLACEHOLDER -->
     <div class="taskplace_holder">
-    </div>  
-	<br><button onclick="redirectToLogout(event)" class="btn">Task placeholder</button>
-    
+        <p>TASKS_PLACEHOLDER</p>
+    </div>
+
+    <form action="/logout" method="get" class="index-form">
+      <button type="submit" class="index-btn">Logout</button>
+    </form>
+
     <!-- Footer -->
     <footer>
       <a href="index.html">
