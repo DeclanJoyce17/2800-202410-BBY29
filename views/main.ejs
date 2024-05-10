@@ -13,6 +13,8 @@
     </a>
   </nav>
 
+
+
   <!-- Chatbot -->
   <form id="form">
     <label for="chatbot">Ask me</label>
@@ -82,5 +84,10 @@
   <div class="row row-cols-4 row-cols-md-4 g-4" id="taskEntriesContainer"></div>
   
   <br><a href="/logout"><button class="btn btn-secondary float-right" type="submit">Log Out</button></a>
-  <!-- Footer -->
+  
+    <form action="/signup" method="get" class="index-form">
+        <button type="submit" class="index-btn">Signup</button>
+      </form>
+
+<!-- Footer -->
   <%- include("templates/footer") %>
