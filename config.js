@@ -273,8 +273,7 @@ async function connectToMongo() {
 				res.redirect('/main');
 			}
 			else {
-				let doc = fs.readFileSync('./html/login.html', 'utf8');
-				res.send(doc);
+				res.render('login');
 			}
 		});
 
