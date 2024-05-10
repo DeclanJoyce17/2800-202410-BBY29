@@ -14,15 +14,6 @@ async function getGroqChatCompletion(userInput) {
     });
 }
 
-// document.addEventListener('DOMContentLoaded', async () => {
-//     // Send an HTTP request to the Node.js script
-//     const response = await fetch('http://localhost:3000/GroqChatCompletion');
-//     const data = await response.json();
-  
-//     // Update the HTML element with the chat completion response
-//     app.textContent = data.message;
-//   });
-
 document.addEventListener('DOMContentLoaded', async () => {
     const warning = document.getElementById('warning');
     const form = document.getElementById('chat-input-form');
