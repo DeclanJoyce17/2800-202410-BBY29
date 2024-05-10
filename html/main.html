@@ -40,103 +40,115 @@
 
 <body>
   <!-- nav bar -->
-  <nav>
-    <br>
-    <a href="index.html">
+  <nav class="task-nav">
+    <a href="fitTasks">
       <input type="image" class="navButton" src="../img/FitnessButton.png">
     </a>
-    <a href="index.html">
-      <input type="image" class="navButton" src="../img/EcoButton.png">
-    </a>
-    <a href="index.html">
+    <a href="fitTasks">
       <input type="image" class="navButton" src="../img/DietButton.png">
     </a>
   </nav>
 
   <!-- Chatbot -->
-  <form id="form">
+  <form id="form" class="center index-form">
     <label for="chatbot">Ask me</label>
     <input type="text" id="question" name="chatbot">
-    <button type="submit">Send</button>
+    <button type="submit" class="index-btn">Send</button>
   </form>
   <div id='response'></div>
 
   <!-- Welcome messsge -->
   <div class="px-4 py-5 my-5 text-center">
-    <h4 style="margin-bottom: 5%;" class="display-4">Are you ready to tackle the day,
-      <span id="name-goes-here"></span>?
+    <h4 style="margin-bottom: 5%;" class="display-4">Are you ready to tackle the day, <!-- USERNAME_PLACEHOLDER -->?
     </h4>
-    <div class="col-lg-6 mx-auto">
-      <div class="navText">
-        Points: 258.244
+
+    <br>
+    <!-- upload images and display it -->
+    <h1>Upload Image to Server</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data" class="resize">
+      <input type="file" name="image" required>
+      <button type="submit">Upload</button>
+    </form>
+    <br>
+    <!-- display images -->
+    <div id="image-container">
+      <!-- Images will be loaded here -->
+    </div>
+
+
+    <!-- Leader board -->
+    <div id="main">
+      <div id="header">
+        <h1>Ranking</h1>
+        <button class="share">
+          <i class="ph ph-share-network"></i>
+        </button>
+      </div>
+      <div id="leaderboard">
+        <div class="ribbon "></div>
+        <table>
+          <tr>
+            <td class="number">1</td>
+            <td class="name">Lee Taeyong</td>
+            <td class="points">
+              258.244 <img class="gold-medal"
+                src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true"
+                alt="gold medal" />
+            </td>
+          </tr>
+          <tr>
+            <td class="number">2</td>
+            <td class="name">Mark Lee</td>
+            <td class="points">258.242</td>
+          </tr>
+          <tr>
+            <td class="number">3</td>
+            <td class="name">Xiao Dejun</td>
+            <td class="points">258.223</td>
+          </tr>
+          <tr>
+            <td class="number">4</td>
+            <td class="name">Qian Kun</td>
+            <td class="points">258.212</td>
+          </tr>
+          <tr>
+            <td class="number">5</td>
+            <td class="name">Johnny Suh</td>
+            <td class="points">258.208</td>
+          </tr>
+        </table>
       </div>
     </div>
 
-  <!-- Leader board -->
-  <div id="main">
-    <div id="header">
-      <h1>Ranking</h1>
-      <button class="share">
-        <i class="ph ph-share-network"></i>
-      </button>
-    </div>
-    <div id="leaderboard">
-      <div class="ribbon"></div>
-      <table>
-        <tr>
-          <td class="number">1</td>
-          <td class="name">Lee Taeyong</td>
-          <td class="points">
-            258.244 <img class="gold-medal"
-              src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true"
-              alt="gold medal" />
-          </td>
-        </tr>
-        <tr>
-          <td class="number">2</td>
-          <td class="name">Mark Lee</td>
-          <td class="points">258.242</td>
-        </tr>
-        <tr>
-          <td class="number">3</td>
-          <td class="name">Xiao Dejun</td>
-          <td class="points">258.223</td>
-        </tr>
-        <tr>
-          <td class="number">4</td>
-          <td class="name">Qian Kun</td>
-          <td class="points">258.212</td>
-        </tr>
-        <tr>
-          <td class="number">5</td>
-          <td class="name">Johnny Suh</td>
-          <td class="points">258.208</td>
-        </tr>
-      </table>
-    </div>
-  </div>
+    <br><br>
 
-  <!-- task container -->
-  <div class="row row-cols-4 row-cols-md-4 g-4" id="taskEntriesContainer"></div>
-  
-  <!-- Footer -->
-  <footer>
-    <a href="index.html">
-      <input type="image" class="footerButton" src="../img/23-user-group.svg">
-    </a>
-    <a href="index.html">
-      <input type="image" class="footerButton" src="../img/35-home-general.svg">
-    </a>
-    <a href="index.html">
-      <input type="image" class="footerButton" src="../img/22-user.svg">
-    </a>
-  </footer>
+    <!-- TASKS_PLACEHOLDER -->
+    <div class="taskplace_holder">
+        <p>TASKS_PLACEHOLDER</p>
+    </div>
 
-  <!-- Link to scripts of our own -->
-  <script src="/scripts/firebaseAPI_TEAMBBY29.js"></script>
-  <script src="/scripts/authentication.js"></script>
-  <script src="/scripts/main.js"></script>
-  <script src="/scripts/skeleton.js"></script>
+    <form action="/logout" method="get" class="index-form">
+      <button type="submit" class="index-btn">Logout</button>
+    </form>
+
+    <!-- Footer -->
+    <footer>
+      <a href="index.html">
+        <input type="image" class="footerButton" src="../img/23-user-group.svg">
+      </a>
+      <a href="index.html">
+        <input type="image" class="footerButton" src="../img/35-home-general.svg">
+      </a>
+      <a href="index.html">
+        <input type="image" class="footerButton" src="../img/22-user.svg">
+      </a>
+    </footer>
+
+    <!-- Link to scripts of our own -->
+    <!-- <script src="/scripts/firebaseAPI_TEAMBBY29.js"></script> -->
+    <!-- <script src="/scripts/authentication.js"></script> -->
+    <!-- <script src="/scripts/main.js"></script> -->
+    <!-- <script src="/scripts/skeleton.js"></script> -->
 
 </body>
 

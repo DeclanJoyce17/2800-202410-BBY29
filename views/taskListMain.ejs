@@ -1,0 +1,8 @@
+<%- include ("tempates/header")%
+    <h2>Your Tasks:</h2>
+    <ul>
+        <% user.fitTasks.forEach(task => { %>
+        <li><%= task %></li>
+        <% }); %>
+    </ul>
+<%- include ("tempates/footer")%

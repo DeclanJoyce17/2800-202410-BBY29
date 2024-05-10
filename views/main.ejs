@@ -1,0 +1,93 @@
+<%- include("templates/header") %>
+  <!-- nav bar -->
+  <nav>
+    <br>
+    <a href="fitTasks">
+      <input type="image" class="navButton" src="../img/FitnessButton.png">
+    </a>
+    <a href="fitTasks">
+      <input type="image" class="navButton" src="../img/EcoButton.png">
+    </a>
+    <a href="fitTasks">
+      <input type="image" class="navButton" src="../img/DietButton.png">
+    </a>
+  </nav>
+
+
+
+  <!-- Chatbot -->
+  <form id="form">
+    <label for="chatbot">Ask me</label>
+    <input type="text" id="question" name="chatbot">
+    <button type="submit">Send</button>
+  </form>
+  <div id='response'></div>
+
+  <!-- Welcome messsge -->
+  <div class="px-4 py-5 my-5 text-center">
+    <h4 style="margin-bottom: 5%;" class="display-4">Are you ready to tackle the day,
+      <span id="name-goes-here"></span>?
+    </h4>
+    <div class="col-lg-6 mx-auto">
+      <div class="navText">
+        <h1>Rank:<%= rank %></h1>
+        <h1>Points:<%= points %></h1>
+      </div>
+      
+    </div>
+
+  <!-- Leader board -->
+  <div id="main">
+    <div id="header">
+      <h1>Ranking</h1>
+      <button class="share">
+        <i class="ph ph-share-network"></i>
+      </button>
+    </div>
+    <div id="leaderboard">
+      <div class="ribbon"></div>
+      <table>
+        <tr>
+          <td class="number">1</td>
+          <td class="name">Lee Taeyong</td>
+          <td class="points">
+            258.244 <img class="gold-medal"
+              src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true"
+              alt="gold medal" />
+          </td>
+        </tr>
+        <tr>
+          <td class="number">2</td>
+          <td class="name">Mark Lee</td>
+          <td class="points">258.242</td>
+        </tr>
+        <tr>
+          <td class="number">3</td>
+          <td class="name">Xiao Dejun</td>
+          <td class="points">258.223</td>
+        </tr>
+        <tr>
+          <td class="number">4</td>
+          <td class="name">Qian Kun</td>
+          <td class="points">258.212</td>
+        </tr>
+        <tr>
+          <td class="number">5</td>
+          <td class="name">Johnny Suh</td>
+          <td class="points">258.208</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- task container -->
+  <div class="row row-cols-4 row-cols-md-4 g-4" id="taskEntriesContainer"></div>
+  
+  <br><a href="/logout"><button class="btn btn-secondary float-right" type="submit">Log Out</button></a>
+  
+    <form action="/signup" method="get" class="index-form">
+        <button type="submit" class="index-btn">Signup</button>
+      </form>
+
+<!-- Footer -->
+  <%- include("templates/footer") %>

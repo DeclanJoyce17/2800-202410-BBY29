@@ -1,0 +1,18 @@
+<%- include("templates/header") %>
+<div class="title" class="center">
+    <img src="/img/Logo.png" alt="logo" width="250" height="250">
+  </div>
+
+<div class="login bg-light">
+    <br>
+    
+            <form action="/signup" method="POST" class="index-form center">
+            <h1>Sign Up</h1>
+            <input type="text" name="username" placeholder="Username"><br>
+            <input type="email" name="email" placeholder="Email"><br>
+            <input type="password" name="password" placeholder="Password"><br>
+            <button type="submit" class="index-btn">Sign Up</button>
+            </form>
+    <br>
+  </div>
+<%- include("templates/end") %>

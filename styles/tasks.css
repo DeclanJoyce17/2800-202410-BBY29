@@ -125,6 +125,8 @@ td {
     text-align: left;
 }
 
+
+
 .name {
     text-align: left;
     font-size: 1.2rem;
@@ -245,6 +247,58 @@ footer {
     text-decoration: none;
 }
 
-.taskplace_holder {
+#Chatter {
+    position: fixed;
+    top:10px;
+    right: 5px;
+    font-size: 18px; 
+    margin: 0;
+}
+
+.title {
+    padding-top: 90px;
+    padding-left: 155px;
+    padding-bottom: 20px;
+}
+
+.taskCards {
+    width: 100%;
+    padding-left: 45px;
+    padding-right: 45px;
+    margin-bottom: 30px;
+}
+
+.card{
     font-size: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.btn {
+    display: inline;
+    width: 50px;
+    position:relative;
+    left: 220px;
+    font-size: 10px;
+    bottom: 5px;
+    
+}
+
+.inline {
+    display: inline;
+}
+
+.skibidi {
+    padding-left:45px;
+    font-size: 30px;
+}
+
+.signUpImage {
+    padding-top: 40px;
+    padding-left: 45px;
+    padding-bottom: 20px;
+}
+
+.login {
+    font-size:30px;
 }

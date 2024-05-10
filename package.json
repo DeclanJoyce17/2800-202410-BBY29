@@ -9,11 +9,22 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "connect-mongo": "^5.1.0",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "express-session": "^1.18.0",
     "firebase": "^10.11.1",
     "firebaseui": "^6.1.0",
+    "GridFS": "^0.3.0",
+    "groq": "^3.41.0",
     "groq-sdk": "^0.3.3",
-    "openai": "^4.40.2"
+    "joi": "^17.13.1",
+    "mongodb": "^6.6.1",
+    "mongoose": "^8.3.4",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.40.2",
+    "path": "^0.12.7"
   }
 }
