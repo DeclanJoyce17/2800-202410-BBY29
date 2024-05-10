@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const userInput = questionInput.value.trim(); // Get the user's input from the form
 
         // Send the user's input to the server
-        const response = await fetch('http://localhost:3000/GroqChatCompletion', {
+        const response = await fetch('http://localhost:2800/GroqChatCompletion', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
