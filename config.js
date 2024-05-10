@@ -152,7 +152,6 @@ async function connectToMongo() {
 
 
 		app.use("/scripts", express.static("./scripts"));
-		app.use('/html', express.static('./html'));
 		app.use('/img', express.static('./img'));
 		app.use('/styles', express.static('./styles'));
 		app.use('/text', express.static('./text'));
@@ -274,7 +273,8 @@ async function connectToMongo() {
 				res.redirect('/main');
 			}
 			else {
-				res.render('login');
+				let doc = fs.readFileSync('./html/login.html', 'utf8');
+				res.send(doc);
 			}
 		});
 
