@@ -113,7 +113,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 
 const taskBank = ["Do 20 pushups", "Do 40 situps", "Do 60 squats", "Do 20 crunches", "Do 10 burpees",
 	"Plank for 1.5 minute", "Do 60 jumping jacks", "Run 1 kilometers", "Hold a L sit for 15 seconds", "Hold wallsit for 1 minute",
-	"30 seconds of non-stop mountain climbers", "30 tricep dips"];
+	"30 seconds of non-stop mountain climbers", "15 tricep dips"];
 
 //if ur wondering why everything is inside this async connect-mongo call, blame davin, but at the same time it works?
 
