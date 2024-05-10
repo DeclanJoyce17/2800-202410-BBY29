@@ -380,7 +380,7 @@ async function connectToMongo() {
 
 				if (!user || !user.fitTasks) {
 					console.error('User not found or no tasks available');
-					doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', '<p>No tasks on your list</p>');
+					doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', '<li class="task-item">No tasks on your list</li>');
 					res.status(404).send(doc);
 					return;
 				}
