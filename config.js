@@ -327,6 +327,46 @@ async function connectToMongo() {
 			});
 		});
 
+		app.get('/map', (req, res) => {
+			// Resolve the path to map.html using path module
+			const mapFilePath = path.join(__dirname, 'html', 'map.html');
+
+			// Send map.html as the response
+			res.sendFile(mapFilePath);
+		});
+
+		app.get('/aichat-home', (req, res) => {
+			// Resolve the path to map.html using path module
+			const mapFilePath = path.join(__dirname, 'html', 'aichat-home.html');
+
+			// Send map.html as the response
+			res.sendFile(mapFilePath);
+		});
+
+		app.get('/aichat-config', (req, res) => {
+			// Resolve the path to map.html using path module
+			const mapFilePath = path.join(__dirname, 'html', 'aichat-config.html');
+
+			// Send map.html as the response
+			res.sendFile(mapFilePath);
+		});
+
+		app.get('/aichat-loading', (req, res) => {
+			// Resolve the path to map.html using path module
+			const mapFilePath = path.join(__dirname, 'html', 'aichat-loading.html');
+
+			// Send map.html as the response
+			res.sendFile(mapFilePath);
+		});
+
+		app.get('/aichat-log', (req, res) => {
+			// Resolve the path to map.html using path module
+			const mapFilePath = path.join(__dirname, 'html', 'aichat-log.html');
+
+			// Send map.html as the response
+			res.sendFile(mapFilePath);
+		});
+
 		//main page - check the user, display the remained tasks, display the user name in the current session;
 		app.get('/main', async (req, res) => {
 
@@ -335,7 +375,7 @@ async function connectToMongo() {
 				res.redirect('/login');  // Redirect to login if no user session
 				return;
 			}
-	
+
 
 			var currentPoints = req.session.points;
 			console.log(currentPoints);
