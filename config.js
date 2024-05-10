@@ -386,7 +386,7 @@ async function connectToMongo() {
 				}
 
 				// Generate tasks HTML
-				let tasksHtml = user.fitTasks.map(task => `<li>${task}</li>`).join('');
+				let tasksHtml = user.fitTasks.map(task => `<li class="task-item">${task}</li>`).join('');
 
 				// written in comment form, because those will be in HTML
 				doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', tasksHtml);
