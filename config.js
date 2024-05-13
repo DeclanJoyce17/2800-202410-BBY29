@@ -1,134 +1,118 @@
-
 "use strict";
+// Load environment variables from .env file
 require('dotenv').config();
-const WebSocket = require('ws');
-const http = require('http');
-const fs = require('fs');
+const fs = require("fs");
+const express = require('express');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const { MongoClient, GridFSBucket } = require('mongodb');
 const path = require('path');
-<<<<<<< Updated upstream
-=======
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
 const multer = require('multer');
-const {SpeechClient} = require('@google-cloud/speech');
-const {spawn} = require('child_process');
+const { SpeechClient } = require('@google-cloud/speech');
+const { spawn } = require('child_process');
 
 require("./utils.js");
->>>>>>> Stashed changes
 
-const express = require('express');
 const app = express();
+const expireTime = 60 * 60 * 1000;
+app.set('view engine', 'ejs')
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Load environment variables from .env file
+require('dotenv').config();
 
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-
-<<<<<<< Updated upstream
-const port = process.env.PORT || 3000;
-=======
 const port = process.env.PORT || 2800;
 
 const speechClient = new SpeechClient();
 
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
->>>>>>> Stashed changes
 
-const wss = new WebSocket.Server({ server: server });
-
-app.use("/scripts", express.static("./scripts"));
-app.use('/html', express.static('./html'));
-app.use('/img', express.static('./img'));
-app.use('/styles', express.static('./styles'));
-app.use('/text', express.static('./text'));
-
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
+// first, store files in memory as Buffer objects by using multer
+const storage = multer.memoryStorage()
+// telling multer to use the previously defined memory storage for storing the files.
+const upload = multer({ storage: storage });
+//to use EJS to render our ejs files as HTML
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-//---------------------------------------------------
-// This code is provided by the Groq API library with
-// modification for our own project
-//---------------------------------------------------
-const Groq = require("groq-sdk");
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
+/************ uploading images ****************/
+
+let db, bucket;
+// Initialize MongoDB and GridFS
+// ensuring that the MongoDB connection 
+// and GridFS initialization are completed before proceeding further.
+async function initMongoDB() {
+	const client = new MongoClient(mongoUri);
+	try {
+		await client.connect();
+		db = client.db('BBY29');
+		bucket = new GridFSBucket(db, { bucketName: 'profileImg' });
+		console.log('Connected to MongoDB and GridFS initialized!');
+	} catch (err) {
+		console.error("Connection error:", err);
+		process.exit(1);
+	}
+}
+initMongoDB();
+
+// Save image to MongoDB using GridFS
+async function saveImageToMongoDB(fileBuffer, contentType, filename) {
+	try {
+		const uploadStream = bucket.openUploadStream(filename, { metadata: { contentType } });
+		uploadStream.write(fileBuffer);
+		uploadStream.end();
+		return new Promise((resolve, reject) => {
+			uploadStream.on('finish', () => resolve(uploadStream.id));
+			uploadStream.on('error', (error) => {
+				console.error('Failed to save image:', error);
+				reject(error);
+			});
+		});
+	} catch (error) {
+		console.error('Failed to save image:', error);
+		throw error;
+	}
+}
+
+// Express route to get an image by filename
+app.get('/images/:filename', async (req, res) => {
+	try {
+		// Assuming 'userId' is the key where the user ID is stored in the session
+		const userId = req.session.userId;
+		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
+
+		// Set the proper content type before sending the stream
+		downloadStream.on('file', (file) => {
+			res.type(file.contentType);
+		});
+		// Pipe the image data to the response
+		downloadStream.pipe(res);
+	} catch (error) {
+		console.error('Failed to retrieve image:', error);
+		res.status(404).send('Image not found');
+	}
 });
 
-app.get('/', (req, res) => {
-  let doc = fs.readFileSync("./html/index.html", "utf8");
-  res.send(doc);
+// Route to upload images
+app.post('/upload', upload.single('image'), async (req, res) => {
+	if (!req.file) {
+		return res.status(400).send('No file uploaded.');
+	}
+	try {
+		const filename = req.file.originalname;
+		const fileId = await saveImageToMongoDB(req.file.buffer, req.file.mimetype, filename);
+		res.send(`Image uploaded successfully with ID: ${fileId}`);
+	} catch (error) {
+		console.error('Upload error:', error);
+		res.status(500).send(`Failed to upload image: ${error.message}`);
+	}
 });
 
-<<<<<<< Updated upstream
-app.get('/login', (req, res) => {
-  let doc = fs.readFileSync('./html/login.html', 'utf8');
-  res.send(doc);
-});
-
-app.get('/main', (req, res) => {
-  let doc = fs.readFileSync('./html/main.html', 'utf8');
-  res.send(doc);
-});
-
-app.get('/aichat-config', (req, res) => {
-  let doc = fs.readFileSync("./html/aichat-config.html", "utf8");
-  res.send(doc);
-});
-
-app.get('/profile', (req, res) => {
-  let doc = fs.readFileSync('./html/profile.html', 'utf8');
-  res.send(doc);
-});
-
-app.get('/map', (req, res) => {
-  let doc = fs.readFileSync('./html/map.html', 'utf8');
-  res.send(doc);
-});
-
-app.get('/aichat-home', (req, res) => {
-  let doc = fs.readFileSync('./html/aichat-home.html', 'utf8');
-  res.send(doc);
-});
-
-app.get('/aichat-loading', (req, res) => {
-  let doc = fs.readFileSync('./html/aichat-loading.html', 'utf8');
-  res.send(doc);
-});
-
-app.get('/aichat-log', (req, res) => {
-  let doc = fs.readFileSync('./html/aichat-log.html', 'utf8');
-  res.send(doc);
-});
-
-
-
-app.post('/GroqChatCompletion', async (req, res) => {
-
-  const userInput = req.body.question;
-  try {
-    const chatCompletion = await getGroqChatCompletion(userInput);
-    res.header('Access-Control-Allow-Origin', '*');
-    res.json({
-      message: chatCompletion.choices[0]?.message?.content,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-
-async function getGroqChatCompletion(userInput) {
-  return groq.chat.completions.create({
-    messages: [
-      {
-        role: "user",
-        content: userInput
-      }
-    ],
-    model: "mixtral-8x7b-32768"
-  });
-=======
 /*********** connecting mongo ***************/
 
 
@@ -600,71 +584,71 @@ async function connectToMongo() {
 		app.post('/transcribe', async (req, res) => { // This is the end point for posting to the Google Speech API
 			const audioStream = req.pipe(require('stream')); // Create a transcription request by piping the incoming request stream 
 			// to a stream created by the 'stream' package
-		  
-			  // Create the Speech-to-Text API request
-			  // Google Client libraries
+
+			// Create the Speech-to-Text API request
+			// Google Client libraries
 			const request = {
-			  config: {
-				encoding: 'LINEAR16',
-				sampleRateHertz: 16000,
-				languageCode: 'en-US',
-			  },
-			  audio: {
-				content: audioStream,
-			  },
+				config: {
+					encoding: 'LINEAR16',
+					sampleRateHertz: 16000,
+					languageCode: 'en-US',
+				},
+				audio: {
+					content: audioStream,
+				},
 			};
-		  
+
 			// Send the request to the Speech-to-Text API, store the response, and process the transcription
 			const [response] = await speechClient.recognize(request);
 			const transcription = response.results
-			  .map(result => result.alternatives[0].transcript)
-			  .join('\n');
-		  
-			res.json({transcription});
-		  });
-		  
-		  app.post('/audio', (req, res) => { // This is the end point for receiving audio and initiating transcription
+				.map(result => result.alternatives[0].transcript)
+				.join('\n');
+
+			res.json({ transcription });
+		});
+
+		app.post('/audio', (req, res) => { // This is the end point for receiving audio and initiating transcription
 			const audioStream = req.pipe(fs.createWriteStream('audio.wav')); // Create a writable stream for the audio file named 'audio.wav' to save the incoming request data
-		  
+
 			// Add event listener for when the 'finish' event is triggered on the stream. 
 			// Once the entire request stream is processed, initiate transcription by calling the 'getTranscription' function
-			audioStream.on('finish', () => { 
-			  console.log('Received audio data, initiating transcription.');
-			  getTranscription();
+			audioStream.on('finish', () => {
+				console.log('Received audio data, initiating transcription.');
+				getTranscription();
 			});
-		  
-			res.json({status: 'received'});
-		  });
-		  
-		  // Initiates a transcription request using the Google Cloud Speech-to-Text API
-		  function getTranscription() {
+
+			res.json({ status: 'received' });
+		});
+
+		// Initiates a transcription request using the Google Cloud Speech-to-Text API
+		function getTranscription() {
 			const audioStream = fs.createReadStream('audio.wav'); // Create a readable stream for the previously saved 'audio.wav' file
-		  
+
 			// Google Speech API configuration settings
 			const request = {
-			  config: {
-				encoding: 'LINEAR16',
-				sampleRateHertz: 16000,
-				languageCode: 'en-US',
-			  },
-			  audio: {
-				content: audioStream,
-			  },
+				config: {
+					encoding: 'LINEAR16',
+					sampleRateHertz: 16000,
+					languageCode: 'en-US',
+				},
+				audio: {
+					content: audioStream,
+				},
 			};
-		  
+
 			// Google Client libraries code with modification for the client side display
 			speechClient.recognize(request)
-			  .then(data => {
-				const transcription = data[0].results
-				  .map(result => result.alternatives[0].transcript)
-				  .join('\n');
-		  
-				console.log(`Transcription: ${transcription}`);
-			  })
-			  .catch(err => {
-				console.error('Error occurred:', err);
-			  });
-		  }
+				.then(data => {
+					const transcription = data[0].results
+						.map(result => result.alternatives[0].transcript)
+						.join('\n');
+
+					console.log(`Transcription: ${transcription}`);
+				})
+				.catch(err => {
+					console.error('Error occurred:', err);
+				});
+		}
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
@@ -680,65 +664,5 @@ async function connectToMongo() {
 		process.exit(1); // Exit with error if connection fails
 	}
 
->>>>>>> Stashed changes
 }
-
-// Define a function to process the audio stream
-function processAudioStream(audioData) {
-  // Create a recognize stream
-  const request = {
-    config: {
-      encoding: 'LINEAR16',
-      sampleRateHertz: 16000,
-      languageCode: 'en-US',
-    },
-    interimResults: false,
-  };
-
-  // Create a recognize stream
-  const recognizeStream = client
-    .streamingRecognize(request)
-    .on('error', console.error)
-    .on('data', data =>
-      // Output the transcription results
-      process.stdout.write(
-        data.results[0] && data.results[0].alternatives[0]
-          ? `Transcription: ${data.results[0].alternatives[0].transcript}\n`
-          : '\n\nReached transcription time limit, press Ctrl+C\n'
-      )
-    );
-
-  // Pipe the audio stream to the recognize stream
-  audioData.pipe(recognizeStream);
-}
-
-// Handle WebSocket connection
-io.on('connection', (socket) => {
-  // Listen for audio stream data from the client
-  socket.on('audioData', (audioData) => {
-    processAudioStream(audioData);
-  });
-});
-
-app.get('/socket', (req, res) => {
-  res.send(JSON.stringify({ io: io }));
-});
-
-wss.on('connection', (ws) => {
-  console.log('New client connected');
-
-  // Handle incoming messages from the client
-  ws.on('message', (message) => {
-    console.log(`Received message => ${message}`);
-  });
-
-  // Handle disconnection
-  ws.on('close', () => {
-    console.log('Client disconnected');
-  });
-});
-
-app.listen(port, () => {
-  console.log("Node appplication listening on port " + port);
-});
-
+connectToMongo().catch(console.error);
