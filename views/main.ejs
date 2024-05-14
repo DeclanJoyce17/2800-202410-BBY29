@@ -26,7 +26,7 @@
   <!-- Welcome messsge -->
   <div class="px-4 py-5 my-5 text-center">
     <h4 style="margin-bottom: 5%;" class="display-4">Are you ready to tackle the day,
-      <span id="name-goes-here"></span>?
+      <span id="name-goes-here"><%= username %></span>?
     </h4>
     <div class="col-lg-6 mx-auto">
       <div class="navText">
@@ -45,37 +45,25 @@
       </button>
     </div>
     <div id="leaderboard">
-      <div class="ribbon"></div>
+      <div class="ribbon "></div>
       <table>
-        <tr>
-          <td class="number">1</td>
-          <td class="name">Lee Taeyong</td>
-          <td class="points">
-            258.244 <img class="gold-medal"
-              src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true"
-              alt="gold medal" />
-          </td>
-        </tr>
-        <tr>
-          <td class="number">2</td>
-          <td class="name">Mark Lee</td>
-          <td class="points">258.242</td>
-        </tr>
-        <tr>
-          <td class="number">3</td>
-          <td class="name">Xiao Dejun</td>
-          <td class="points">258.223</td>
-        </tr>
-        <tr>
-          <td class="number">4</td>
-          <td class="name">Qian Kun</td>
-          <td class="points">258.212</td>
-        </tr>
-        <tr>
-          <td class="number">5</td>
-          <td class="name">Johnny Suh</td>
-          <td class="points">258.208</td>
-        </tr>
+          <% users.forEach(function(user, index) { %>
+            <tr>
+              <td class="number"><%= index + 1 %></td>
+              <td class="profile-image">
+                <img src="./images/<%= userId %>" width="50" height="50" alt="Profile Image" />
+              </td>
+              <td class="name"><%= user.name %></td>
+              <td class="points">
+                <%= user.points.toFixed(3) %>
+                <% if (index === 0) { %>
+                  <img class="gold-medal"
+                  src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true"
+                  alt="gold medal" />
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
       </table>
     </div>
   </div>

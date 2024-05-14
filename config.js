@@ -5,12 +5,13 @@ const fs = require("fs");
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const { MongoClient, GridFSBucket } = require('mongodb');
+const { ObjectId, MongoClient, GridFSBucket } = require('mongodb');
 const path = require('path');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
-const multer = require('multer')
+const multer = require('multer');
+const sharp = require('sharp');
 
 require("./utils.js");
 
@@ -35,7 +36,7 @@ const upload = multer({ storage: storage });
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-/************ uploading images ****************/
+/************ uploading profile images ***********/
 
 let db, bucket;
 // Initialize MongoDB and GridFS
@@ -55,58 +56,6 @@ async function initMongoDB() {
 }
 initMongoDB();
 
-// Save image to MongoDB using GridFS
-async function saveImageToMongoDB(fileBuffer, contentType, filename) {
-	try {
-		const uploadStream = bucket.openUploadStream(filename, { metadata: { contentType } });
-		uploadStream.write(fileBuffer);
-		uploadStream.end();
-		return new Promise((resolve, reject) => {
-			uploadStream.on('finish', () => resolve(uploadStream.id));
-			uploadStream.on('error', (error) => {
-				console.error('Failed to save image:', error);
-				reject(error);
-			});
-		});
-	} catch (error) {
-		console.error('Failed to save image:', error);
-		throw error;
-	}
-}
-
-// Express route to get an image by filename
-app.get('/images/:filename', async (req, res) => {
-	try {
-		// Assuming 'userId' is the key where the user ID is stored in the session
-		const userId = req.session.userId;
-		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
-
-		// Set the proper content type before sending the stream
-		downloadStream.on('file', (file) => {
-			res.type(file.contentType);
-		});
-		// Pipe the image data to the response
-		downloadStream.pipe(res);
-	} catch (error) {
-		console.error('Failed to retrieve image:', error);
-		res.status(404).send('Image not found');
-	}
-});
-
-// Route to upload images
-app.post('/upload', upload.single('image'), async (req, res) => {
-	if (!req.file) {
-		return res.status(400).send('No file uploaded.');
-	}
-	try {
-		const filename = req.file.originalname;
-		const fileId = await saveImageToMongoDB(req.file.buffer, req.file.mimetype, filename);
-		res.send(`Image uploaded successfully with ID: ${fileId}`);
-	} catch (error) {
-		console.error('Upload error:', error);
-		res.status(500).send(`Failed to upload image: ${error.message}`);
-	}
-});
 
 /*********** connecting mongo ***************/
 
@@ -253,9 +202,10 @@ async function connectToMongo() {
 
 			var hashedPassword = await bcrypt.hash(password, saltRounds);
 			try {
-				await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, user_rank: 'Bronze' });
+				const result = await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, user_rank: 'Bronze'});
 				console.log("Inserted user");
 				req.session.authenticated = true;
+				req.session.userId = result.insertedId;
 				req.session.username = username;
 				req.session.points = 0;
 				req.session.rank = 'Bronze';
@@ -288,7 +238,6 @@ async function connectToMongo() {
 			if (validationResult.error != null) {
 				res.send(`Invalid email or password combination. 1<br> <a href='/login'>Try Again</a>`);
 				return;
-				return;
 			}
 
 			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1 }).toArray();
@@ -301,6 +250,7 @@ async function connectToMongo() {
 			if (await bcrypt.compare(password, result[0].password)) {
 				console.log("correct password");
 				req.session.authenticated = true;
+				req.session.userId = result[0]._id;
 				req.session.username = result[0].username;
 				req.session.points = result[0].points;
 				req.session.rank = result[0].user_rank;
@@ -335,7 +285,7 @@ async function connectToMongo() {
 				res.redirect('/login');  // Redirect to login if no user session
 				return;
 			}
-	
+
 
 			var currentPoints = req.session.points;
 			console.log(currentPoints);
@@ -374,6 +324,19 @@ async function connectToMongo() {
 			const result = await usersCollection.updateOne(filter, updateDoc);
 
 			let doc = fs.readFileSync('./html/main.html', 'utf8'); // Ensure this path is correct
+			
+			// To use the ejs template:
+			const username = req.session.username
+			const points = req.session.points
+			const rank = req.session.rank
+			// const users = *** get list of users ***
+
+			/*res.render('main', {
+				// Pass data to the template here
+				username,
+				rank,
+				points
+			});*/ 
 
 			try {
 				const user = await usersCollection.findOne({ username: req.session.username });
@@ -535,6 +498,56 @@ async function connectToMongo() {
 		//     main,
 		//     getGroqChatCompletion
 		// };
+		
+		/****************** getting Images *************************/
+
+		// Express route to get a profile image by user id
+		app.get('/images/:userId', async (req, res) => {
+			try {
+				console.log("Session User ID: " + req.params.userId)
+				// Assuming 'userId' is the key where the user ID is stored in the session
+				const userId = req.params.userId;
+				// Find the file in the MongoDB GridFS bucket by metadata userId
+				const files = await bucket.find({ "metadata.userId": userId }).toArray();
+				console.log("Files: " + files)
+
+				// There is only one profile picture
+				const file = files[0];
+
+				// Open a download stream by the file ID
+				const downloadStream = bucket.openDownloadStream(file._id);
+
+				// Set the proper content type before sending the stream
+				downloadStream.on('file', (file) => {
+					res.type(file.metadata.contentType);
+				});
+
+				// Pipe the image data to the response
+				downloadStream.pipe(res);
+
+			} catch (error) {
+				console.error('Failed to retrieve image:', error);
+				res.status(500).send('Failed to retrieve image due to an internal error.');
+			}
+		});
+
+		// Route to upload profile images
+		app.post('/profile-upload', upload.single('image'), async (req, res) => {
+			if (!req.file) {
+				return res.status(400).send('No file uploaded.');
+			}
+			try {
+				console.log("session user id: " + req.session.userId);
+				const userId = req.session.userId;
+				const filename = req.file.originalname;
+				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
+				// res.send(`Image uploaded successfully with ID: ${fileId}`);
+				res.redirect("/main");
+			} catch (error) {
+				console.error('Upload error:', error);
+				res.status(500).send(`Failed to upload image: ${error.message}`);
+			}
+		});
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
@@ -545,6 +558,7 @@ async function connectToMongo() {
 			console.log("Node appplication listening on port " + port);
 		});
 
+
 	} catch (err) {
 		console.error("Connection error:", err);
 		process.exit(1); // Exit with error if connection fails
@@ -552,3 +566,69 @@ async function connectToMongo() {
 
 }
 connectToMongo().catch(console.error);
+
+
+/************************ helper functions to upload profile images ***************************/
+
+
+async function saveProfileImageToMongoDB(fileBuffer, contentType, filename, userId) {
+    // This function specifically saves profile images and ensures only one exists per user.
+    try {
+        return await saveImageToMongoDB(fileBuffer, contentType, filename, userId, 320, 320, true);
+    } catch (error) {
+        console.error('Failed to save profile image:', error);
+        throw error;
+    }
+}
+
+// Save image to MongoDB using GridFS
+async function saveImageToMongoDB(fileBuffer, contentType, filename, userId, width, height, allowOneImageOnly) {
+	try {
+		 // Resize the image before uploading for profile picture
+		 const resizedBuffer = await resizeImage(fileBuffer, width, height);
+
+		const metadata = {
+			contentType: contentType,
+			userId: userId
+		};
+
+		if (allowOneImageOnly) {
+			// Check if a file already exists for the given userId
+			const existingFiles = await bucket.find({ "metadata.userId": userId }).toArray();
+			if (existingFiles.length > 0) {
+				// Assuming there is only one image per user, replace the existing one
+				await bucket.delete(existingFiles[0]._id);
+			}
+		}
+
+		const uploadStream = bucket.openUploadStream(filename, { metadata: metadata });
+		uploadStream.write(resizedBuffer);
+		uploadStream.end();
+
+		return new Promise((resolve, reject) => {
+			uploadStream.on('finish', () => resolve(uploadStream.id));
+			uploadStream.on('error', (error) => {
+				console.error('Failed to save image:', error);
+				reject(error);
+			});
+		});
+
+	} catch (error) {
+		console.error('Failed to save image:', error);
+		throw error;
+	}
+}
+
+// resize Images
+async function resizeImage(fileBuffer, width, height) {
+    try {
+        // Resize the image
+        const resizedBuffer = await sharp(fileBuffer)
+            .resize(width, height)
+            .toBuffer();
+        return resizedBuffer;
+    } catch (error) {
+        console.error('Error resizing image:', error);
+        throw error;
+    }
+}
