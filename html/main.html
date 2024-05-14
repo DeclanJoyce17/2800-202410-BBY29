@@ -50,12 +50,11 @@
   </nav>
 
   <!-- Chatbot -->
-  <form id="form" class="center index-form">
-    <label for="chatbot">Ask me</label>
-    <input type="text" id="question" name="chatbot">
-    <button type="submit" class="index-btn">Send</button>
-  </form>
-  <div id='response'></div>
+
+    <form action="/aichat-home" method="get" class="index-form">
+      <label for="chatbot">Ask me</label>
+      <button type="submit" class="index-btn">ChatBot</button>
+    </form>
 
   <!-- Welcome messsge -->
   <div class="px-4 py-5 my-5 text-center">
@@ -123,6 +122,10 @@
     <br><br>
 
     <ul><!-- TASKS_PLACEHOLDER --></ul>
+
+    <form action="/map" method="get" class="index-form">
+      <button type="submit" class="index-btn">Map</button>
+    </form>
 
     <form action="/logout" method="get" class="index-form">
       <button type="submit" class="index-btn">Logout</button>
