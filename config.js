@@ -10,13 +10,22 @@ const path = require('path');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
+<<<<<<< Updated upstream
 const multer = require('multer')
+=======
+const multer = require('multer');
+const {SpeechClient} = require('@google-cloud/speech');
+const {spawn} = require('child_process');
+const sharp = require('sharp');
+const axios = require('axios');
+>>>>>>> Stashed changes
 
 require("./utils.js");
 
 const app = express();
 const expireTime = 60 * 60 * 1000;
 app.set('view engine', 'ejs')
+
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -571,10 +580,110 @@ async function connectToMongo() {
 			});
 		}
 
+<<<<<<< Updated upstream
 		// module.exports = {
 		//     main,
 		//     getGroqChatCompletion
 		// };
+=======
+		// ----------------------------------------------------------
+		// This code is partially provided in the Google Speech to Text API, 
+		// which is modified with the help of GroqCloud AI API to connect 
+		// client side to handle audio streaming from the client side.
+
+		app.post('/transcribe', async (req, res) => { // This is the end point for posting to the Google Speech API
+			const audioStream = req.pipe(require('stream')); // Create a transcription request by piping the incoming request stream 
+			// to a stream created by the 'stream' package
+		  
+			  // Create the Speech-to-Text API request
+			  // Google Client libraries
+			const request = {
+			  config: {
+				encoding: 'LINEAR16',
+				sampleRateHertz: 16000,
+				languageCode: 'en-US',
+			  },
+			  audio: {
+				content: audioStream,
+			  },
+			};
+		  
+			// Send the request to the Speech-to-Text API, store the response, and process the transcription
+			const [response] = await speechClient.recognize(request);
+			const transcription = response.results
+			  .map(result => result.alternatives[0].transcript)
+			  .join('\n');
+		  
+			res.json({transcription});
+		  });
+		  
+		  app.post('/audio', (req, res) => { // This is the end point for receiving audio and initiating transcription
+			const audioStream = req.pipe(fs.createWriteStream('audio.wav')); // Create a writable stream for the audio file named 'audio.wav' to save the incoming request data
+		  
+			// Add event listener for when the 'finish' event is triggered on the stream. 
+			// Once the entire request stream is processed, initiate transcription by calling the 'getTranscription' function
+			audioStream.on('finish', () => { 
+			  console.log('Received audio data, initiating transcription.');
+			  getTranscription();
+			});
+		  
+			res.json({status: 'received'});
+		  });
+		  
+		  // Initiates a transcription request using the Google Cloud Speech-to-Text API
+		  function getTranscription() {
+			const audioStream = fs.createReadStream('audio.wav'); // Create a readable stream for the previously saved 'audio.wav' file
+		  
+			// Google Speech API configuration settings
+			const request = {
+			  config: {
+				encoding: 'LINEAR16',
+				sampleRateHertz: 16000,
+				languageCode: 'en-US',
+			  },
+			  audio: {
+				content: audioStream,
+			  },
+			};
+		  
+			// Google Client libraries code with modification for the client side display
+			speechClient.recognize(request)
+			  .then(data => {
+				const transcription = data[0].results
+				  .map(result => result.alternatives[0].transcript)
+				  .join('\n');
+		  
+				console.log(`Transcription: ${transcription}`);
+			  })
+			  .catch(err => {
+				console.error('Error occurred:', err);
+			  });
+		  }
+
+		  app.get('/scan', (req, res) => {
+			var doc = fs.readFileSync('./html/scan.html', 'utf-8');
+			res.send(doc);
+		  });
+
+		  app.post('/api/avatar', upload.single('image'), async (req, res) => {
+			try {
+			  const imageUrl = `https://localhost:2800/uploads/${req.file.filename}`;
+		  
+			  // Send the image to the Avaturn API
+			  const avaturnResponse = await axios.post('https://demo.avaturn.dev/api/avatar', {
+				image: imageUrl,
+			  });
+		  
+			  // Return the response from the Avaturn API to the client
+			  res.json(avaturnResponse.data);
+			} catch (error) {
+			  console.error('Error:', error);
+		  
+			  // Send an error response to the client
+			  res.status(500).json({ error: 'An error occurred while processing your request.' });
+			}
+		  });
+>>>>>>> Stashed changes
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
