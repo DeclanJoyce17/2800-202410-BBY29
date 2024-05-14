@@ -9,13 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-<<<<<<< Updated upstream
-=======
     "@avaturn/sdk": "^1.0.0",
     "@google-cloud/speech": "^6.5.0",
     "axios": "^1.6.8",
     "base64-img": "^1.0.4",
->>>>>>> Stashed changes
     "bcrypt": "^5.1.1",
     "connect-mongo": "^5.1.0",
     "dotenv": "^16.4.5",

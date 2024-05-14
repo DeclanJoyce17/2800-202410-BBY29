@@ -10,15 +10,11 @@ const path = require('path');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
-<<<<<<< Updated upstream
-const multer = require('multer')
-=======
 const multer = require('multer');
 const {SpeechClient} = require('@google-cloud/speech');
 const {spawn} = require('child_process');
 const sharp = require('sharp');
 const axios = require('axios');
->>>>>>> Stashed changes
 
 require("./utils.js");
 
@@ -580,12 +576,6 @@ async function connectToMongo() {
 			});
 		}
 
-<<<<<<< Updated upstream
-		// module.exports = {
-		//     main,
-		//     getGroqChatCompletion
-		// };
-=======
 		// ----------------------------------------------------------
 		// This code is partially provided in the Google Speech to Text API, 
 		// which is modified with the help of GroqCloud AI API to connect 
@@ -683,7 +673,6 @@ async function connectToMongo() {
 			  res.status(500).json({ error: 'An error occurred while processing your request.' });
 			}
 		  });
->>>>>>> Stashed changes
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
