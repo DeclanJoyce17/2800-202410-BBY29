@@ -1,0 +1,59 @@
+<%- include("templates/header2") %>
+    <link rel="stylesheet" type="text/css" href="/styles/tasks.css" text="">
+
+    </head>
+
+    <body>
+        <!-- Chatbot -->
+        <form id="Chatter">
+            <input type="text" id="question" name="chatbot" placeholder="Ask Me Anything!">
+            <button type="submit">Send</button>
+        </form>
+
+        <!--Contents in the body tag-->
+        <img class="title" src="/img/DietLogo.png" alt="logo">
+        <div class="container taskCards">
+            <h1>Points: <%= points %>
+            </h1>
+            <div class="card">
+                <div class="card-body">
+                    <%= task1 %>
+                </div>
+                <span>
+                    <form method="post" action="/addPointDiet" style="display: inline">
+                        <button class="btn btn-secondary float-right" type="submit">Done</button>
+                    </form>
+                    <form method="post" action="/rerollDiet1" style="display: inline">
+                        <button class="btn btn-secondary float-right" type="submit">Reroll</button>
+                    </form>
+                </span>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <%= task2 %>
+                </div>
+                <span>
+                    <form method="post" action="/addPointDiet" style="display: inline">
+                        <button class="btn btn-secondary float-right" type="submit">Done</button>
+                    </form>
+                    <form method="post" action="/rerollDiet2" style="display: inline">
+                        <button class="btn btn-secondary float-right" type="submit">Reroll</button>
+                    </form>
+                </span>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <%= task3 %>
+                </div>
+                <span>
+                    <form method="post" action="/addPointDiet" style="display: inline">
+                        <button class="btn btn-secondary float-right" type="submit">Done</button>
+                    </form>
+                    <form method="post" action="/rerollDiet3" style="display: inline">
+                        <button class="btn btn-secondary float-right" type="submit">Reroll</button>
+                    </form>
+                </span>
+            </div>
+
+        </div>
+        <%- include("templates/footer") %>
