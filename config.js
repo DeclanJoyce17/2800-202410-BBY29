@@ -76,11 +76,12 @@ async function saveImageToMongoDB(fileBuffer, contentType, filename) {
 		throw error;
 	}
 }
-
+/*
 // Express route to get an image by filename
 app.get('/images/:filename', async (req, res) => {
 	try {
 		// Assuming 'userId' is the key where the user ID is stored in the session
+
 		const userId = req.session.userId;
 		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
 
@@ -95,7 +96,7 @@ app.get('/images/:filename', async (req, res) => {
 		res.status(404).send('Image not found');
 	}
 });
-
+*/
 // Route to upload images
 app.post('/upload', upload.single('image'), async (req, res) => {
 	if (!req.file) {
