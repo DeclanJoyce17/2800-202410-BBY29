@@ -12,6 +12,8 @@ const bcrypt = require('bcrypt');
 const saltRounds = 12;
 const multer = require('multer');
 const sharp = require('sharp');
+const { SpeechClient } = require('@google-cloud/speech');
+const { spawn } = require('child_process');
 
 require("./utils.js");
 
@@ -23,6 +25,7 @@ app.set('view engine', 'ejs')
 require('dotenv').config();
 
 const port = process.env.PORT || 3000;
+const speechClient = new SpeechClient();
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
 
@@ -55,6 +58,58 @@ async function initMongoDB() {
 	}
 }
 initMongoDB();
+// Save image to MongoDB using GridFS
+async function saveImageToMongoDB(fileBuffer, contentType, filename) {
+	try {
+		const uploadStream = bucket.openUploadStream(filename, { metadata: { contentType } });
+		uploadStream.write(fileBuffer);
+		uploadStream.end();
+		return new Promise((resolve, reject) => {
+			uploadStream.on('finish', () => resolve(uploadStream.id));
+			uploadStream.on('error', (error) => {
+				console.error('Failed to save image:', error);
+				reject(error);
+			});
+		});
+	} catch (error) {
+		console.error('Failed to save image:', error);
+		throw error;
+	}
+}
+
+// Express route to get an image by filename
+app.get('/images/:filename', async (req, res) => {
+	try {
+		// Assuming 'userId' is the key where the user ID is stored in the session
+		const userId = req.session.userId;
+		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
+
+		// Set the proper content type before sending the stream
+		downloadStream.on('file', (file) => {
+			res.type(file.contentType);
+		});
+		// Pipe the image data to the response
+		downloadStream.pipe(res);
+	} catch (error) {
+		console.error('Failed to retrieve image:', error);
+		res.status(404).send('Image not found');
+	}
+});
+
+// Route to upload images
+app.post('/upload', upload.single('image'), async (req, res) => {
+	if (!req.file) {
+		return res.status(400).send('No file uploaded.');
+	}
+	try {
+		const filename = req.file.originalname;
+		const fileId = await saveImageToMongoDB(req.file.buffer, req.file.mimetype, filename);
+		res.send(`Image uploaded successfully with ID: ${fileId}`);
+	} catch (error) {
+		console.error('Upload error:', error);
+		res.status(500).send(`Failed to upload image: ${error.message}`);
+	}
+});
 
 
 /*********** connecting mongo ***************/
@@ -212,7 +267,7 @@ async function connectToMongo() {
 
 			var hashedPassword = await bcrypt.hash(password, saltRounds);
 			try {
-				const result = await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, user_rank: 'Bronze'});
+				const result = await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, user_rank: 'Bronze' });
 				console.log("Inserted user");
 				req.session.authenticated = true;
 				req.session.userId = result.insertedId;
@@ -374,7 +429,7 @@ async function connectToMongo() {
 			const result = await usersCollection.updateOne(filter, updateDoc);
 
 			let doc = fs.readFileSync('./html/main.html', 'utf8'); // Ensure this path is correct
-			
+
 			// To use the ejs template:
 			const username = req.session.username
 			const points = req.session.points
@@ -386,7 +441,7 @@ async function connectToMongo() {
 				username,
 				rank,
 				points
-			});*/ 
+			});*/
 
 			try {
 				const user = await usersCollection.findOne({ username: req.session.username });
@@ -634,7 +689,7 @@ async function connectToMongo() {
 		//     main,
 		//     getGroqChatCompletion
 		// };
-		
+
 		/****************** getting Images *************************/
 
 		// Express route to get a profile image by user id
@@ -685,6 +740,80 @@ async function connectToMongo() {
 			}
 		});
 
+		// ----------------------------------------------------------
+		// This code is partially provided in the Google Speech to Text API, 
+		// which is modified with the help of GroqCloud AI API to connect 
+		// client side to handle audio streaming from the client side.
+
+		app.post('/transcribe', async (req, res) => { // This is the end point for posting to the Google Speech API
+			const audioStream = req.pipe(require('stream')); // Create a transcription request by piping the incoming request stream 
+			// to a stream created by the 'stream' package
+
+			// Create the Speech-to-Text API request
+			// Google Client libraries
+			const request = {
+				config: {
+					encoding: 'LINEAR16',
+					sampleRateHertz: 16000,
+					languageCode: 'en-US',
+				},
+				audio: {
+					content: audioStream,
+				},
+			};
+
+			// Send the request to the Speech-to-Text API, store the response, and process the transcription
+			const [response] = await speechClient.recognize(request);
+			const transcription = response.results
+				.map(result => result.alternatives[0].transcript)
+				.join('\n');
+
+			res.json({ transcription });
+		});
+
+		app.post('/audio', (req, res) => { // This is the end point for receiving audio and initiating transcription
+			const audioStream = req.pipe(fs.createWriteStream('audio.wav')); // Create a writable stream for the audio file named 'audio.wav' to save the incoming request data
+
+			// Add event listener for when the 'finish' event is triggered on the stream. 
+			// Once the entire request stream is processed, initiate transcription by calling the 'getTranscription' function
+			audioStream.on('finish', () => {
+				console.log('Received audio data, initiating transcription.');
+				getTranscription();
+			});
+
+			res.json({ status: 'received' });
+		});
+
+		// Initiates a transcription request using the Google Cloud Speech-to-Text API
+		function getTranscription() {
+			const audioStream = fs.createReadStream('audio.wav'); // Create a readable stream for the previously saved 'audio.wav' file
+
+			// Google Speech API configuration settings
+			const request = {
+				config: {
+					encoding: 'LINEAR16',
+					sampleRateHertz: 16000,
+					languageCode: 'en-US',
+				},
+				audio: {
+					content: audioStream,
+				},
+			};
+
+			// Google Client libraries code with modification for the client side display
+			speechClient.recognize(request)
+				.then(data => {
+					const transcription = data[0].results
+						.map(result => result.alternatives[0].transcript)
+						.join('\n');
+
+					console.log(`Transcription: ${transcription}`);
+				})
+				.catch(err => {
+					console.error('Error occurred:', err);
+				});
+		}
+
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
 			res.status(404).send('Page not found - 404');
@@ -708,20 +837,20 @@ connectToMongo().catch(console.error);
 
 
 async function saveProfileImageToMongoDB(fileBuffer, contentType, filename, userId) {
-    // This function specifically saves profile images and ensures only one exists per user.
-    try {
-        return await saveImageToMongoDB(fileBuffer, contentType, filename, userId, 320, 320, true);
-    } catch (error) {
-        console.error('Failed to save profile image:', error);
-        throw error;
-    }
+	// This function specifically saves profile images and ensures only one exists per user.
+	try {
+		return await saveImageToMongoDB(fileBuffer, contentType, filename, userId, 320, 320, true);
+	} catch (error) {
+		console.error('Failed to save profile image:', error);
+		throw error;
+	}
 }
 
 // Save image to MongoDB using GridFS
 async function saveImageToMongoDB(fileBuffer, contentType, filename, userId, width, height, allowOneImageOnly) {
 	try {
-		 // Resize the image before uploading for profile picture
-		 const resizedBuffer = await resizeImage(fileBuffer, width, height);
+		// Resize the image before uploading for profile picture
+		const resizedBuffer = await resizeImage(fileBuffer, width, height);
 
 		const metadata = {
 			contentType: contentType,
@@ -757,14 +886,14 @@ async function saveImageToMongoDB(fileBuffer, contentType, filename, userId, wid
 
 // resize Images
 async function resizeImage(fileBuffer, width, height) {
-    try {
-        // Resize the image
-        const resizedBuffer = await sharp(fileBuffer)
-            .resize(width, height)
-            .toBuffer();
-        return resizedBuffer;
-    } catch (error) {
-        console.error('Error resizing image:', error);
-        throw error;
-    }
+	try {
+		// Resize the image
+		const resizedBuffer = await sharp(fileBuffer)
+			.resize(width, height)
+			.toBuffer();
+		return resizedBuffer;
+	} catch (error) {
+		console.error('Error resizing image:', error);
+		throw error;
+	}
 }
