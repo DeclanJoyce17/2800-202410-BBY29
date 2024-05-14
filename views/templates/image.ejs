@@ -1,0 +1,9 @@
+<div>
+    <% if (images && images.length > 0) { %>
+        <% images.forEach(function(image) { %>
+            <img src="<%= image %>" alt="Image">
+        <% }); %>
+    <% } else { %>
+        <p>No images found.</p>
+    <% } %>
+</div>
