@@ -214,56 +214,82 @@ async function connectToMongo() {
 
 		//Signup POST
 		app.post('/signup', async (req, res) => {
-
-
 			const usersCollection = db.collection('users');
-			var username = req.body.username;
-			var email = req.body.email;
-			var password = req.body.password;
-
-			if (username.length == 0 || username == null) {
-				res.send(`Name is required. <br> <a href='/signup'>Try Again</a>`);
+			const { username, email, password } = req.body;
+		
+			// Validate input
+			if (!username) {
+				res.render('signup', { errorMessage: 'Name is required.' });
 				return;
 			}
-			else if (email.length == 0 || email == null) {
-				res.send(`Email is required. <br> <a href='/signup'>Try Again</a>`);
+			if (!email) {
+				res.render('signup', { errorMessage: 'Email is required.' });
 				return;
 			}
-			else if (password.length == 0 || password == null) {
-				res.send(`Password is required. <br> <a href='/signup'>Try Again</a>`);
+			if (!password) {
+				res.render('signup', { errorMessage: 'Password is required.' });
 				return;
 			}
-
-			const d = new Date();
-			var time = d.getTime();
-			const schema = Joi.object(
-				{
-					username: Joi.string().alphanum().max(20).required(),
-					email: Joi.string().max(35).required(),
-					password: Joi.string().max(20).required()
-				});
-
-			const validationResult = schema.validate({ username, email, password });
-			if (validationResult.error != null) {
-				console.log(validationResult.error);
-				res.redirect("/signup");
+		
+			// Validate input format with Joi
+			const schema = Joi.object({
+				username: Joi.string().alphanum().max(20).required(),
+				email: Joi.string().email().max(35).required(),
+				password: Joi.string().max(20).required()
+			});
+		
+			const { error } = schema.validate({ username, email, password });
+			if (error) {
+				res.render('signup', { errorMessage: `Validation error: ${error.details[0].message}` });
 				return;
 			}
-
-			var hashedPassword = await bcrypt.hash(password, saltRounds);
+		
 			try {
-				const result = await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, user_rank: 'Bronze' });
+				// Check if username or email already exists
+				const existingUser = await usersCollection.findOne({
+					$or: [{ username: username }, { email: email }]
+				});
+		
+				if (existingUser) {
+					let errorMessage = '';
+					if (existingUser.username === username && existingUser.email === email) {
+						errorMessage = 'Username and Email already exist.';
+					} else if (existingUser.username === username) {
+						errorMessage = 'Username already exists.';
+					} else if (existingUser.email === email) {
+						errorMessage = 'Email already exists.';
+					}
+					res.render('signup', { errorMessage: errorMessage });
+					return;
+				}
+		
+				// Hash the password
+				const hashedPassword = await bcrypt.hash(password, saltRounds);
+		
+				// Insert the new user into the database
+				const result = await usersCollection.insertOne({
+					username,
+					email,
+					password: hashedPassword,
+					timeCreated: new Date().getTime(),
+					points: 0,
+					user_rank: 'Bronze'
+				});
+		
 				console.log("Inserted user");
+		
+				// Set session variables
 				req.session.authenticated = true;
 				req.session.userId = result.insertedId;
 				req.session.username = username;
 				req.session.points = 0;
 				req.session.rank = 'Bronze';
 				req.session.cookie.maxAge = expireTime;
+		
 				res.redirect('/main');
 			} catch (err) {
 				console.error("Error registering user:", err);
-				res.status(500).send('Failed to register user');
+				res.render('signup', { errorMessage: 'Failed to register user.' });
 			}
 		});
 

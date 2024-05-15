@@ -69,28 +69,7 @@ footer{
     border: none;
     text-decoration: none;
 }
-/* nav bar */
-nav {
-    width: 100%;
-    /* position: fixed; */
-    top: 20px;
-}
 
-.navButton {
-    margin-left: 19px;
-    margin-right: 18px;
-    text-align: center;
-    vertical-align: middle;
-}
-
-.navText {
-    position: relative;
-    top: 20px;
-    padding: 14px 0;
-    margin-left: 20px;
-    font-size: 20px;
-    padding-bottom: 14px;
-}
 
 /* leader board */
 main {
