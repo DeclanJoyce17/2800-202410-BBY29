@@ -252,6 +252,79 @@ async function connectToMongo() {
 			res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2] });
 		});
 
+		//Profile Page
+		app.get('/profile', sessionValidation, async (req, res) => {
+			console.log(req.session.userId);
+			res.render('profile', { userID: req.session.userId, username: req.session.username });
+		});
+
+		//ChangeEmail Page
+		app.get('/changeEmail', sessionValidation, async (req, res) => {
+			res.render('changeEmail');
+		});
+
+		app.post('/changeEmail', sessionValidation, async (req, res) => {
+			const filter = { username: req.session.username };
+			const email = req.body.email;
+
+			const schema = Joi.object(
+				{
+					email: Joi.string().max(35).required()
+				}
+			);
+
+			if (schema.validate({ email }) != null) {
+				const updateDoc = {
+					$set: {
+						email: email
+					}
+				};
+
+				const usersCollection = db.collection('users');
+				await usersCollection.updateOne(filter, updateDoc);
+				req.session.email = email;
+
+				res.redirect('profile');
+			} else {
+
+				res.redirect('changeEmail');
+			}
+
+		});
+
+		//ChangePassword Page
+		app.get('/changePassword', sessionValidation, async (req, res) => {
+			res.render('changePassword');
+		});
+
+		app.post('/changePassword', sessionValidation, async (req, res) => {
+			const filter = { username: req.session.username };
+			const password = req.body.password;
+
+			const schema = Joi.object(
+				{
+					password: Joi.string().min(8).max(20).required()
+				}
+			);
+
+			if (schema.validate({ password }) != null) {
+				const updateDoc = {
+					$set: {
+						password: await bcrypt.hash(password, saltRounds)
+					}
+				};
+
+				const usersCollection = db.collection('users');
+				await usersCollection.updateOne(filter, updateDoc);
+
+				res.redirect('profile');
+			} else {
+
+				res.redirect('changePassword');
+			}
+
+		});
+
 		//Signup POST
 		app.post('/signup', async (req, res) => {
 
