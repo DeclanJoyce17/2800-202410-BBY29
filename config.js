@@ -702,21 +702,27 @@ async function connectToMongo() {
 				// Find the file in the MongoDB GridFS bucket by metadata userId
 				const files = await bucket.find({ "metadata.userId": userId }).toArray();
 				console.log("Files: " + files)
+				if (files.length === 0) {
+					// If no images found, serve the default image
+					const defaultImagePath = './img/default-avatar.jpg';
+					res.sendFile(defaultImagePath, { root: __dirname });
+				} else {
 
-				// There is only one profile picture
-				const file = files[0];
+					// There is only one profile picture
+					const file = files[0];
 
-				// Open a download stream by the file ID
-				const downloadStream = bucket.openDownloadStream(file._id);
+					// Open a download stream by the file ID
+					const downloadStream = bucket.openDownloadStream(file._id);
 
-				// Set the proper content type before sending the stream
-				downloadStream.on('file', (file) => {
-					res.type(file.metadata.contentType);
-				});
+					// Set the proper content type before sending the stream
+					downloadStream.on('file', (file) => {
+						res.type(file.metadata.contentType);
+					});
 
-				// Pipe the image data to the response
-				downloadStream.pipe(res);
+					// Pipe the image data to the response
+					downloadStream.pipe(res);
 
+				}
 			} catch (error) {
 				console.error('Failed to retrieve image:', error);
 				res.status(500).send('Failed to retrieve image due to an internal error.');
