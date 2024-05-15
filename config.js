@@ -213,7 +213,7 @@ async function connectToMongo() {
 			
 
 			const usersCollection = db.collection('shopItems');
-			const result = await usersCollection.find().project({price: 1}).toArray();
+			const result = await usersCollection.find({name: itemName}).project({price: 1}).toArray();
 			if (points < result[0].price) {
 				console.log("Not Enough Points.");
 				return false;
@@ -231,6 +231,7 @@ async function connectToMongo() {
 			const userCollection = db.collection('users');
 			const results = await userCollection.updateOne(filter, updateDoc);
 			req.session.currentPoints = newprice;
+			console.log("You bought a " + itemName);
 			res.redirect('/shop');
 			return true;
 			
@@ -250,79 +251,6 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
 			res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2] });
-		});
-
-		//Profile Page
-		app.get('/profile', sessionValidation, async (req, res) => {
-			console.log(req.session.userId);
-			res.render('profile', { userID: req.session.userId, username: req.session.username });
-		});
-
-		//ChangeEmail Page
-		app.get('/changeEmail', sessionValidation, async (req, res) => {
-			res.render('changeEmail');
-		});
-
-		app.post('/changeEmail', sessionValidation, async (req, res) => {
-			const filter = { username: req.session.username };
-			const email = req.body.email;
-
-			const schema = Joi.object(
-				{
-					email: Joi.string().max(35).required()
-				}
-			);
-
-			if (schema.validate({ email }) != null) {
-				const updateDoc = {
-					$set: {
-						email: email
-					}
-				};
-
-				const usersCollection = db.collection('users');
-				await usersCollection.updateOne(filter, updateDoc);
-				req.session.email = email;
-
-				res.redirect('profile');
-			} else {
-
-				res.redirect('changeEmail');
-			}
-
-		});
-
-		//ChangePassword Page
-		app.get('/changePassword', sessionValidation, async (req, res) => {
-			res.render('changePassword');
-		});
-
-		app.post('/changePassword', sessionValidation, async (req, res) => {
-			const filter = { username: req.session.username };
-			const password = req.body.password;
-
-			const schema = Joi.object(
-				{
-					password: Joi.string().min(8).max(20).required()
-				}
-			);
-
-			if (schema.validate({ password }) != null) {
-				const updateDoc = {
-					$set: {
-						password: await bcrypt.hash(password, saltRounds)
-					}
-				};
-
-				const usersCollection = db.collection('users');
-				await usersCollection.updateOne(filter, updateDoc);
-
-				res.redirect('profile');
-			} else {
-
-				res.redirect('changePassword');
-			}
-
 		});
 
 		//Signup POST
@@ -867,6 +795,78 @@ async function connectToMongo() {
 				res.status(500).send('Failed to retrieve image due to an internal error.');
 			}
 		});
+
+		app.get('/profile', sessionValidation, async (req, res) => {
+            console.log(req.session.userId);
+            res.render('profile', { userID: req.session.userId, username: req.session.username });
+        });
+
+        //ChangeEmail Page
+        app.get('/changeEmail', sessionValidation, async (req, res) => {
+            res.render('changeEmail');
+        });
+
+        app.post('/changeEmail', sessionValidation, async (req, res) => {
+            const filter = { username: req.session.username };
+            const email = req.body.email;
+
+            const schema = Joi.object(
+                {
+                    email: Joi.string().max(35).required()
+                }
+            );
+
+            if (schema.validate({ email }) != null) {
+                const updateDoc = {
+                    $set: {
+                        email: email
+                    }
+                };
+
+                const usersCollection = db.collection('users');
+                await usersCollection.updateOne(filter, updateDoc);
+                req.session.email = email;
+
+                res.redirect('profile');
+            } else {
+
+                res.redirect('changeEmail');
+            }
+
+        });
+
+        //ChangePassword Page
+        app.get('/changePassword', sessionValidation, async (req, res) => {
+            res.render('changePassword');
+        });
+
+        app.post('/changePassword', sessionValidation, async (req, res) => {
+            const filter = { username: req.session.username };
+            const password = req.body.password;
+
+            const schema = Joi.object(
+                {
+                    password: Joi.string().min(8).max(20).required()
+                }
+            );
+
+            if (schema.validate({ password }) != null) {
+                const updateDoc = {
+                    $set: {
+                        password: await bcrypt.hash(password, saltRounds)
+                    }
+                };
+
+                const usersCollection = db.collection('users');
+                await usersCollection.updateOne(filter, updateDoc);
+
+                res.redirect('profile');
+            } else {
+
+                res.redirect('changePassword');
+            }
+
+        });
 
 		// Route to upload profile images
 		app.post('/profile-upload', upload.single('image'), async (req, res) => {
