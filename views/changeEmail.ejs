@@ -1,0 +1,15 @@
+<%- include("templates/header") %>
+    <div class="title" class="center">
+        <img src="/img/Logo.png" alt="logo" width="250" height="250">
+    </div>
+
+    <div class="login bg-light">
+        <br>
+        <form action="/changeEmail" method="POST" class="index-form center">
+            <h1>New Email</h1>
+            <input type="email" name="email" placeholder="Email" required>
+            <button type="submit" class="index-btn">Confirm</button>
+        </form>
+        <br>
+    </div>
+    <%- include("templates/end") %>
