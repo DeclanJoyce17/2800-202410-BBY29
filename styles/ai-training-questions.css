@@ -1,23 +1,14 @@
 body {
     margin: 0;
     padding: 0;
-    /* background-color: black; */
-    color: white;
-    overflow: hidden;
-    background-image: url('/img/aibot2.png');
-    background-size: 150%;
-    background-repeat: no-repeat;
-    
+    background-color: black;
 }
 
-#personalize-training {
-    font-size: 30pt;
+#logo {
     position: absolute;
-    top: 600px;
-    text-align: center;
-    margin: 0 20px;
-    font-weight: bold;
-    /*  */
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 footer {
@@ -138,4 +129,62 @@ footer {
     background-color: white;
     width: 90px;
     height: 50px;
+}
+
+#top-nav {
+    position: relative;
+}
+
+#go-back {
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    background-color: gray;
+    opacity: 0.4;
+    border-radius: 20px;
+    width: 50px;
+    height: 50px;
+}
+
+#go-back-icon {
+    position: absolute;
+    left: 28px;
+    top: 59px;
+}
+
+#setting {
+    position: absolute;
+    right: 20px;
+    top: 50px;
+    background-color: gray;
+    opacity: 0.4;
+    border-radius: 20px;
+    width: 50px;
+    height: 50px;
+}
+
+#setting-icon {
+    position: absolute;
+    right: 29px;
+    top: 59px;
+}
+
+.card-container {
+    display: flex;
+    overflow-x: scroll; /* Enable horizontal scrolling */
+    gap: 16px; /* Space between cards */
+    scrollbar-width: none;
+    position: absolute;
+    top: 200px;
+    margin: 0 20px;
+    width: 95%;
+}
+
+.card {
+    flex: 0 0 calc(50% - 8px); /* Each card takes 50% width minus gap */
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 16px;
+    border-radius: 20px;
+    height: 500px;
 }
