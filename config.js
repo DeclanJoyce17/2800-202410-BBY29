@@ -196,6 +196,46 @@ async function connectToMongo() {
 			}
 		});
 
+		//Shop Page
+		app.get('/shop', sessionValidation, async (req,res) =>{
+			const usersCollection = db.collection('shopItems');
+			const result = await usersCollection.find().project({}).toArray();
+			const userCollection = db.collection('users');
+			const results = await userCollection.find().project({currentPoints: 1}).toArray();
+			console.log(results[0].currentPoints);
+			req.session.currentPoints = results[0].currentPoints;
+    		res.render('shop', {items: result, currentPoints: results[0].currentPoints});
+		});
+
+		app.post('/buy/:name', sessionValidation, async (req,res)=>{
+			var itemName = req.params.name;
+			var points = req.session.currentPoints;
+			
+
+			const usersCollection = db.collection('shopItems');
+			const result = await usersCollection.find().project({price: 1}).toArray();
+			if (points < result[0].price) {
+				console.log("Not Enough Points.");
+				return false;
+			}
+			const filter = { username: req.session.username };
+			var newprice = points - result[0].price;
+			console.log(newprice);
+			const updateDoc = {
+				$set: {
+					currentPoints: newprice
+
+				},
+			};
+
+			const userCollection = db.collection('users');
+			const results = await userCollection.updateOne(filter, updateDoc);
+			req.session.currentPoints = newprice;
+			res.redirect('/shop');
+			return true;
+			
+		});
+
 		//FitTasks Page
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
 			var point = req.session.points;
@@ -252,12 +292,13 @@ async function connectToMongo() {
 
 			var hashedPassword = await bcrypt.hash(password, saltRounds);
 			try {
-				const result = await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, user_rank: 'Bronze' });
+				const result = await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, currentPoints: 0, user_rank: 'Bronze' });
 				console.log("Inserted user");
 				req.session.authenticated = true;
 				req.session.userId = result.insertedId;
 				req.session.username = username;
 				req.session.points = 0;
+				req.session.currentPoints = 0;
 				req.session.rank = 'Bronze';
 				req.session.cookie.maxAge = expireTime;
 				res.redirect('/main');
@@ -290,7 +331,7 @@ async function connectToMongo() {
 				return;
 			}
 
-			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1 }).toArray();
+			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, _id: 1 }).toArray();
 
 			console.log(result);
 			if (result.length != 1) {
@@ -304,6 +345,7 @@ async function connectToMongo() {
 				req.session.username = result[0].username;
 				req.session.points = result[0].points;
 				req.session.rank = result[0].user_rank;
+				req.session.currentPoints = result[0].currentPoints;
 				req.session.email = email;
 				req.session.cookie.maxAge = expireTime;
 
@@ -642,18 +684,22 @@ async function connectToMongo() {
 		//Adding points to Fitness Page
 		app.post('/addPointFit', sessionValidation, async (req, res) => {
 
-			var currentPoints = req.session.points;
+			var point = req.session.points;
+			var currentPoint = req.session.currentPoints;
 			const filter = { username: req.session.username };
 
 			const updateDoc = {
 				$set: {
-					points: currentPoints + 5
+					points: point + 5,
+					currentPoints: currentPoint + 5
+
 				},
 			};
 
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.updateOne(filter, updateDoc);
-			req.session.points = currentPoints + 5;
+			req.session.points = point + 5;
+			req.session.currentPoints = currentPoint + 5;
 			console.log(result);
 			res.redirect('/fitTasks');
 		});
@@ -661,18 +707,22 @@ async function connectToMongo() {
 		//Adding points to Diet Page
 		app.post('/addPointDiet', sessionValidation, async (req, res) => {
 
-			var currentPoints = req.session.points;
+			var point = req.session.points;
+			var currentPoint = req.session.currentPoints;
 			const filter = { username: req.session.username };
 
 			const updateDoc = {
 				$set: {
-					points: currentPoints + 5
+					points: point + 5,
+					currentPoints: currentPoint + 5
+
 				},
 			};
 
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.updateOne(filter, updateDoc);
-			req.session.points = currentPoints + 5;
+			req.session.points = point + 5;
+			req.session.currentPoints = currentPoint + 5;
 			console.log(result);
 			res.redirect('/dietTasks');
 		});
