@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,18 +11,23 @@
         }
     </style>
 </head>
+
 <body>
     <video id="camera-feed" autoplay muted></video>
     <div id="avaturn-sdk-container" style="height:500px;"></div>
     <button id="capture-button">Capture</button>
     <canvas id="canvas" style="display: none;"></canvas>
 
-    <div class="hm-hero__video" data-mobile="https://3dlook.ai/wp-content/uploads/2024/02/3d-model.mp4" data-desktop="https://3dlook.ai/wp-content/uploads/2024/02/1920.mp4">
+    <div class="hm-hero__video" data-mobile="https://3dlook.ai/wp-content/uploads/2024/02/3d-model.mp4"
+        data-desktop="https://3dlook.ai/wp-content/uploads/2024/02/1920.mp4">
         <video loop="" autoplay="" muted="" playsinline="">
             <source src="https://3dlook.ai/wp-content/uploads/2024/02/1920.mp4" type="video/mp4">
         </video>
     </div>
 
     <script type="module" src="/scripts/scan.js"></script>
+    <script src="/path/to/three.js"></script>
+    <script src="/path/to/OBJLoader.js"></script>
 </body>
+
 </html>
