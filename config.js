@@ -58,25 +58,10 @@ async function initMongoDB() {
 	}
 }
 initMongoDB();
-// Save image to MongoDB using GridFS
-async function saveImageToMongoDB(fileBuffer, contentType, filename) {
-	try {
-		const uploadStream = bucket.openUploadStream(filename, { metadata: { contentType } });
-		uploadStream.write(fileBuffer);
-		uploadStream.end();
-		return new Promise((resolve, reject) => {
-			uploadStream.on('finish', () => resolve(uploadStream.id));
-			uploadStream.on('error', (error) => {
-				console.error('Failed to save image:', error);
-				reject(error);
-			});
-		});
-	} catch (error) {
-		console.error('Failed to save image:', error);
-		throw error;
-	}
-}
-/*
+
+
+/* probably it will be used later on. leave it for now.
+
 // Express route to get an image by filename
 app.get('/images/:filename', async (req, res) => {
 	try {
@@ -97,6 +82,7 @@ app.get('/images/:filename', async (req, res) => {
 	}
 });
 */
+
 // Route to upload images
 app.post('/upload', upload.single('image'), async (req, res) => {
 	if (!req.file) {
@@ -429,43 +415,54 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.updateOne(filter, updateDoc);
 
-			let doc = fs.readFileSync('./html/main.html', 'utf8'); // Ensure this path is correct
+			//let doc = fs.readFileSync('./html/main.html', 'utf8'); // Ensure this path is correct
 
-			// To use the ejs template:
+			async function getAndSortUsersFromDB(limit = 5) {
+				try {
+				  // Only return the data we need (excluding the password field)  // Sort by points in descending order
+				  const users = await usersCollection.find({}, { projection: { password: 0 } })
+				  										.sort({ points: -1 })
+				  										.limit(limit).toArray();
+				  return users;
+				} catch (error) {
+				  console.error("Error retrieving users from the database:", error);
+				  return [];
+				}
+			  }
+
+		/************ To use the ejs template ***********/
+		
 			const username = req.session.username
 			const points = req.session.points
 			const rank = req.session.rank
-			// const users = *** get list of users ***
-
-			/*res.render('main', {
-				// Pass data to the template here
-				username,
-				rank,
-				points
-			});*/
+			const users = await getAndSortUsersFromDB();
+			let tasks = [];
 
 			try {
-				const user = await usersCollection.findOne({ username: req.session.username });
+				const current_user = await usersCollection.findOne({ username: req.session.username });
 
-				if (!user || !user.fitTasks) {
-					console.error('User not found or no tasks available');
-					doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', '<li class="task-item">No tasks on your list</li>');
-					res.status(404).send(doc);
-					return;
-				}
+				// Get tasks
+				tasks = current_user.fitTasks.map(task => task);
 
-				// Generate tasks HTML
-				let tasksHtml = user.fitTasks.map(task => `<li class="task-item">${task}</li>`).join('');
-
-				// written in comment form, because those will be in HTML
-				doc = doc.replace('<!-- TASKS_PLACEHOLDER -->', tasksHtml);
-				doc = doc.replace('<!-- USERNAME_PLACEHOLDER -->', `${req.session.username}`);
-
-				res.send(doc);
 			} catch (err) {
 				console.error("Error fetching user or tasks:", err);
 				res.status(500).send('Failed to fetch user data');
 			}
+
+			// console.log("username: " + username);
+			// console.log("points: " + points);
+			// console.log("rank: " + rank);
+			// console.log("USERS: " + users);
+			// console.log("tasks: " + tasks);
+
+			res.render('main', {
+				// Pass data to the template here
+				username,
+				rank,
+				points,
+				users,
+				tasks
+			});
 		});
 
 		//Adding points POST
@@ -732,20 +729,19 @@ async function connectToMongo() {
 		// Route to upload profile images
 		app.post('/profile-upload', upload.single('image'), async (req, res) => {
 			if (!req.file) {
-				return res.status(400).send('No file uploaded.');
+			  return res.status(400).send('No file uploaded.');
 			}
 			try {
-				console.log("session user id: " + req.session.userId);
-				const userId = req.session.userId;
-				const filename = req.file.originalname;
-				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
-				// res.send(`Image uploaded successfully with ID: ${fileId}`);
-				res.redirect("/main");
+			  console.log("session user id: " + req.session.userId);
+			  const userId = req.session.userId;
+			  const filename = req.file.originalname;
+			  await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
+			  res.redirect('/main?upload=success');
 			} catch (error) {
-				console.error('Upload error:', error);
-				res.status(500).send(`Failed to upload image: ${error.message}`);
+			  console.error('Upload error:', error);
+			  res.status(500).send(`Failed to upload image: ${error.message}`);
 			}
-		});
+		  });
 
 		// ----------------------------------------------------------
 		// This code is partially provided in the Google Speech to Text API, 
