@@ -11,15 +11,17 @@ const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
 const multer = require('multer');
-const sharp = require('sharp');
 const { SpeechClient } = require('@google-cloud/speech');
 const { spawn } = require('child_process');
+const sharp = require('sharp');
+const axios = require('axios');
 
 require("./utils.js");
 
 const app = express();
 const expireTime = 60 * 60 * 1000;
 app.set('view engine', 'ejs')
+
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -415,19 +417,19 @@ async function connectToMongo() {
 
 			async function getAndSortUsersFromDB(limit = 5) {
 				try {
-				  // Only return the data we need (excluding the password field)  // Sort by points in descending order
-				  const users = await usersCollection.find({}, { projection: { password: 0 } })
-				  										.sort({ points: -1 })
-				  										.limit(limit).toArray();
-				  return users;
+					// Only return the data we need (excluding the password field)  // Sort by points in descending order
+					const users = await usersCollection.find({}, { projection: { password: 0 } })
+						.sort({ points: -1 })
+						.limit(limit).toArray();
+					return users;
 				} catch (error) {
-				  console.error("Error retrieving users from the database:", error);
-				  return [];
+					console.error("Error retrieving users from the database:", error);
+					return [];
 				}
-			  }
+			}
 
-		/************ To use the ejs template ***********/
-		
+			/************ To use the ejs template ***********/
+
 			const username = req.session.username
 			const points = req.session.points
 			const rank = req.session.rank
@@ -746,19 +748,19 @@ async function connectToMongo() {
 		// Route to upload profile images
 		app.post('/profile-upload', upload.single('image'), async (req, res) => {
 			if (!req.file) {
-			  return res.status(400).send('No file uploaded.');
+				return res.status(400).send('No file uploaded.');
 			}
 			try {
-			  console.log("session user id: " + req.session.userId);
-			  const userId = req.session.userId;
-			  const filename = req.file.originalname;
-			  await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
-			  res.redirect('/main?upload=success');
+				console.log("session user id: " + req.session.userId);
+				const userId = req.session.userId;
+				const filename = req.file.originalname;
+				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
+				res.redirect('/main?upload=success');
 			} catch (error) {
-			  console.error('Upload error:', error);
-			  res.status(500).send(`Failed to upload image: ${error.message}`);
+				console.error('Upload error:', error);
+				res.status(500).send(`Failed to upload image: ${error.message}`);
 			}
-		  });
+		});
 
 		// ----------------------------------------------------------
 		// This code is partially provided in the Google Speech to Text API, 
@@ -833,6 +835,30 @@ async function connectToMongo() {
 					console.error('Error occurred:', err);
 				});
 		}
+
+		app.get('/scan', (req, res) => {
+			var doc = fs.readFileSync('./html/scan.html', 'utf-8');
+			res.send(doc);
+		});
+
+		app.post('/api/avatar', upload.single('image'), async (req, res) => {
+			try {
+				const imageUrl = `https://localhost:2800/uploads/${req.file.filename}`;
+
+				// Send the image to the Avaturn API
+				const avaturnResponse = await axios.post('https://demo.avaturn.dev/api/avatar', {
+					image: imageUrl,
+				});
+
+				// Return the response from the Avaturn API to the client
+				res.json(avaturnResponse.data);
+			} catch (error) {
+				console.error('Error:', error);
+
+				// Send an error response to the client
+				res.status(500).json({ error: 'An error occurred while processing your request.' });
+			}
+		});
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
