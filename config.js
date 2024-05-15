@@ -116,10 +116,6 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 /*********** connecting mongo ***************/
 
 
-const taskBankFit = ["Do 20 pushups", "Do 40 situps", "Do 60 squats", "Do 20 crunches", "Do 10 burpees",
-	"Plank for 1.5 minute", "Do 60 jumping jacks", "Run 1 kilometers", "Hold a L sit for 15 seconds", "Hold wallsit for 1 minute",
-	"30 seconds of non-stop mountain climbers", "15 tricep dips"];
-const taskBankDiet = ["Only eat a single meal today", "Eat a pound of fruit today", "Go vegan for today", "Don't eat any processed foods for the day", "Cook a meal for yourself"];
 
 //if ur wondering why everything is inside this async connect-mongo call, blame davin, but at the same time it works?
 
@@ -494,21 +490,32 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
 			var temp = '';
+
+			var tempTasks;
+			if ((Math.random() * 10) >= 7) {
+				tempTasks = db.collection('fitnessTasksHard');
+			} else {
+				tempTasks = db.collection('fitnessTasks');
+			}
+
+
+			var taskBankFit = await tempTasks.find({}).project({ task: 1 }).toArray();
 			while (true) {
 				temp = Math.floor(Math.random() * taskBankFit.length);
-				if (taskBankFit[temp] != result[0].fitTasks[0] && taskBankFit[temp] != result[0].fitTasks[1] && taskBankFit[temp] != result[0].fitTasks[2]) {
+				if (taskBankFit[temp].task != result[0].fitTasks[0] && taskBankFit[temp].task != result[0].fitTasks[1] && taskBankFit[temp].task != result[0].fitTasks[2]) {
 					break;
 				}
 			}
 
+			console.log(taskBankFit[temp].task);
+
 			const updateDoc = {
 				$set: {
-					fitTasks: [taskBankFit[temp], result[0].fitTasks[1], result[0].fitTasks[2]]
+					fitTasks: [taskBankFit[temp].task, result[0].fitTasks[1], result[0].fitTasks[2]]
 				},
 			};
 
 			result = await usersCollection.updateOne(result[0], updateDoc);
-			console.log(result);
 			res.redirect('/fitTasks');
 		});
 
@@ -516,21 +523,22 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
 			var temp = '';
+			const tempTasks = db.collection('fitnessTasks');
+			var taskBankFit = await tempTasks.find({}).project({ task: 1 }).toArray();
 			while (true) {
 				temp = Math.floor(Math.random() * taskBankFit.length);
-				if (taskBankFit[temp] != result[0].fitTasks[0] && taskBankFit[temp] != result[0].fitTasks[1] && taskBankFit[temp] != result[0].fitTasks[2]) {
+				if (taskBankFit[temp].task != result[0].fitTasks[0] && taskBankFit[temp].task != result[0].fitTasks[1] && taskBankFit[temp].task != result[0].fitTasks[2]) {
 					break;
 				}
 			}
 
 			const updateDoc = {
 				$set: {
-					fitTasks: [result[0].fitTasks[0], taskBankFit[temp], result[0].fitTasks[2]]
+					fitTasks: [result[0].fitTasks[0], taskBankFit[temp].task, result[0].fitTasks[2]]
 				},
 			};
 
 			result = await usersCollection.updateOne(result[0], updateDoc);
-			console.log(result);
 			res.redirect('/fitTasks');
 		});
 
@@ -538,21 +546,22 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
 			var temp = '';
+			const tempTasks = db.collection('fitnessTasks');
+			var taskBankFit = await tempTasks.find({}).project({ task: 1 }).toArray();
 			while (true) {
 				temp = Math.floor(Math.random() * taskBankFit.length);
-				if (taskBankFit[temp] != result[0].fitTasks[0] && taskBankFit[temp] != result[0].fitTasks[1] && taskBankFit[temp] != result[0].fitTasks[2]) {
+				if (taskBankFit[temp].task != result[0].fitTasks[0] && taskBankFit[temp].task != result[0].fitTasks[1] && taskBankFit[temp].task != result[0].fitTasks[2]) {
 					break;
 				}
 			}
 
 			const updateDoc = {
 				$set: {
-					fitTasks: [result[0].fitTasks[0], result[0].fitTasks[1], taskBankFit[temp]]
+					fitTasks: [result[0].fitTasks[0], result[0].fitTasks[1], taskBankFit[temp].task]
 				},
 			};
 
 			result = await usersCollection.updateOne(result[0], updateDoc);
-			console.log(result);
 			res.redirect('/fitTasks');
 		});
 
@@ -560,16 +569,18 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
 			var temp = '';
+			const tempTasks = db.collection('dietTasks');
+			var taskBankDiet = await tempTasks.find({}).project({ task: 1 }).toArray();
 			while (true) {
 				temp = Math.floor(Math.random() * taskBankDiet.length);
-				if (taskBankDiet[temp] != result[0].dietTasks[0] && taskBankDiet[temp] != result[0].dietTasks[1] && taskBankDiet[temp] != result[0].dietTasks[2]) {
+				if (taskBankDiet[temp].task != result[0].dietTasks[0] && taskBankDiet[temp].task != result[0].dietTasks[1] && taskBankDiet[temp].task != result[0].dietTasks[2]) {
 					break;
 				}
 			}
 
 			const updateDoc = {
 				$set: {
-					dietTasks: [taskBankDiet[temp], result[0].dietTasks[1], result[0].dietTasks[2]]
+					dietTasks: [taskBankDiet[temp].task, result[0].dietTasks[1], result[0].dietTasks[2]]
 				},
 			};
 
@@ -582,16 +593,19 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
 			var temp = '';
+			const tempTasks = db.collection('dietTasks');
+			var taskBankDiet = await tempTasks.find({}).project({ task: 1 }).toArray();
 			while (true) {
 				temp = Math.floor(Math.random() * taskBankDiet.length);
-				if (taskBankDiet[temp] != result[0].dietTasks[0] && taskBankDiet[temp] != result[0].dietTasks[1] && taskBankDiet[temp] != result[0].dietTasks[2]) {
+				if (taskBankDiet[temp].task != result[0].dietTasks[0] && taskBankDiet[temp].task != result[0].dietTasks[1] && taskBankDiet[temp].task != result[0].dietTasks[2]) {
 					break;
 				}
 			}
 
+
 			const updateDoc = {
 				$set: {
-					dietTasks: [result[0].dietTasks[0], taskBankDiet[temp], result[0].dietTasks[2]]
+					dietTasks: [result[0].dietTasks[0], taskBankDiet[temp].task, result[0].dietTasks[2]]
 				},
 			};
 
@@ -604,16 +618,19 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
 			var temp = '';
+			const tempTasks = db.collection('dietTasks');
+			var taskBankDiet = await tempTasks.find({}).project({ task: 1 }).toArray();
 			while (true) {
 				temp = Math.floor(Math.random() * taskBankDiet.length);
-				if (taskBankDiet[temp] != result[0].dietTasks[0] && taskBankDiet[temp] != result[0].dietTasks[1] && taskBankDiet[temp] != result[0].dietTasks[2]) {
+				if (taskBankDiet[temp].task != result[0].dietTasks[0] && taskBankDiet[temp].task != result[0].dietTasks[1] && taskBankDiet[temp].task != result[0].dietTasks[2]) {
 					break;
 				}
 			}
 
+
 			const updateDoc = {
 				$set: {
-					dietTasks: [result[0].dietTasks[0], result[0].dietTasks[1], taskBankDiet[temp]]
+					dietTasks: [result[0].dietTasks[0], result[0].dietTasks[1], taskBankDiet[temp].task]
 				},
 			};
 
