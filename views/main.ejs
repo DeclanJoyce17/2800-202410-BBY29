@@ -1,4 +1,4 @@
-<%- include("templates/header2") %>
+<%- include("templates/header") %>
 
   <link rel="stylesheet" type="text/css" href="/styles/main.css" text="">
   <link rel="stylesheet" href="../../styles/style.css">
@@ -20,7 +20,7 @@
   </nav>
 
   <!-- Chatbot -->
-  <form action="/aichat-home" method="get" class="index-form">
+  <form action="/aichat-home" method="get" class="index-form px-4 py-5 my-5 text-center">
     <label for="chatbot">Ask me</label>
     <button type="submit" class="index-btn">ChatBot</button>
   </form>
@@ -34,94 +34,103 @@
           <h1>Points:<%= points %></h1>
       </div>
     </div>
-  <br>
+  </div>
 
   <!-- upload images and display it -->
-  <h1>Upload Your Profile Picture</h1>
-  <form action="/profile-upload" method="post" enctype="multipart/form-data" class="resize">
-    <input type="file" name="image" required>
-    <button type="submit">Upload</button>
-    <div id="success-message" class="success-message" style="display: none;">Image uploaded successfully!</div>
-  </form>
-  
-  <br>
+  <!-- <div class="px-4 py-5 my-5 text-center">
+    <h1>Upload Your Profile Picture</h1>
+    <form action="/profile-upload" method="post" enctype="multipart/form-data" class="resize">
+      <input type="file" name="image" required>
+      <button type="submit">Upload</button>
+      <div id="success-message" class="success-message" style="display: none;">Image uploaded successfully!</div>
+    </form>
+  </div> -->
+
 
   <!-- Leader board -->
-  <div id="main">
-    <div id="header">
-      <h1>Ranking</h1>
-      <button class="share">
-        <i class="ph ph-share-network"></i>
-      </button>
-    </div>
-    <div id="leaderboard">
-      <div class="ribbon "></div>
-      <table>
-        <% users.forEach(function(user, index) { %>
-          <tr>
-            <td class="number">
-              <%= index + 1 %>
-            </td>
-            <td class="profile-image">
-              <img src="./images/<%= user._id %>" width="50" height="50" alt="Profile Image" />
-            </td>
-            <td class="name">
-              <%= user.username %>
-            </td>
-            <td class="points">
-              <%= user.points %>
-                <% if (index===0) { %>
-                  <img class="gold-medal"
-                    src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true"
-                    alt="gold medal" />
-                  <% } %>
-            </td>
-          </tr>
-          <% }); %>
-      </table>
+  <div class="px-4 py-5 my-5 text-center">
+    <div id="main">
+      <div id="header">
+        <h1>Ranking</h1>
+        <button class="share">
+          <i class="ph ph-share-network"></i>
+        </button>
+      </div>
+      <div id="leaderboard">
+        <div class="ribbon "></div>
+        <table>
+          <% users.forEach(function(user, index) { %>
+            <tr>
+              <td class="number">
+                <%= index + 1 %>
+              </td>
+              <td class="profile-image">
+                <img src="./images/<%= user._id %>" width="50" height="50" alt="Profile" />
+              </td>
+              <td class="name">
+                <%= user.username %>
+              </td>
+              <td class="points">
+                <%= user.points %>
+                  <% if (index===0) { %>
+                    <img class="gold-medal"
+                      src="https://github.com/malunaridev/Challenges-iCodeThis/blob/master/4-leaderboard/assets/gold-medal.png?raw=true"
+                      alt="gold medal" />
+                    <% } %>
+              </td>
+            </tr>
+            <% }); %>
+        </table>
+      </div>
     </div>
   </div>
 
   <!-- tasks list -->
-  <ul>
-    <% if (tasks.length===0) { %>
-      <li>No tasks on your list</li>
-      <% } else { %>
-        <% tasks.forEach(function(task) { %>
-          <li class="task-item">
-            <%= task %>
-          </li>
-          <% }); %>
-      <% } %>
-  </ul>
+  <div class="px-4 py-5 my-5 text-center">
+    <ul>
+      <% if (tasks.length===0) { %>
+        <li>No tasks on your list</li>
+        <% } else { %>
+          <% tasks.forEach(function(task) { %>
+            <li class="task-item">
+              <%= task %>
+            </li>
+            <% }); %>
+        <% } %>
+    </ul>
+  </div>
 
   <!-- buttons -->
-  <form action="/map" method="get" class="index-form">
-    <button type="submit" class="index-btn">Map</button>
-  </form>
+  <div class="px-4 py-5 my-5 text-center">
+    <form action="/map" method="get" class="index-form">
+      <button type="submit" class="index-btn">Map</button>
+    </form>
 
-  <form action="/logout" method="get" class="index-form">
-    <button type="submit" class="index-btn">Logout</button>
-  </form>
+    <form action="/logout" method="get" class="index-form">
+      <button type="submit" class="index-btn">Logout</button>
+    </form>
+  </div>
 
 
   <!-- image upload success message -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const uploadSuccess = urlParams.get('upload');
+  <div class="px-4 py-5 my-5 text-center">
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const uploadSuccess = urlParams.get('upload');
 
-      if (uploadSuccess === 'success') {
-        const successMessageDiv = document.getElementById('success-message');
-        successMessageDiv.style.display = 'block';
+        if (uploadSuccess === 'success') {
+          const successMessageDiv = document.getElementById('success-message');
+          successMessageDiv.style.display = 'block';
 
-        // Optionally, refresh the page after a short delay
-        setTimeout(() => {
-          window.location.href = window.location.pathname;
-        }, 3000); // Refresh after 3 seconds
-      }
-    });
-  </script>
+          // Optionally, refresh the page after a short delay
+          setTimeout(() => {
+            window.location.href = window.location.pathname;
+          }, 3000); // Refresh after 3 seconds
+        }
+      });
+    </script>
+  </div>
 
   <!-- Footer -->
   <%- include("templates/footer") %>

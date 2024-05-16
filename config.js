@@ -94,6 +94,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 		const filename = req.file.originalname;
 		const fileId = await saveImageToMongoDB(req.file.buffer, req.file.mimetype, filename);
 		res.send(`Image uploaded successfully with ID: ${fileId}`);
+		
 	} catch (error) {
 		console.error('Upload error:', error);
 		res.status(500).send(`Failed to upload image: ${error.message}`);
@@ -445,7 +446,6 @@ async function connectToMongo() {
 				res.redirect('/login');  // Redirect to login if no user session
 				return;
 			}
-
 
 			var currentPoints = req.session.points;
 			console.log(currentPoints);
@@ -825,7 +825,9 @@ async function connectToMongo() {
 
 		app.get('/profile', sessionValidation, async (req, res) => {
             console.log(req.session.userId);
-            res.render('profile', { userID: req.session.userId, username: req.session.username });
+			const uploadSuccess = req.session.uploadSuccess;
+			req.session.uploadSuccess = false; // Reset the flag immediately
+            res.render('profile', { userID: req.session.userId, username: req.session.username, uploadSuccess: uploadSuccess}); 
         });
 
         //ChangeEmail Page
@@ -905,7 +907,9 @@ async function connectToMongo() {
 				const userId = req.session.userId;
 				const filename = req.file.originalname;
 				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
-				res.redirect('/main?upload=success');
+				// Reset the flag after rendering
+				req.session.uploadSuccess = true;
+				res.redirect('/profile');
 			} catch (error) {
 				console.error('Upload error:', error);
 				res.status(500).send(`Failed to upload image: ${error.message}`);
