@@ -92,25 +92,11 @@ app.get('/scan', async (req, res) => {
     }
 });
 
-// async function loadModel() {
-//     const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-//     const loader = new GLTFLoader();
-
-//     const path = './3d/male-body-scan.glb';
-//     const file = fs.readFileSync(path);
-//     const buffer = Buffer.from(file);
-
-//     const model = await loader.parse(buffer, '', (xhr) => {
-//         console.log((xhr.loaded / xhr.total * 100).toFixed(0) + '% loaded');
-//     });
-
-//     scene.add(model.scene);
-// }
 
 
 
 app.get('/', (req, res) => {
-    var doc = fs.readFileSync('./html/body-scan.html', 'utf-8');
+    var doc = fs.readFileSync('./html/ai-training-male-body-scan-result.html', 'utf-8');
     res.send(doc);
 });
 
