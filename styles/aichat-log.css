@@ -107,14 +107,14 @@ body {
 }
 
 input {
-    width: 67%;
+    width: 62%;
     height: 60px;
     border-radius: 20px;
     border: none;
     position: absolute;
     bottom: 50px;
     background-color: rgb(221, 218, 218);
-    padding-left: 50px;
+    padding-left: 70px;
     margin-left: 10px;
 }
 
@@ -134,6 +134,14 @@ input {
     left: 20px;
     bottom: 60px;
     opacity: 0.6;
+}
+
+#active-microphone {
+    display: none;
+    position: absolute;
+    left: 0px;
+    top: -10px;
+    border-radius: 25px;
 }
 
 footer {
@@ -176,5 +184,4 @@ footer {
     border-bottom-right-radius: 20px;
     display: none;
 }
-
 

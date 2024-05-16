@@ -655,25 +655,6 @@ async function connectToMongo() {
 			res.send(doc);
 		  });
 
-		  app.post('/api/avatar', upload.single('image'), async (req, res) => {
-			try {
-			  const imageUrl = `https://localhost:2800/uploads/${req.file.filename}`;
-		  
-			  // Send the image to the Avaturn API
-			  const avaturnResponse = await axios.post('https://demo.avaturn.dev/api/avatar', {
-				image: imageUrl,
-			  });
-		  
-			  // Return the response from the Avaturn API to the client
-			  res.json(avaturnResponse.data);
-			} catch (error) {
-			  console.error('Error:', error);
-		  
-			  // Send an error response to the client
-			  res.status(500).json({ error: 'An error occurred while processing your request.' });
-			}
-		  });
-
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
 			res.status(404).send('Page not found - 404');
