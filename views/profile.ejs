@@ -1,0 +1,63 @@
+<%- include("templates/header2") %>
+    <link rel="stylesheet" type="text/css" href="/styles/profile.css" text="">
+
+    </head>
+
+    <body>
+        <div style="margin-top: 50px;">
+            <div class="d-flex justify-content-center">
+                <td class="profile-image">
+                    <img src="./images/<%= userID %>" width="300" height="300" alt="Profile Image" />
+                </td>
+            </div>
+
+
+            <div class="d-flex justify-content-center">
+                <h1>
+                    <%= username %>
+                </h1>
+            </div>
+        </div>
+
+
+        <div style="margin-top: 70px;">
+            <div class="d-flex justify-content-center">
+                <a href="/" style="text-decoration : none;">
+                    <h1>
+                        <img src="./img/settings_gear.png" style="height: 1.5em;margin-bottom: 5px;">Settings
+                    </h1>
+                </a>
+
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <a href="/" style="text-decoration : none;">
+                    <h1><img src="./img/default-avatar.jpg" style="height: 1.5em;margin-bottom: 5px;">Change Profile
+                        Image
+                    </h1>
+                </a>
+
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <a href="/" style="text-decoration : none;">
+                    <h1><img src="./img/Trophy icon.png" style="height: 1.5em;margin-bottom: 5px;">Rank Progress</h1>
+                </a>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <a href="/changeEmail" style="text-decoration : none;">
+                    <h1>Change Email</h1>
+                </a>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <a href="/changePassword" style="text-decoration : none;">
+                    <h1>Change Password</h1>
+                </a>
+            </div>
+
+        </div>
+    </body>
+
+    <%- include("templates/footer") %>

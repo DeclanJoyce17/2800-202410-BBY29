@@ -196,6 +196,47 @@ async function connectToMongo() {
 			}
 		});
 
+		//Shop Page
+		app.get('/shop', sessionValidation, async (req,res) =>{
+			const usersCollection = db.collection('shopItems');
+			const result = await usersCollection.find().project({}).toArray();
+			const userCollection = db.collection('users');
+			const results = await userCollection.find().project({currentPoints: 1}).toArray();
+			console.log(results[0].currentPoints);
+			req.session.currentPoints = results[0].currentPoints;
+    		res.render('shop', {items: result, currentPoints: results[0].currentPoints});
+		});
+
+		app.post('/buy/:name', sessionValidation, async (req,res)=>{
+			var itemName = req.params.name;
+			var points = req.session.currentPoints;
+			
+
+			const usersCollection = db.collection('shopItems');
+			const result = await usersCollection.find({name: itemName}).project({price: 1}).toArray();
+			if (points < result[0].price) {
+				console.log("Not Enough Points.");
+				return false;
+			}
+			const filter = { username: req.session.username };
+			var newprice = points - result[0].price;
+			console.log(newprice);
+			const updateDoc = {
+				$set: {
+					currentPoints: newprice
+
+				},
+			};
+
+			const userCollection = db.collection('users');
+			const results = await userCollection.updateOne(filter, updateDoc);
+			req.session.currentPoints = newprice;
+			console.log("You bought a " + itemName);
+			res.redirect('/shop');
+			return true;
+			
+		});
+
 		//FitTasks Page
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
 			var point = req.session.points;
@@ -245,6 +286,7 @@ async function connectToMongo() {
 			}
 		
 			try {
+
 				// Check if username or email already exists
 				const existingUser = await usersCollection.findOne({
 					$or: [{ username: username }, { email: email }]
@@ -283,6 +325,7 @@ async function connectToMongo() {
 				req.session.userId = result.insertedId;
 				req.session.username = username;
 				req.session.points = 0;
+				req.session.currentPoints = 0;
 				req.session.rank = 'Bronze';
 				req.session.cookie.maxAge = expireTime;
 		
@@ -316,7 +359,7 @@ async function connectToMongo() {
 				return;
 			}
 
-			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1 }).toArray();
+			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, _id: 1 }).toArray();
 
 			console.log(result);
 			if (result.length != 1) {
@@ -330,6 +373,7 @@ async function connectToMongo() {
 				req.session.username = result[0].username;
 				req.session.points = result[0].points;
 				req.session.rank = result[0].user_rank;
+				req.session.currentPoints = result[0].currentPoints;
 				req.session.email = email;
 				req.session.cookie.maxAge = expireTime;
 
@@ -668,18 +712,22 @@ async function connectToMongo() {
 		//Adding points to Fitness Page
 		app.post('/addPointFit', sessionValidation, async (req, res) => {
 
-			var currentPoints = req.session.points;
+			var point = req.session.points;
+			var currentPoint = req.session.currentPoints;
 			const filter = { username: req.session.username };
 
 			const updateDoc = {
 				$set: {
-					points: currentPoints + 5
+					points: point + 5,
+					currentPoints: currentPoint + 5
+
 				},
 			};
 
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.updateOne(filter, updateDoc);
-			req.session.points = currentPoints + 5;
+			req.session.points = point + 5;
+			req.session.currentPoints = currentPoint + 5;
 			console.log(result);
 			res.redirect('/fitTasks');
 		});
@@ -687,18 +735,22 @@ async function connectToMongo() {
 		//Adding points to Diet Page
 		app.post('/addPointDiet', sessionValidation, async (req, res) => {
 
-			var currentPoints = req.session.points;
+			var point = req.session.points;
+			var currentPoint = req.session.currentPoints;
 			const filter = { username: req.session.username };
 
 			const updateDoc = {
 				$set: {
-					points: currentPoints + 5
+					points: point + 5,
+					currentPoints: currentPoint + 5
+
 				},
 			};
 
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.updateOne(filter, updateDoc);
-			req.session.points = currentPoints + 5;
+			req.session.points = point + 5;
+			req.session.currentPoints = currentPoint + 5;
 			console.log(result);
 			res.redirect('/dietTasks');
 		});
@@ -770,6 +822,78 @@ async function connectToMongo() {
 				res.status(500).send('Failed to retrieve image due to an internal error.');
 			}
 		});
+
+		app.get('/profile', sessionValidation, async (req, res) => {
+            console.log(req.session.userId);
+            res.render('profile', { userID: req.session.userId, username: req.session.username });
+        });
+
+        //ChangeEmail Page
+        app.get('/changeEmail', sessionValidation, async (req, res) => {
+            res.render('changeEmail');
+        });
+
+        app.post('/changeEmail', sessionValidation, async (req, res) => {
+            const filter = { username: req.session.username };
+            const email = req.body.email;
+
+            const schema = Joi.object(
+                {
+                    email: Joi.string().max(35).required()
+                }
+            );
+
+            if (schema.validate({ email }) != null) {
+                const updateDoc = {
+                    $set: {
+                        email: email
+                    }
+                };
+
+                const usersCollection = db.collection('users');
+                await usersCollection.updateOne(filter, updateDoc);
+                req.session.email = email;
+
+                res.redirect('profile');
+            } else {
+
+                res.redirect('changeEmail');
+            }
+
+        });
+
+        //ChangePassword Page
+        app.get('/changePassword', sessionValidation, async (req, res) => {
+            res.render('changePassword');
+        });
+
+        app.post('/changePassword', sessionValidation, async (req, res) => {
+            const filter = { username: req.session.username };
+            const password = req.body.password;
+
+            const schema = Joi.object(
+                {
+                    password: Joi.string().min(8).max(20).required()
+                }
+            );
+
+            if (schema.validate({ password }) != null) {
+                const updateDoc = {
+                    $set: {
+                        password: await bcrypt.hash(password, saltRounds)
+                    }
+                };
+
+                const usersCollection = db.collection('users');
+                await usersCollection.updateOne(filter, updateDoc);
+
+                res.redirect('profile');
+            } else {
+
+                res.redirect('changePassword');
+            }
+
+        });
 
 		// Route to upload profile images
 		app.post('/profile-upload', upload.single('image'), async (req, res) => {

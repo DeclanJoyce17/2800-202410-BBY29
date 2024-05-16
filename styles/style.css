@@ -17,6 +17,10 @@
     transition-duration: 0.4s;
 }
 
+.shopitems {
+    font-size: 25pt;
+}
+
 .button:hover {
     background-color: #9fa5a7;
 }
