@@ -336,19 +336,17 @@ async function connectToMongo() {
 					console.error('Error destroying session:', err);
 				}
 				res.redirect('/');
-			}); n
+			}); 
 		});
 
 		app.get('/reset-email', (req, res) => {
-			res.render('sendemail');
+			res.render('reset-email');
 		});
 
-		app.post('/email', async (req, res) => {
-			// Email content with help of chatgpt
+		app.post('/reset-email', async (req, res) => {
+			// Email url made with help of chatgpt
 			const { email } = req.body;
 			const sessionToken = crypto.randomBytes(32).toString('hex');
-			const appUrl = 'http://localhost:2800/email';
-			const urlWithSession = `${appUrl}?session=${sessionToken}`;
 			try {
 				await db.collection('passwordResetTokens').insertOne({ email, token: sessionToken });
 
@@ -366,7 +364,7 @@ async function connectToMongo() {
 				};
 
 				await transporter.sendMail(mailOptions);
-				res.send('Password reset email sent successfully.');
+				res.send('Password reset email sent successfully. <br><a href="/">Back to home page</a>');
 			}
 			catch (error) {
 				console.error('Error sending password reset email:', error);
@@ -375,48 +373,66 @@ async function connectToMongo() {
 		});
 
 		app.get('/reset-password', async (req, res) => {
-    const { token } = req.query;
+			const { token } = req.query;
 
-    try {
-        // Check if the session token exists in MongoDB
-        const resetToken = await db.collection('passwordResetTokens').findOne({ token });
+			try {
+				// Check if the session token exists in MongoDB
+				const resetToken = await db.collection('passwordResetTokens').findOne({ token });
 
-        if (!resetToken) {
-            return res.status(400).send('Invalid or expired token.');
-        }
+				if (!resetToken) {
+					return res.status(400).send('Invalid or expired token.');
+				}
 
-        // Display the password reset form
-        res.render('reset-password', { token });
-    } catch (error) {
-        console.error('Error fetching reset token:', error);
-        res.status(500).send('Error resetting password.');
-    }
-});
+				// Display the password reset form
+				res.render('reset-password', { token });
+			} catch (error) {
+				console.error('Error fetching reset token:', error);
+				res.status(500).send('Error resetting password.');
+			}
+		});
 
-// Route to handle password reset form submission
-app.post('/reset-password', async (req, res) => {
-    const { token, newPassword } = req.body;
+		// Route to handle password reset form submission
+		app.post('/reset-password', async (req, res) => {
+			const { token, newPassword, confirmNewPassword } = req.body;
 
-    try {
-        // Verify that the session token exists in MongoDB
-        const resetToken = await db.collection('passwordResetTokens').findOne({ token });
+			// Define Joi schema for password validation
+			const schema = Joi.object({
+				newPassword: Joi.string().min(8).max(20).required(),
+				confirmNewPassword: Joi.string().valid(Joi.ref('newPassword')).required()
+			});
 
-        if (!resetToken) {
-            return res.status(400).send('Invalid or expired token.');
-        }
+			try {
+				// Validate the incoming data
+				const validationResult = schema.validate({ newPassword, confirmNewPassword });
 
-        // Update the user's password in MongoDB (you would replace this logic with your own)
-        await db.collection('users').updateOne({ email: resetToken.email }, { $set: { password: newPassword } });
+				if (validationResult.error) {
+					// Handle validation error
+					return res.status(400).send('Invalid password or password confirmation.');
+				}
 
-        // Delete the reset token from MongoDB
-        await db.collection('passwordResetTokens').deleteOne({ token });
+				// Verify that the session token exists in MongoDB
+				const resetToken = await db.collection('passwordResetTokens').findOne({ token });
 
-        res.send('Password reset successful.');
-    } catch (error) {
-        console.error('Error resetting password:', error);
-        res.status(500).send('Error resetting password.');
-    }
-});
+				if (!resetToken) {
+					return res.status(400).send('Invalid or expired token.');
+				}
+
+				// Hash the new password
+				const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+				// Update the user's password in MongoDB
+				await db.collection('users').updateOne({ email: resetToken.email }, { $set: { password: hashedPassword } });
+
+				// Delete the reset token from MongoDB
+				await db.collection('passwordResetTokens').deleteOne({ token });
+
+				res.send('Password reset successful. <br><a href="/login">Back to login</a>');
+			} catch (error) {
+				console.error('Error resetting password:', error);
+				res.status(500).send('Error resetting password.');
+			}
+		});
+
 
 
 

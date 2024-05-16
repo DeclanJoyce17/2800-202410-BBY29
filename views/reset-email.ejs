@@ -1,0 +1,10 @@
+<%- include("templates/header") %>
+    <div class="login bg-light">
+    <form action="/reset-email" method="POST" class="index-form center">
+        <label for="email">Enter your email:</label>
+        <input type="email" id="email" name="email" required>
+        <button type="submit" class="index-btn">Reset Password</button>
+    </form>
+    </div>
+
+<%- include("templates/end") %>
