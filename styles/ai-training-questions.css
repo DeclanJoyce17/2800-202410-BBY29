@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: black;
+    /* background-color: black; */
 }
 
 #logo {
@@ -9,126 +9,6 @@ body {
     top: 100px;
     left: 50%;
     transform: translateX(-50%);
-}
-
-footer {
-    display: flex;
-    position: fixed;
-    bottom: -40px;
-    width: 100%;
-    height: 130px;
-}
-
-#home-weight {
-    height: 120px;
-    width: 180px;
-    background-color: white;
-    border-radius: 20px;
-}
-
-#home {
-    background-color: rgb(225, 225, 225);
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    position: absolute;
-    left: 20px;
-    bottom: 60px;
-    border-bottom: solid #FF8624;
-}
-
-#home-icon {
-    position: absolute;
-    left: 13px;
-    top: 13px;
-}
-
-#weight {
-    background-color: rgb(225, 225, 225);
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    position: absolute;
-    left: 100px;
-    bottom: 60px;
-    opacity: 0.6;
-}
-
-#weight-icon {
-    position: absolute;
-    left: 13px;
-    top: 13px;
-}
-
-#plus {
-    position: absolute;
-    left: 180px;
-    bottom: 90px;
-    background-color: #FF8624;
-    width: 70px;
-    height: 70px;
-    border-radius: 10px;
-}
-
-#plus-icon {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 20px;
-}
-
-#diet-user {
-    height: 130px;
-    width: 180px;
-    background-color: white;
-    border-radius: 20px;
-    position: absolute;
-    right: 0;
-    bottom: 0px;
-}
-
-#diet {
-    background-color: rgb(225, 225, 225);
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    position: absolute;
-    right: 100px;
-    bottom: 60px;
-    opacity: 0.6;
-}
-
-#diet-icon {
-    position: absolute;
-    left: 13px;
-    top: 13px;
-}
-
-#user {
-    background-color: rgb(225, 225, 225);
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    position: absolute;
-    right: 20px;
-    bottom: 60px;
-    opacity: 0.6;
-}
-
-#user-icon {
-    position: absolute;
-    left: 13px;
-    top: 13px;
-}
-
-
-#fill {
-    position: absolute;
-    left: 170px;
-    bottom: 40px;
-    background-color: white;
-    width: 90px;
-    height: 50px;
 }
 
 #top-nav {
@@ -139,7 +19,7 @@ footer {
     position: absolute;
     left: 20px;
     top: 50px;
-    background-color: gray;
+    background-color: rgb(221, 218, 218);
     opacity: 0.4;
     border-radius: 20px;
     width: 50px;
@@ -156,7 +36,7 @@ footer {
     position: absolute;
     right: 20px;
     top: 50px;
-    background-color: gray;
+    background-color: rgb(221, 218, 218);
     opacity: 0.4;
     border-radius: 20px;
     width: 50px;
@@ -171,20 +51,123 @@ footer {
 
 .card-container {
     display: flex;
-    overflow-x: scroll; /* Enable horizontal scrolling */
-    gap: 16px; /* Space between cards */
+    overflow-x: scroll; 
+    gap: 16px; 
     scrollbar-width: none;
     position: absolute;
     top: 200px;
-    margin: 0 20px;
+    margin-left:  10px;
+    margin-right: 10px;
     width: 95%;
 }
 
 .card {
-    flex: 0 0 calc(50% - 8px); /* Each card takes 50% width minus gap */
+    flex: 0 0 calc(50% - 8px); 
     background-color: #f0f0f0;
     border-radius: 8px;
     padding: 16px;
     border-radius: 20px;
     height: 500px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    display: flex;
+}
+
+#home {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    background-color: rgb(221, 218, 218);
+    border-radius: 20px;
+    border-bottom: solid #FF8624;
+}
+
+#home-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15px;
+}
+
+#dash-board {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    left: 120px;
+    bottom: 30px;
+    background-color: rgb(221, 218, 218);
+    border-radius: 20px;
+    opacity: 0.6;
+}
+
+#continue-ctn {
+    position: absolute;
+    left: 210px;
+    bottom: 30px;
+    background-color: black;
+    width: 200px;
+    height: 60px;
+    border-radius: 20px;
+}
+
+#continue {
+    color: white;
+    font-size: 16pt;
+    text-align: center;
+    position: absolute;
+    left: 30px;
+    top: 15px;
+}
+
+#continue-btn {
+    position: absolute;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    border-radius: 30px;
+    /* background-color: rgb(221, 218, 218); */
+    /* top: 5px; */
+}
+
+#continue-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 25%;
+}
+
+#dash-board-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15px;
+}
+
+
+#styling-bar {
+    background-color: black;
+    height: 3px;
+    width: 50%;
+    position: absolute;
+    bottom: 10px;
+    left: 50px;
+}
+
+#content {
+    margin-bottom: 200px;
+}
+
+
+#fill {
+    position: absolute;
+    left: 170px;
+    bottom: 40px;
+    background-color: white;
+    width: 90px;
+    height: 50px;
 }

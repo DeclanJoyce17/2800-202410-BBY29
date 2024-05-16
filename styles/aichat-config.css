@@ -59,6 +59,9 @@ body {
     width: 100%;
 }
 
+video {
+    width: 430px;
+}
 #new-chat {
     color: white;
     font-size: 14pt;

@@ -5,7 +5,7 @@
   <title>Groq Chat Completion</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" href="/styles/chatAI.css">
+  <link rel="stylesheet" href="/styles/aichat-config.css">
 </head>
 
 <body>
@@ -13,7 +13,10 @@
 
   <div id="top-nav">
     <div id="ai-image">
-      <img id="ai-assistant" src="../img/ai-assistant.gif" alt="ai-assistant">
+      <!-- <img id="ai-assistant" src="../img/ai-assistant.gif" alt="ai-assistant"> -->
+      <video loop="" autoplay="" muted="" playsinline="">
+        <source id="video" src="/img/friendly-bot.mp4" type="video/mp4">
+    </video> 
     </div>
     <div id="go-back"></div>
     <svg id="go-back-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -108,15 +111,6 @@
       <input id="llm-range-value" type="range" class="form-range" name="llm-range-value">
       <div id="tensor">tensor/mx</div>
     </div>
-
-    <!-- <form id="form">
-      <label for="chatbot">Ask me</label>
-      <input type="text" id="question" name="question">
-      <button type="submit">Send</button>
-    </form>
-
-    <div id='response'></div>
-  </div> -->
 
     <div id="topic-icons">
       <p id='topic-selection'>Topic Selection</p>
