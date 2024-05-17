@@ -1,0 +1,9 @@
+<br>
+    <%= item.name %> (<%= item.price %> Points)
+        <form action='/buy/<%= item.name %>' method='post'>
+            <button class="btn btn-success rounded-pill px-5">Buy</button>
+        </form>
+        <form action='/moreinfo/<%= item.moreinfo %>' method='post'>
+            <button class="btn btn-warning rounded-pill px-4">More Info</button>
+            </form>
+            
