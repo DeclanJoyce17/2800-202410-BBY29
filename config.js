@@ -438,7 +438,7 @@ async function connectToMongo() {
 			try {
 				await db.collection('passwordResetTokens').insertOne({ email, token: sessionToken });
 
-				const resetUrl = `http://localhost:2800/reset-password?token=${sessionToken}`;
+				const resetUrl = `https://two800-202410-bby29-63o6.onrender.com/reset-password?token=${sessionToken}`;
 				const mailOptions = {
 					from: process.env.APP_EMAIL,
 					to: email,
@@ -709,7 +709,7 @@ async function connectToMongo() {
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
-			req.session.user_rank = result[0].rerolls;
+			req.session.rerolls = result[0].rerolls;
 			var randomVal = Math.random() * 10;
 			var odds;
 
