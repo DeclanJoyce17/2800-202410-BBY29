@@ -575,22 +575,22 @@ async function connectToMongo() {
 			var number = req.body.number;
 
 			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1 }).toArray();
+			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1 }).toArray();
 			var temp = '';
 			var tempTasks;
 
 			var randomVal = Math.random() * 10;
 			var odds;
 
-			if (res.session.user_rank == "Bronze") {
+			if (req.session.user_rank == "Bronze") {
 				odds = 1;
-			} else if (res.session.user_rank == "Silver") {
+			} else if (req.session.user_rank == "Silver") {
 				odds = 2;
-			} else if (res.session.user_rank == "Gold") {
+			} else if (req.session.user_rank == "Gold") {
 				odds = 5;
-			} else if (res.session.user_rank == "Platinum") {
+			} else if (req.session.user_rank == "Platinum") {
 				odds = 8;
-			} else if (res.session.user_rank == "Diamond") {
+			} else if (req.session.user_rank == "Diamond") {
 				odds = 10;
 			}
 
