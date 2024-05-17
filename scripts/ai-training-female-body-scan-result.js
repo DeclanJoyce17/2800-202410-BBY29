@@ -102,3 +102,8 @@ document.onmousemove = (e) => {
 
 //Start the 3D rendering
 animate();
+
+const continueButton = document.getElementById('continue-ctn');
+continueButton.addEventListener('click', () => {
+  window.location.href = '/ai-training-recommendation';
+});

@@ -1,13 +1,8 @@
 body {
     margin: 0;
     padding: 0;
-    /* background-color: black; */
-    color: white;
-    overflow: hidden;
-    /* background-image: url('/img/aibot2.png');
-    background-size: 150%;
-    background-repeat: no-repeat; */
-    
+    color: black;
+    font-size: 16pt;
 }
 
 #personalize-training {
@@ -139,3 +134,22 @@ footer {
     width: 90px;
     height: 50px;
 }
+
+
+
+
+#video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+#video-background video {
+    object-fit: cover;
+    width: 100%;
+    height: 150%;
+}
+

@@ -11,8 +11,8 @@ const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
 const multer = require('multer');
-const {SpeechClient} = require('@google-cloud/speech');
-const {spawn} = require('child_process');
+const { SpeechClient } = require('@google-cloud/speech');
+const { spawn } = require('child_process');
 const sharp = require('sharp');
 const axios = require('axios');
 
@@ -584,112 +584,116 @@ async function connectToMongo() {
 		app.post('/transcribe', async (req, res) => { // This is the end point for posting to the Google Speech API
 			const audioStream = req.pipe(require('stream')); // Create a transcription request by piping the incoming request stream 
 			// to a stream created by the 'stream' package
-		  
-			  // Create the Speech-to-Text API request
-			  // Google Client libraries
+
+			// Create the Speech-to-Text API request
+			// Google Client libraries
 			const request = {
-			  config: {
-				encoding: 'LINEAR16',
-				sampleRateHertz: 16000,
-				languageCode: 'en-US',
-			  },
-			  audio: {
-				content: audioStream,
-			  },
+				config: {
+					encoding: 'LINEAR16',
+					sampleRateHertz: 16000,
+					languageCode: 'en-US',
+				},
+				audio: {
+					content: audioStream,
+				},
 			};
-		  
+
 			// Send the request to the Speech-to-Text API, store the response, and process the transcription
 			const [response] = await speechClient.recognize(request);
 			const transcription = response.results
-			  .map(result => result.alternatives[0].transcript)
-			  .join('\n');
-		  
-			res.json({transcription});
-		  });
-		  
-		  app.post('/audio', (req, res) => { // This is the end point for receiving audio and initiating transcription
+				.map(result => result.alternatives[0].transcript)
+				.join('\n');
+
+			res.json({ transcription });
+		});
+
+		app.post('/audio', (req, res) => { // This is the end point for receiving audio and initiating transcription
 			const audioStream = req.pipe(fs.createWriteStream('audio.wav')); // Create a writable stream for the audio file named 'audio.wav' to save the incoming request data
-		  
+
 			// Add event listener for when the 'finish' event is triggered on the stream. 
 			// Once the entire request stream is processed, initiate transcription by calling the 'getTranscription' function
-			audioStream.on('finish', () => { 
-			  console.log('Received audio data, initiating transcription.');
-			  getTranscription();
+			audioStream.on('finish', () => {
+				console.log('Received audio data, initiating transcription.');
+				getTranscription();
 			});
-		  
-			res.json({status: 'received'});
-		  });
-		  
-		  // Initiates a transcription request using the Google Cloud Speech-to-Text API
-		  function getTranscription() {
+
+			res.json({ status: 'received' });
+		});
+
+		// Initiates a transcription request using the Google Cloud Speech-to-Text API
+		function getTranscription() {
 			const audioStream = fs.createReadStream('audio.wav'); // Create a readable stream for the previously saved 'audio.wav' file
-		  
+
 			// Google Speech API configuration settings
 			const request = {
-			  config: {
-				encoding: 'LINEAR16',
-				sampleRateHertz: 16000,
-				languageCode: 'en-US',
-			  },
-			  audio: {
-				content: audioStream,
-			  },
+				config: {
+					encoding: 'LINEAR16',
+					sampleRateHertz: 16000,
+					languageCode: 'en-US',
+				},
+				audio: {
+					content: audioStream,
+				},
 			};
-		  
+
 			// Google Client libraries code with modification for the client side display
 			speechClient.recognize(request)
-			  .then(data => {
-				const transcription = data[0].results
-				  .map(result => result.alternatives[0].transcript)
-				  .join('\n');
-		  
-				console.log(`Transcription: ${transcription}`);
-			  })
-			  .catch(err => {
-				console.error('Error occurred:', err);
-			  });
-		  }
+				.then(data => {
+					const transcription = data[0].results
+						.map(result => result.alternatives[0].transcript)
+						.join('\n');
 
-		  app.get('/ai-training-home', (req, res) => {
+					console.log(`Transcription: ${transcription}`);
+				})
+				.catch(err => {
+					console.error('Error occurred:', err);
+				});
+		}
+
+		app.get('/ai-training-home', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-home.html', 'utf-8');
 			res.send(doc);
-		  });
+		});
 
-		  app.get('/ai-training-questions', (req, res) => {
+		app.get('/ai-training-questions', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-questions.html', 'utf-8');
 			res.send(doc);
-		  });
+		});
 
-		  app.get('/ai-training-scan-request', (req, res) => {
+		app.get('/ai-training-scan-request', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-scan-request.html', 'utf-8');
 			res.send(doc);
-		  });
+		});
 
-		  app.get('/ai-training-camera-feed', (req, res) => {
+		app.get('/ai-training-camera-feed', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-camera-feed.html', 'utf-8');
 			res.send(doc);
-		  });
+		});
 
-		  app.get('/ai-training-female-body-scan', (req, res) => {
+		app.get('/ai-training-female-body-scan', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-female-body-scan.html', 'utf-8');
 			res.send(doc);
-		  });
+		});
 
-		  app.get('/ai-training-female-body-scan-result', (req, res) => {
+		app.get('/ai-training-female-body-scan-result', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-female-body-scan-result.html', 'utf-8');
 			res.send(doc);
-		  });
+		});
 
-		  app.get('/ai-training-male-body-scan', (req, res) => {
+		app.get('/ai-training-male-body-scan', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-male-body-scan.html', 'utf-8');
 			res.send(doc);
-		  });
+		});
 
-		  app.get('/ai-training-male-body-scan-result', (req, res) => {
+		app.get('/ai-training-male-body-scan-result', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-male-body-scan-result.html', 'utf-8');
 			res.send(doc);
 		});
 
+		app.get('/ai-training-recommendation', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-recommendation.html', 'utf-8');
+			res.send(doc);
+		});
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
