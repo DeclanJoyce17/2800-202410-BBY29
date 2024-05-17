@@ -1,7 +1,8 @@
 body {
     margin: 0;
     padding: 0;
-    /* background-color: black; */
+    font-size: 16pt;
+    background-color: black;
 }
 
 #logo {
@@ -55,19 +56,21 @@ body {
     gap: 16px; 
     scrollbar-width: none;
     position: absolute;
-    top: 200px;
+    top: 130px;
     margin-left:  10px;
     margin-right: 10px;
     width: 95%;
 }
 
 .card {
-    flex: 0 0 calc(50% - 8px); 
-    background-color: #f0f0f0;
+    flex: 0 0 calc(100% - 8px); 
+    background-color: white;
     border-radius: 8px;
     padding: 16px;
     border-radius: 20px;
-    height: 500px;
+    height: 650px;
+    width: 410px;
+    border: none;
 }
 
 footer {
@@ -109,7 +112,7 @@ footer {
     position: absolute;
     left: 210px;
     bottom: 30px;
-    background-color: black;
+    background-color: #FF8624;
     width: 200px;
     height: 60px;
     border-radius: 20px;
@@ -170,4 +173,250 @@ footer {
     background-color: white;
     width: 90px;
     height: 50px;
+}
+
+.form-check .form-check-input {
+    float: right;
+    height: 25px;
+    width: 25px;
+    border-radius: 8px;
+    border: solid black ;
+}
+
+.goal {
+    width: 100%;
+    height: 80px;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+#age-card {
+    overflow: scroll;
+}
+
+.progress {
+    height: 20px;
+    width: 60%;
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.logo-card {
+    width: calc(30%);
+    height: calc(30%);
+    background-color: white;
+}
+
+h2 {
+    font-size: 30pt;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.form-check-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 100px;
+}
+
+.form-check-input {
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    right: 20px;
+}
+
+.list-group {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    text-align: center;
+    border-radius: 20px;
+}
+
+.list-group-item {
+    height: 60px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+
+.nav-pills {
+    position: absolute;
+    bottom: 100px;
+    width: 92%;
+    height: 60px;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    border-radius: 20px;
+}
+
+.nav-link {
+    height: 60px;
+    border-radius: 20px;
+}
+
+#weight {
+    width: 115px;
+    height: 130px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    left: 15px;
+    top: 180px;
+    opacity: 0.6;
+}
+
+.topic-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 25%;
+}
+
+.topic-text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px;
+    font-size: 14pt;
+}
+
+#walking {
+    width: 115px;
+    height: 130px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    left: 143px;
+    top: 180px;
+    opacity: 0.6;
+}
+
+/* #walking-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+} */
+
+#running {
+    width: 115px;
+    height: 130px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    right: 15px;
+    top: 180px;
+    opacity: 0.6;
+}
+
+#running-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#cycling {
+    width: 115px;
+    height: 130px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    left: 15px;
+    top: 325px;
+    opacity: 0.6;
+}
+
+/* #cycling-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+} */
+
+#hiking {
+    width: 115px;
+    height: 130px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    left: 143px;
+    top: 325px;
+    opacity: 0.6;
+}
+
+#hiking-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#karate {
+    width: 115px;
+    height: 130px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    right: 15px;
+    top: 325px;
+    opacity: 0.6;
+}
+
+#karate-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#skating {
+    width: 115px;
+    height: 130px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    left: 15px;
+    top: 470px;
+    opacity: 0.6;
+
+}
+
+/* #skating-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+} */
+
+#cardio {
+    width: 115px;
+    height: 130px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    left: 143px;
+    top: 470px;
+    opacity: 0.6;
+}
+
+#other {
+    width: 115px;
+    height: 130px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    right: 15px;
+    top: 470px;
+    opacity: 0.6;
 }

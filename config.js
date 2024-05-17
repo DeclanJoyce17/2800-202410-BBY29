@@ -650,10 +650,15 @@ async function connectToMongo() {
 			  });
 		  }
 
-		  app.get('/scan', (req, res) => {
-			var doc = fs.readFileSync('./html/scan.html', 'utf-8');
-			res.send(doc);
-		  });
+		//   app.get('/ai-training-home', (req, res) => {
+		// 	var doc = fs.readFileSync('./html/ai-training-home.html', 'utf-8');
+		// 	res.send(doc);
+		//   });
+
+		//   app.get('/ai-training-questions', (req, res) => {
+		// 	var doc = fs.readFileSync('./html/ai-training-questions.html', 'utf-8');
+		// 	res.send(doc);
+		//   });
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
