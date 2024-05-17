@@ -23,3 +23,17 @@ captureButton.addEventListener("click", () => {
 });
 
 getCameraStream();
+
+// Check the selected video state on page load
+const selectedVideo = sessionStorage.getItem('selectedVideo');
+document.getElementById('camera').addEventListener('click', () => {
+  console.log('clicked');
+if (selectedVideo) {
+  // Redirect to the appropriate scanning page
+  if (selectedVideo === 'female') {
+    window.location.href = "/ai-training-female-body-scan";
+  } else if (selectedVideo === 'male') {
+    window.location.href = "/ai-training-male-body-scan";
+  }
+}
+});

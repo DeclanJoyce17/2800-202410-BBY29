@@ -31,7 +31,7 @@ const loader = new GLTFLoader();
 
 //Load the file
 loader.load(
-  `./models/${objToRender}/female-body-scan-result.glb`,
+  `img/female-body-scan-result.glb`,
   function (gltf) {
     //If the file is loaded, add it to the scene
     object = gltf.scene;

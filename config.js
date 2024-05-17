@@ -650,15 +650,46 @@ async function connectToMongo() {
 			  });
 		  }
 
-		//   app.get('/ai-training-home', (req, res) => {
-		// 	var doc = fs.readFileSync('./html/ai-training-home.html', 'utf-8');
-		// 	res.send(doc);
-		//   });
+		  app.get('/ai-training-home', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-home.html', 'utf-8');
+			res.send(doc);
+		  });
 
-		//   app.get('/ai-training-questions', (req, res) => {
-		// 	var doc = fs.readFileSync('./html/ai-training-questions.html', 'utf-8');
-		// 	res.send(doc);
-		//   });
+		  app.get('/ai-training-questions', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-questions.html', 'utf-8');
+			res.send(doc);
+		  });
+
+		  app.get('/ai-training-scan-request', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-scan-request.html', 'utf-8');
+			res.send(doc);
+		  });
+
+		  app.get('/ai-training-camera-feed', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-camera-feed.html', 'utf-8');
+			res.send(doc);
+		  });
+
+		  app.get('/ai-training-female-body-scan', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-female-body-scan.html', 'utf-8');
+			res.send(doc);
+		  });
+
+		  app.get('/ai-training-female-body-scan-result', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-female-body-scan-result.html', 'utf-8');
+			res.send(doc);
+		  });
+
+		  app.get('/ai-training-male-body-scan', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-male-body-scan.html', 'utf-8');
+			res.send(doc);
+		  });
+
+		  app.get('/ai-training-male-body-scan-result', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-male-body-scan-result.html', 'utf-8');
+			res.send(doc);
+		});
+
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {

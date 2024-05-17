@@ -100,6 +100,21 @@ app.get('/', (req, res) => {
     res.send(doc);
 });
 
+app.get('/male', (req, res) => {
+    var doc = fs.readFileSync('./html/ai-training-male-body-scan.html', 'utf-8');
+    res.send(doc);
+});
+
+app.get('/', (req, res) => {
+    var doc = fs.readFileSync('./html/ai-training-male-body-scan-result.html', 'utf-8');
+    res.send(doc);
+});
+
+app.get('/female', (req, res) => {
+    var doc = fs.readFileSync('./html/ai-training-female-body-scan-result.html', 'utf-8');
+    res.send(doc);
+});
+
 app.listen(3000, () => {
     console.log('Server listening on port 3000');
 });

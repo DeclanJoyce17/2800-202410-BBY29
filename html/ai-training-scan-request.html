@@ -6,27 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Train with an AI Coach</title>
 
-  <link rel="stylesheet" href="/styles/ai-training-questions.css">
+  <link rel="stylesheet" href="/styles/ai-training-scan-request.css">
   </link>
-  <style>
-    .fade {
-      opacity: 0.5;
-      transition: opacity 0.5s;
-    }
-
-    video:not(.fade) {
-      opacity: 1;
-    }
-
-    #female {
-      margin-left: 2px;
-    }
-
-    body {
-      background-color: #606060;
-      overflow: hidden;
-    }
-  </style>
+  
 </head>
 
 <body>
@@ -108,47 +90,7 @@
     <div id="styling-bar"></div>
   </footer>
 
-  <script>
-
-document.addEventListener('DOMContentLoaded', () => {
-  const toggleVideo = (event) => {
-    const video = event.target;
-    let otherVideo = null;
-
-    if (video.id === 'female') {
-      otherVideo = document.getElementById('male');
-    } else if (video.id === 'male') {
-      otherVideo = document.getElementById('female');
-    }
-
-    if (otherVideo !== null) {
-      video.classList.add('fade');
-      setTimeout(() => {
-        otherVideo.classList.remove('fade');
-      }, 0);
-
-      // Save the state of which video was toggled
-      if (video.id === 'female') {
-        sessionStorage.setItem('selectedVideo', 'female');
-      } else if (video.id === 'male') {
-        sessionStorage.setItem('selectedVideo', 'male');
-      }
-    }
-  };
-
-  ['female', 'male'].forEach((videoId) => {
-    document.getElementById(videoId).addEventListener('click', toggleVideo);
-  });
-});
-
-    const nextPage = () => {
-      // Navigate to another page
-      window.location.href = "ai-training-camera.html";
-    };
-
-
-    document.getElementById('continue').addEventListener('click', nextPage);
-  </script>
+  <script src="/scripts/ai-training-scan-request.js"></script>
 </body>
 
 </html>

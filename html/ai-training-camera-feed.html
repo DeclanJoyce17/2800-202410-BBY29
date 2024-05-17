@@ -4,94 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avaturn Camera Scan</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-      video {
-        height: 932px;
-        width: 430px;
-      }
-      .fixed-bottom {
-    position: fixed;
-    bottom: 0;
-}
-
-footer {
-    position: fixed;
-    display: flex;
-}
-
-#home {
-    width: 60px;
-    height: 60px;
-    position: absolute;
-    left: 90px;
-    bottom: 30px;
-    background-color: black;
-    border-radius: 20px;
-}
-
-#home-icon {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 15px;
-}
-
-#camera {
-    width: 80px;
-    height: 80px;
-    position: absolute;
-    left: 175px;
-    transform: translateY(-50%);
-    bottom: 30px;
-    background-color: black;
-    border-radius: 20px;
-}
-
-#camera-icon {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 20px;
-}
-
-#bookmark {
-    width: 60px;
-    height: 60px;
-    position: absolute;
-    left: 280px;
-    bottom: 30px;
-    background-color: black;
-    border-radius: 20px;
-}
-
-#bookmark-icon {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 15px;
-}
-
-#styling-bar {
-    background-color: black;
-    height: 3px;
-    width: 50%;
-    position: absolute;
-    bottom: 10px;
-    left: 50px;
-}
-
-#content {
-    margin-bottom: 200px;
-}
-
-
-
-    </style>
+    <title>Scan with Camera</title>
+    
+    <link rel="stylesheet" href="/styles/ai-training-camera-feed.css">
 </head>
 
 <body>
@@ -127,22 +42,8 @@ footer {
       </footer>
     <canvas id="canvas" style="display: none;"></canvas>
 
-    <script type="module" src="/scripts/ai-training-camera.js"></script>
-    <script>
-        // Check the selected video state on page load
-      const selectedVideo = sessionStorage.getItem('selectedVideo');
-      document.getElementById('camera').addEventListener('click', () => {
-        console.log('clicked');
-      if (selectedVideo) {
-        // Redirect to the appropriate scanning page
-        if (selectedVideo === 'female') {
-          window.location.href = "ai-training-female-body-scan.html";
-        } else if (selectedVideo === 'male') {
-          window.location.href = "ai-training-male-body-scan.html";
-        }
-    }
-});
-    </script>
+    <script type="module" src="/scripts/ai-training-camera-feed.js"></script>
+
 </body>
 
 </html>

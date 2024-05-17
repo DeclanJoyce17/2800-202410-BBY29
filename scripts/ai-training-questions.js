@@ -94,5 +94,7 @@ continueButton.addEventListener("click", async () => {
     
             // Update the HTML content with the response
             console.log(responseData.message);
+
+            window.location.href = '/ai-training-scan-request';
         });
     });
