@@ -709,6 +709,7 @@ async function connectToMongo() {
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
+			req.session.user_rank = result[0].rerolls;
 			var randomVal = Math.random() * 10;
 			var odds;
 
