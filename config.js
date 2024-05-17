@@ -7,7 +7,6 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const { ObjectId, MongoClient, GridFSBucket } = require('mongodb');
 const path = require('path');
-const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
 const multer = require('multer');
@@ -15,6 +14,10 @@ const { SpeechClient } = require('@google-cloud/speech');
 const { spawn } = require('child_process');
 const sharp = require('sharp');
 const axios = require('axios');
+var nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const Joi = require('joi');
+
 
 require("./utils.js");
 
@@ -176,6 +179,15 @@ async function connectToMongo() {
 				res.redirect('/login');
 			}
 		}
+
+		//Used chatgpt to help figure out the password
+		const transporter = nodemailer.createTransport({
+			service: 'gmail', // e.g., 'gmail', 'yahoo', etc.
+			auth: {
+				user: process.env.APP_EMAIL,
+				pass: process.env.APP_PASSWORD
+			}
+		});
 
 		//Index Page
 		app.get('/', (req, res) => {
@@ -412,8 +424,107 @@ async function connectToMongo() {
 					console.error('Error destroying session:', err);
 				}
 				res.redirect('/');
-			});
+			}); 
 		});
+
+		app.get('/reset-email', (req, res) => {
+			res.render('reset-email');
+		});
+
+		app.post('/reset-email', async (req, res) => {
+			// Email url made with help of chatgpt
+			const { email } = req.body;
+			const sessionToken = crypto.randomBytes(32).toString('hex');
+			try {
+				await db.collection('passwordResetTokens').insertOne({ email, token: sessionToken });
+
+				const resetUrl = `http://localhost:2800/reset-password?token=${sessionToken}`;
+				const mailOptions = {
+					from: process.env.APP_EMAIL,
+					to: email,
+					subject: 'Password Reset',
+					html: `
+                <p>Hello,</p>
+                <p>You have requested to reset your password. Please click the link below to reset your password:</p>
+                <a href="${resetUrl}">${resetUrl}</a>
+                <p>This link will expire in 30 minutes.</p>
+            `
+				};
+
+				await transporter.sendMail(mailOptions);
+				res.send('Password reset email sent successfully. <br><a href="/">Back to home page</a>');
+			}
+			catch (error) {
+				console.error('Error sending password reset email:', error);
+				res.status(500).send('Failed to send password reset email.');
+			}
+		});
+
+		app.get('/reset-password', async (req, res) => {
+			const { token } = req.query;
+
+			try {
+				// Check if the session token exists in MongoDB
+				const resetToken = await db.collection('passwordResetTokens').findOne({ token });
+
+				if (!resetToken) {
+					return res.status(400).send('Invalid or expired token.');
+				}
+
+				// Display the password reset form
+				res.render('reset-password', { token });
+			} catch (error) {
+				console.error('Error fetching reset token:', error);
+				res.status(500).send('Error resetting password.');
+			}
+		});
+
+		// Route to handle password reset form submission
+		app.post('/reset-password', async (req, res) => {
+			const { token, newPassword, confirmNewPassword } = req.body;
+
+			// Define Joi schema for password validation
+			const schema = Joi.object({
+				newPassword: Joi.string().min(8).max(20).required(),
+				confirmNewPassword: Joi.string().valid(Joi.ref('newPassword')).required()
+			});
+
+			try {
+				// Validate the incoming data
+				const validationResult = schema.validate({ newPassword, confirmNewPassword });
+
+				if (validationResult.error) {
+					// Handle validation error
+					return res.status(400).send('Invalid password or password confirmation.');
+				}
+
+				// Verify that the session token exists in MongoDB
+				const resetToken = await db.collection('passwordResetTokens').findOne({ token });
+
+				if (!resetToken) {
+					return res.status(400).send('Invalid or expired token.');
+				}
+
+				// Hash the new password
+				const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+				// Update the user's password in MongoDB
+				await db.collection('users').updateOne({ email: resetToken.email }, { $set: { password: hashedPassword } });
+
+				// Delete the reset token from MongoDB
+				await db.collection('passwordResetTokens').deleteOne({ token });
+
+				res.send('Password reset successful. <br><a href="/login">Back to login</a>');
+			} catch (error) {
+				console.error('Error resetting password:', error);
+				res.status(500).send('Error resetting password.');
+			}
+		});
+
+
+
+
+
 
 		app.get('/map', (req, res) => {
 			// Resolve the path to map.html using path module
