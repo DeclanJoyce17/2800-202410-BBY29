@@ -202,7 +202,7 @@ async function connectToMongo() {
 			const usersCollection = db.collection('shopItems');
 			const result = await usersCollection.find().project({}).toArray();
 			const userCollection = db.collection('users');
-			const results = await userCollection.find().project({ currentPoints: 1 }).toArray();
+			const results = await userCollection.find({ email: req.session.email }).project({ currentPoints: 1 }).toArray();
 			console.log(results[0].currentPoints);
 			req.session.currentPoints = results[0].currentPoints;
 			res.render('shop', { items: result, currentPoints: results[0].currentPoints });
@@ -212,15 +212,32 @@ async function connectToMongo() {
 			var itemName = req.params.name;
 			var points = req.session.currentPoints;
 
+			const shopItemCollection = db.collection('shopItems');
+			const shopItems = await shopItemCollection.find({ name: itemName }).project({ price: 1 }).toArray();
 
-			const usersCollection = db.collection('shopItems');
-			const result = await usersCollection.find({ name: itemName }).project({ price: 1 }).toArray();
-			if (points < result[0].price) {
+			const userCollection = db.collection('users');
+			const rerollAmount = await userCollection.find({ email: req.session.email }).project({ rerolls: 1 }).toArray();
+
+			if (points < shopItems[0].price) {
 				console.log("Not Enough Points.");
 				return false;
 			}
 			const filter = { username: req.session.username };
-			var newprice = points - result[0].price;
+			if (itemName == 'Task Reroll') {
+				var rerolls = rerollAmount[0].rerolls;
+				const updateDoc = {
+					$set: {
+						rerolls: rerolls + 1
+
+					},
+				};
+
+
+				await userCollection.updateOne(filter, updateDoc);
+				req.session.rerolls = rerolls;
+			}
+
+			var newprice = points - shopItems[0].price;
 			console.log(newprice);
 			const updateDoc = {
 				$set: {
@@ -229,8 +246,7 @@ async function connectToMongo() {
 				},
 			};
 
-			const userCollection = db.collection('users');
-			const results = await userCollection.updateOne(filter, updateDoc);
+			await userCollection.updateOne(filter, updateDoc);
 			req.session.currentPoints = newprice;
 			console.log("You bought a " + itemName);
 			res.redirect('/shop');
@@ -285,8 +301,6 @@ async function connectToMongo() {
 				res.render('signup', { errorMessage: `Validation error: ${error.details[0].message}` });
 				return;
 			}
-
-			var tempArr = new Array(3);
 
 			try {
 
@@ -362,7 +376,7 @@ async function connectToMongo() {
 				return;
 			}
 
-			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, _id: 1 }).toArray();
+			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, rerolls: 1, _id: 1 }).toArray();
 
 			console.log(result);
 			if (result.length != 1) {
@@ -377,6 +391,7 @@ async function connectToMongo() {
 				req.session.points = result[0].points;
 				req.session.rank = result[0].user_rank;
 				req.session.currentPoints = result[0].currentPoints;
+				req.session.rerolls = result[0].rerolls;
 				req.session.email = email;
 				req.session.cookie.maxAge = expireTime;
 
@@ -575,10 +590,14 @@ async function connectToMongo() {
 			var number = req.body.number;
 
 			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1 }).toArray();
+			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1 }).toArray();
 			var temp = '';
 			var tempTasks;
-
+			if (result[0].rerolls < 1) {
+				console.log("no rerolls");
+				return;
+			}
+			req.session.user_rank = result[0].user_rank;
 			var randomVal = Math.random() * 10;
 			var odds;
 
@@ -615,24 +634,30 @@ async function connectToMongo() {
 			if (number == 1) {
 				updateDoc = {
 					$set: {
-						fitTasks: [taskBankFit[temp].task, result[0].fitTasks[1], result[0].fitTasks[2]]
+						fitTasks: [taskBankFit[temp].task, result[0].fitTasks[1], result[0].fitTasks[2]],
+						rerolls: req.session.rerolls - 1
 					},
 				};
 			} else if (number == 2) {
 				updateDoc = {
 					$set: {
-						fitTasks: [result[0].fitTasks[0], taskBankFit[temp].task, result[0].fitTasks[2]]
+						fitTasks: [result[0].fitTasks[0], taskBankFit[temp].task, result[0].fitTasks[2]],
+						rerolls: req.session.rerolls - 1
 					},
 				};
 			} else if (number == 3) {
 				updateDoc = {
 					$set: {
-						fitTasks: [result[0].fitTasks[0], result[0].fitTasks[1], taskBankFit[temp].task]
+						fitTasks: [result[0].fitTasks[0], result[0].fitTasks[1], taskBankFit[temp].task],
+						rerolls: req.session.rerolls - 1
 					},
 				};
 			}
 
+
+
 			result = await usersCollection.updateOne(result[0], updateDoc);
+
 			res.redirect('/fitTasks');
 		});
 
