@@ -1,0 +1,141 @@
+body {
+    margin: 0;
+    padding: 0;
+    /* background-color: black; */
+    color: white;
+    overflow: hidden;
+    background-image: url('/img/aibot2.png');
+    background-size: 150%;
+    background-repeat: no-repeat;
+    
+}
+
+#personalize-training {
+    font-size: 30pt;
+    position: absolute;
+    top: 600px;
+    text-align: center;
+    margin: 0 20px;
+    font-weight: bold;
+    /*  */
+}
+
+footer {
+    display: flex;
+    position: fixed;
+    bottom: -40px;
+    width: 100%;
+    height: 130px;
+}
+
+#home-weight {
+    height: 120px;
+    width: 180px;
+    background-color: white;
+    border-radius: 20px;
+}
+
+#home {
+    background-color: rgb(225, 225, 225);
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    position: absolute;
+    left: 20px;
+    bottom: 60px;
+    border-bottom: solid #FF8624;
+}
+
+#home-icon {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+}
+
+#weight {
+    background-color: rgb(225, 225, 225);
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    position: absolute;
+    left: 100px;
+    bottom: 60px;
+    opacity: 0.6;
+}
+
+#weight-icon {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+}
+
+#plus {
+    position: absolute;
+    left: 180px;
+    bottom: 90px;
+    background-color: #FF8624;
+    width: 70px;
+    height: 70px;
+    border-radius: 10px;
+}
+
+#plus-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 20px;
+}
+
+#diet-user {
+    height: 130px;
+    width: 180px;
+    background-color: white;
+    border-radius: 20px;
+    position: absolute;
+    right: 0;
+    bottom: 0px;
+}
+
+#diet {
+    background-color: rgb(225, 225, 225);
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    position: absolute;
+    right: 100px;
+    bottom: 60px;
+    opacity: 0.6;
+}
+
+#diet-icon {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+}
+
+#user {
+    background-color: rgb(225, 225, 225);
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    position: absolute;
+    right: 20px;
+    bottom: 60px;
+    opacity: 0.6;
+}
+
+#user-icon {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+}
+
+
+#fill {
+    position: absolute;
+    left: 170px;
+    bottom: 40px;
+    background-color: white;
+    width: 90px;
+    height: 50px;
+}

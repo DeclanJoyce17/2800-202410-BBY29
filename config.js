@@ -424,7 +424,7 @@ async function connectToMongo() {
 					console.error('Error destroying session:', err);
 				}
 				res.redirect('/');
-			}); 
+			});
 		});
 
 		app.get('/reset-email', (req, res) => {
@@ -1076,6 +1076,7 @@ async function connectToMongo() {
 			const audioStream = req.pipe(require('stream')); // Create a transcription request by piping the incoming request stream 
 			// to a stream created by the 'stream' package
 
+
 			// Create the Speech-to-Text API request
 			// Google Client libraries
 			const request = {
@@ -1141,28 +1142,49 @@ async function connectToMongo() {
 				});
 		}
 
-		app.get('/scan', (req, res) => {
-			var doc = fs.readFileSync('./html/scan.html', 'utf-8');
+		app.get('/ai-training-home', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-home.html', 'utf-8');
 			res.send(doc);
 		});
 
-		app.post('/api/avatar', upload.single('image'), async (req, res) => {
-			try {
-				const imageUrl = `https://localhost:2800/uploads/${req.file.filename}`;
+		app.get('/ai-training-questions', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-questions.html', 'utf-8');
+			res.send(doc);
+		});
 
-				// Send the image to the Avaturn API
-				const avaturnResponse = await axios.post('https://demo.avaturn.dev/api/avatar', {
-					image: imageUrl,
-				});
+		app.get('/ai-training-scan-request', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-scan-request.html', 'utf-8');
+			res.send(doc);
+		});
 
-				// Return the response from the Avaturn API to the client
-				res.json(avaturnResponse.data);
-			} catch (error) {
-				console.error('Error:', error);
+		app.get('/ai-training-camera-feed', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-camera-feed.html', 'utf-8');
+			res.send(doc);
+		});
 
-				// Send an error response to the client
-				res.status(500).json({ error: 'An error occurred while processing your request.' });
-			}
+		app.get('/ai-training-female-body-scan', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-female-body-scan.html', 'utf-8');
+			res.send(doc);
+		});
+
+		app.get('/ai-training-female-body-scan-result', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-female-body-scan-result.html', 'utf-8');
+			res.send(doc);
+		});
+
+		app.get('/ai-training-male-body-scan', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-male-body-scan.html', 'utf-8');
+			res.send(doc);
+		});
+
+		app.get('/ai-training-male-body-scan-result', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-male-body-scan-result.html', 'utf-8');
+			res.send(doc);
+		});
+
+		app.get('/ai-training-recommendation', (req, res) => {
+			var doc = fs.readFileSync('./html/ai-training-recommendation.html', 'utf-8');
+			res.send(doc);
 		});
 
 		// Route for handling 404 Not Found

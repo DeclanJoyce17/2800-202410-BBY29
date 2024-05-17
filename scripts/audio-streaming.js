@@ -58,8 +58,6 @@ function startRecording() {
             document.getElementById('chat-question').disabled = true;
 
             isSpeechRecognitionActive = true;
-
-            // sendAudio();
         });
     } else {
         recognition.start();
