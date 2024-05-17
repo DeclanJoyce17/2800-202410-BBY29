@@ -1,4 +1,5 @@
-<%- include("templates/header2") %>
+<%- include("templates/header") %>
+
   <link rel="stylesheet" type="text/css" href="/styles/main.css" text="">
   <link rel="stylesheet" href="../../styles/style.css">
 
@@ -18,50 +19,42 @@
     </a>
   </nav>
 
-
-
   <!-- Chatbot -->
-  <form action="/aichat-home" method="get" class="index-form">
+  <form action="/aichat-home" method="get" class="index-form px-4 py-5 my-5 text-center">
     <label for="chatbot">Ask me</label>
     <button type="submit" class="index-btn">ChatBot</button>
   </form>
 
   <!-- Welcome messsge -->
   <div class="px-4 py-5 my-5 text-center">
-    <h4 style="margin-bottom: 5%;" class="display-4">Are you ready to tackle the day, <%= username %>?
-    </h4>
+    <h4 style="margin-bottom: 5%;" class="display-4"><%= greeting %>, <%= username %></h4>
     <div class="col-lg-6 mx-auto">
       <div class="navText">
-        <h1>Rank:<%= rank %>
-        </h1>
-        <h1>Points:<%= points %>
-        </h1>
+        <h1>Rank:<%= rank %></h1>
+          <h1>Points:<%= points %></h1>
       </div>
     </div>
+  </div>
 
-    <br>
-
-    <!-- upload images and display it -->
+  <!-- upload images and display it -->
+  <!-- <div class="px-4 py-5 my-5 text-center">
     <h1>Upload Your Profile Picture</h1>
     <form action="/profile-upload" method="post" enctype="multipart/form-data" class="resize">
       <input type="file" name="image" required>
       <button type="submit">Upload</button>
       <div id="success-message" class="success-message" style="display: none;">Image uploaded successfully!</div>
     </form>
-    <br>
-    <!-- display images -->
-    <div id="image-container">
-      <!-- Images will be loaded here -->
-    </div>
+  </div> -->
 
 
-    <!-- Leader board -->
+  <!-- Leader board -->
+  <div class="px-4 py-5 my-5 text-center">
     <div id="main">
       <div id="header">
         <h1>Ranking</h1>
-        <button class="share">
+        <!-- <button class="share">
           <i class="ph ph-share-network"></i>
-        </button>
+        </button> -->
       </div>
       <div id="leaderboard">
         <div class="ribbon "></div>
@@ -72,7 +65,7 @@
                 <%= index + 1 %>
               </td>
               <td class="profile-image">
-                <img src="./images/<%= user._id %>" width="50" height="50" alt="Profile Image" />
+                <img src="./images/<%= user._id %>" width="50" height="50" alt="Profile" />
               </td>
               <td class="name">
                 <%= user.username %>
@@ -90,8 +83,10 @@
         </table>
       </div>
     </div>
+  </div>
 
-    <!-- tasks list -->
+  <!-- tasks list -->
+  <div class="px-4 py-5 my-5 text-center">
     <ul>
       <% if (tasks.length===0) { %>
         <li>No tasks on your list</li>
@@ -101,10 +96,12 @@
               <%= task %>
             </li>
             <% }); %>
-              <% } %>
+        <% } %>
     </ul>
+  </div>
 
-    <!-- buttons -->
+  <!-- buttons -->
+  <div class="px-4 py-5 my-5 text-center">
     <form action="/map" method="get" class="index-form">
       <button type="submit" class="index-btn">Map</button>
     </form>
@@ -112,9 +109,11 @@
     <form action="/logout" method="get" class="index-form">
       <button type="submit" class="index-btn">Logout</button>
     </form>
+  </div>
 
 
-    <!-- image upload success message -->
+  <!-- image upload success message -->
+  <div class="px-4 py-5 my-5 text-center">
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -131,6 +130,7 @@
         }
       });
     </script>
+  </div>
 
-    <!-- Footer -->
-    <%- include("templates/footer") %>
+  <!-- Footer -->
+  <%- include("templates/footer") %>

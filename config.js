@@ -94,6 +94,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 		const filename = req.file.originalname;
 		const fileId = await saveImageToMongoDB(req.file.buffer, req.file.mimetype, filename);
 		res.send(`Image uploaded successfully with ID: ${fileId}`);
+
 	} catch (error) {
 		console.error('Upload error:', error);
 		res.status(500).send(`Failed to upload image: ${error.message}`);
@@ -255,48 +256,74 @@ async function connectToMongo() {
 
 		//Signup POST
 		app.post('/signup', async (req, res) => {
-
-
 			const usersCollection = db.collection('users');
-			var username = req.body.username;
-			var email = req.body.email;
-			var password = req.body.password;
+			const { username, email, password } = req.body;
 
-			if (username.length == 0 || username == null) {
-				res.send(`Name is required. <br> <a href='/signup'>Try Again</a>`);
+			// Validate input
+			if (!username) {
+				res.render('signup', { errorMessage: 'Name is required.' });
 				return;
 			}
-			else if (email.length == 0 || email == null) {
-				res.send(`Email is required. <br> <a href='/signup'>Try Again</a>`);
+			if (!email) {
+				res.render('signup', { errorMessage: 'Email is required.' });
 				return;
 			}
-			else if (password.length == 0 || password == null) {
-				res.send(`Password is required. <br> <a href='/signup'>Try Again</a>`);
+			if (!password) {
+				res.render('signup', { errorMessage: 'Password is required.' });
 				return;
 			}
 
-			const d = new Date();
-			var time = d.getTime();
-			const schema = Joi.object(
-				{
-					username: Joi.string().alphanum().max(20).required(),
-					email: Joi.string().max(35).required(),
-					password: Joi.string().max(20).required()
-				});
+			// Validate input format with Joi
+			const schema = Joi.object({
+				username: Joi.string().alphanum().max(20).required(),
+				email: Joi.string().email().max(35).required(),
+				password: Joi.string().max(20).required()
+			});
 
-			const validationResult = schema.validate({ username, email, password });
-			if (validationResult.error != null) {
-				console.log(validationResult.error);
-				res.redirect("/signup");
+			const { error } = schema.validate({ username, email, password });
+			if (error) {
+				res.render('signup', { errorMessage: `Validation error: ${error.details[0].message}` });
 				return;
 			}
 
 			var tempArr = new Array(3);
 
-			var hashedPassword = await bcrypt.hash(password, saltRounds);
 			try {
-				const result = await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, currentPoints: 0, user_rank: 'Bronze', fitTasks: tempArr, dietTasks: tempArr });
+
+				// Check if username or email already exists
+				const existingUser = await usersCollection.findOne({
+					$or: [{ username: username }, { email: email }]
+				});
+
+				if (existingUser) {
+					let errorMessage = '';
+					if (existingUser.username === username && existingUser.email === email) {
+						errorMessage = 'Username and Email already exist.';
+					} else if (existingUser.username === username) {
+						errorMessage = 'Username already exists.';
+					} else if (existingUser.email === email) {
+						errorMessage = 'Email already exists.';
+					}
+					res.render('signup', { errorMessage: errorMessage });
+					return;
+				}
+
+				// Hash the password
+				const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+				// Insert the new user into the database
+				const result = await usersCollection.insertOne({
+					username,
+					email,
+					password: hashedPassword,
+					timeCreated: new Date().getTime(),
+					points: 0,
+					user_rank: 'Bronze', fitTasks: tempArr, dietTasks: tempArr
+				});
+
 				console.log("Inserted user");
+
+				// Set session variables
 				req.session.authenticated = true;
 				req.session.userId = result.insertedId;
 				req.session.username = username;
@@ -304,10 +331,11 @@ async function connectToMongo() {
 				req.session.currentPoints = 0;
 				req.session.rank = 'Bronze';
 				req.session.cookie.maxAge = expireTime;
+
 				res.redirect('/main');
 			} catch (err) {
 				console.error("Error registering user:", err);
-				res.status(500).send('Failed to register user');
+				res.render('signup', { errorMessage: 'Failed to register user.' });
 			}
 		});
 
@@ -421,7 +449,18 @@ async function connectToMongo() {
 				return;
 			}
 
+			// greeting depends on the time user logged in
+			const currentHour = new Date().getHours();
+			let greeting;
+			if (currentHour < 12) {
+				greeting = 'Good Morning';
+			} else if (currentHour < 18) {
+				greeting = 'Good Afternoon';
+			} else {
+				greeting = 'Good Evening';
+			}
 
+			// ranking
 			var currentPoints = req.session.points;
 			console.log(currentPoints);
 			if (currentPoints < 50 && currentPoints >= 0) {
@@ -504,7 +543,8 @@ async function connectToMongo() {
 				rank,
 				points,
 				users,
-				tasks
+				tasks,
+				greeting
 			});
 		});
 
@@ -766,7 +806,6 @@ async function connectToMongo() {
 		app.get('/images/:userId', async (req, res) => {
 			try {
 				console.log("Session User ID: " + req.params.userId)
-				// Assuming 'userId' is the key where the user ID is stored in the session
 				const userId = req.params.userId;
 				// Find the file in the MongoDB GridFS bucket by metadata userId
 				const files = await bucket.find({ "metadata.userId": userId }).toArray();
@@ -792,6 +831,7 @@ async function connectToMongo() {
 					downloadStream.pipe(res);
 
 				}
+
 			} catch (error) {
 				console.error('Failed to retrieve image:', error);
 				res.status(500).send('Failed to retrieve image due to an internal error.');
@@ -800,7 +840,9 @@ async function connectToMongo() {
 
 		app.get('/profile', sessionValidation, async (req, res) => {
 			console.log(req.session.userId);
-			res.render('profile', { userID: req.session.userId, username: req.session.username, email: req.session.email });
+			const uploadSuccess = req.session.uploadSuccess;
+			req.session.uploadSuccess = false; // Reset the flag immediately
+			res.render('profile', { userID: req.session.userId, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
 		});
 
 		//ChangeEmail Page
@@ -880,7 +922,9 @@ async function connectToMongo() {
 				const userId = req.session.userId;
 				const filename = req.file.originalname;
 				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
-				res.redirect('/main?upload=success');
+				// Reset the flag after rendering
+				req.session.uploadSuccess = true;
+				res.redirect('/profile');
 			} catch (error) {
 				console.error('Upload error:', error);
 				res.status(500).send(`Failed to upload image: ${error.message}`);
@@ -999,7 +1043,6 @@ async function connectToMongo() {
 		console.error("Connection error:", err);
 		process.exit(1); // Exit with error if connection fails
 	}
-
 }
 connectToMongo().catch(console.error);
 

@@ -1,8 +1,3 @@
-body {
-    display: grid;
-    grid-area: auto;
-}
-
 /* nav bar */
 nav {
     width: 100%;
