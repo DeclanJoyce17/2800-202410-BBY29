@@ -1,99 +1,157 @@
-<%- include("templates/header") %>
-    <link rel="stylesheet" type="text/css" href="/styles/profile.css" text="">
+<!DOCTYPE html>
+<html lang="en">
 
-    </head>
+<head>
+    <meta name="Comp2800 template" content="FitUp">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <body>
-        <div style="margin-top: 50px;">
-            <div class="d-flex justify-content-center">
-                <td class="profile-image">
-                    <img src="./images/<%= userID %>" width="300" height="300" alt="Profile Image" />
-                </td>
-            </div>
+    <title>Account Settings</title>
+    <link rel="stylesheet" href="/styles/profile.css">
+</head>
 
+<!-- can't use header.ejs because there is style.css. that ruins the page-->
 
-            <div class="d-flex justify-content-center">
-                <h1>
-                    <%= username %>
-                </h1>
+<body>
+    <div class="container">
+
+        <div class="header">
+            <div id="go-back"></div>
+                Account Settings
             </div>
         </div>
 
-        <!-- Success Message -->
-        <% if (uploadSuccess) { %>
-            <div id="success-message" class="alert alert-success" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
-                Image uploaded successfully!
-            </div>
-        <% } %>
-            
+        <div class="profile-image">
+            <img src="./images/<%= userID %>" alt="Profile" class="profile-image">
+        </div>
 
-        <!-- <div style="margin-top: 70px;">
-            <div class="d-flex justify-content-center">
-                <a href="/" style="text-decoration : none;">
-                    <h1>
-                        <img src="./img/settings_gear.png" style="height: 1.5em;margin-bottom: 5px;">Settings
-                    </h1>
+            <!-- Success Message -->
+            <% if (uploadSuccess) { %>
+                <div id="success-message" class="alert alert-success" style="position: fixed; top: 30em; right: 30em; z-index: 9999;">
+                    Image uploaded successfully!
+                </div>
+            <% } %>
+                
+
+        <div class="username">
+            <h1><%= username %> </h1>
+        </div>
+
+        <div class="section">
+            <div class="section-title">General</div>
+
+            <!-- possibly use -->
+             <!-- <div class="item">
+                <span>Notifications</span>
+                <span class="icon">🔔</span>
+            </div> -->
+            <!-- <div class="item">
+                <span>Language</span>
+                <span class="icon">🌐</span>
+                <span class="badge">EN</span>
+            </div> -->
+            <!-- <div class="item">
+                <span>Dark Mode</span>
+                <input type="checkbox" class="toggle" checked>
+            </div> -->
+
+                <div class="item">
+                    <a href="/" id="profileImageLink" style="text-decoration: none;">
+                        <span class="icon">👤</span>
+                        <span>Change Profile Image</span>
+                    </a>
+                    <form id="profileUploadForm" action="/profile-upload" method="post" enctype="multipart/form-data" class="d-none">
+                        <input type="file" name="image" id="profileImageInput" required style="display: none;">
+                    </form>
+                </div>
+
+                <div class="item">
+                    <a href="/changeEmail" style="text-decoration : none;">
+                        <span class="icon">✉️</span>
+                        <span>Change Email</span>
+                    </a>
+                </div>
+
+                <div class="item">
+                    <a href="/changePassword" style="text-decoration : none;">
+                        <span class="icon">📝</span>
+                        <span>Change Password</span>
+                    </a>
+                </div>
+
+                <div class="item">
+                    <a href="/" style="text-decoration : none;">
+                        <span class="icon">🏆</span>
+                        <span>Ranking Progress</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Security & Privacy</div>
+                <div class="item">
+                    <a href="/" style="text-decoration : none;">
+                        <span class="icon">🔏</span>
+                        <span>Privacy Policy</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Help & Support</div>
+                <div class="item">
+                    <a href="/" style="text-decoration : none;">
+                        <span class="icon">🗨️</span>
+                        <span>About Us</span>
+                    </a>
+                </div>
+
+                <div class="item">
+                    <a href="/" style="text-decoration : none;">
+                        <span class="icon">🆘</span>
+                        <span>Help Center</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section danger-zone">
+            <div class="section-title">Danger Zone</div>
+            <div class="item" action="/logout" method="get">
+                <a href="/logout" type="submit" style="text-decoration : none;">
+                    <span class="icon">❌</span>
+                    <span>Log Out</span>
                 </a>
-
-            </div>
-        </div> -->
-
-
-        <div class="d-flex justify-content-center mt-5">
-            <a href="#" id="profileImageLink" style="text-decoration: none;">
-              <h1>
-                <img src="/img/default-avatar.jpg" style="height: 1.5em; margin-bottom: 5px;">
-                Change Profile Image
-              </h1>
-            </a>
-            <form id="profileUploadForm" action="/profile-upload" method="post" enctype="multipart/form-data" class="d-none">
-              <input type="file" name="image" id="profileImageInput" required style="display: none;">
             </form>
-          </div>
         </div>
 
-
-        <div class="d-flex justify-content-center mt-5">
-            <a href="/" style="text-decoration : none;">
-                <h1><img src="./img/Trophy icon.png" style="height: 1.5em;margin-bottom: 5px;">Rank Progress</h1>
-            </a>
+        <div class="footer">
+            fitup.ai v1.2800 ©All Rights Reserved, 2024
         </div>
+    </div>
 
-        <div class="d-flex justify-content-center mt-5">
-            <a href="/changeEmail" style="text-decoration : none;">
-                <h1>Change Email</h1>
-            </a>
-        </div>
+    <!-- one click event for uploading image / mitigating the steps -->
+    <script>
+        document.getElementById('profileImageLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('profileImageInput').click();
+        });
 
-        <div class="d-flex justify-content-center mt-5">
-            <a href="/changePassword" style="text-decoration : none;">
-                <h1>Change Password</h1>
-            </a>
-        </div>
+        document.getElementById('profileImageInput').addEventListener('change', function () {
+            document.getElementById('profileUploadForm').submit();
+        });
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const successMessageDiv = document.getElementById('success-message');
+            if (successMessageDiv) {
+                // Hide the success message after 3 seconds
+                setTimeout(() => {
+                    successMessageDiv.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
 
-        <!-- one click event for uploading image / mitigating the steps -->
-        <script>
-            document.getElementById('profileImageLink').addEventListener('click', function (e) {
-                e.preventDefault();
-                document.getElementById('profileImageInput').click();
-            });
-    
-            document.getElementById('profileImageInput').addEventListener('change', function () {
-                document.getElementById('profileUploadForm').submit();
-            });
-    
-            document.addEventListener('DOMContentLoaded', () => {
-                const successMessageDiv = document.getElementById('success-message');
-                if (successMessageDiv) {
-                    // Hide the success message after 3 seconds
-                    setTimeout(() => {
-                        successMessageDiv.style.display = 'none';
-                    }, 3000);
-                }
-            });
-        </script>
-
-    </body>
-
-    <%- include("templates/footer") %>
+<%- include("templates/end") %>

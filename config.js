@@ -447,6 +447,18 @@ async function connectToMongo() {
 				return;
 			}
 
+			// greeting depends on the time user logged in
+			const currentHour = new Date().getHours();
+			let greeting;
+				if (currentHour < 12) {
+					greeting = 'Good Morning';
+				} else if (currentHour < 18) {
+					greeting = 'Good Afternoon';
+				} else {
+					greeting = 'Good Evening';
+				}
+	
+			// ranking
 			var currentPoints = req.session.points;
 			console.log(currentPoints);
 			if (currentPoints < 50 && currentPoints >= 0) {
@@ -529,7 +541,8 @@ async function connectToMongo() {
 				rank,
 				points,
 				users,
-				tasks
+				tasks,
+				greeting
 			});
 		});
 
@@ -827,7 +840,7 @@ async function connectToMongo() {
             console.log(req.session.userId);
 			const uploadSuccess = req.session.uploadSuccess;
 			req.session.uploadSuccess = false; // Reset the flag immediately
-            res.render('profile', { userID: req.session.userId, username: req.session.username, uploadSuccess: uploadSuccess}); 
+            res.render('profile', { userID: req.session.userId, username: req.session.username, uploadSuccess: uploadSuccess});
         });
 
         //ChangeEmail Page
@@ -1028,7 +1041,6 @@ async function connectToMongo() {
 		console.error("Connection error:", err);
 		process.exit(1); // Exit with error if connection fails
 	}
-
 }
 connectToMongo().catch(console.error);
 
