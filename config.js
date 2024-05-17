@@ -641,7 +641,7 @@ async function connectToMongo() {
 			/************ To use the ejs template ***********/
 
 			const username = req.session.username
-			const points = req.session.points
+			
 			const rank = req.session.rank
 			const users = await getAndSortUsersFromDB();
 			let tasks = [];
@@ -663,6 +663,8 @@ async function connectToMongo() {
 			// console.log("USERS: " + users);
 			// console.log("tasks: " + tasks);
 
+			var results = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, points: 1 }).toArray();
+			const points = results[0].points;
 			res.render('main', {
 				// Pass data to the template here
 				username,
