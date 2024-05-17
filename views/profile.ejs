@@ -16,35 +16,37 @@
     <div class="container">
 
         <div class="header">
-            <div id="go-back"></div>
-                Account Settings
-            </div>
+            <p class="headerTitle">Account Settings</p>
+            <a class="go-back" onclick="goBack()">Back</a>
         </div>
 
         <div class="profile-image">
             <img src="./images/<%= userID %>" alt="Profile" class="profile-image">
         </div>
 
-            <!-- Success Message -->
-            <% if (uploadSuccess) { %>
-                <div id="success-message" class="alert alert-success" style="position: fixed; top: 30em; right: 30em; z-index: 9999;">
-                    Image uploaded successfully!
-                </div>
-            <% } %>
-                
-
         <div class="username">
-            <h1><%= username %> </h1>
+            <h1>
+                <%= username %>
+            </h1>
         </div>
+
+        <!-- Success Message -->
+        <% if (uploadSuccess) { %>
+            <div id="success-message" class="alert-success">
+                Image uploaded successfully!
+            </div>
+        <% } %>
+    
 
         <div class="section">
             <div class="section-title">General</div>
 
             <!-- possibly use -->
-             <!-- <div class="item">
+            <!-- <div class="item">
                 <span>Notifications</span>
                 <span class="icon">🔔</span>
             </div> -->
+            
             <!-- <div class="item">
                 <span>Language</span>
                 <span class="icon">🌐</span>
@@ -55,67 +57,66 @@
                 <input type="checkbox" class="toggle" checked>
             </div> -->
 
-                <div class="item">
-                    <a href="/" id="profileImageLink" style="text-decoration: none;">
-                        <span class="icon">👤</span>
-                        <span>Change Profile Image</span>
-                    </a>
-                    <form id="profileUploadForm" action="/profile-upload" method="post" enctype="multipart/form-data" class="d-none">
-                        <input type="file" name="image" id="profileImageInput" required style="display: none;">
-                    </form>
-                </div>
+            <div class="item">
+                <a href="/" id="profileImageLink" style="text-decoration: none;">
+                    <span class="icon">👤</span>
+                    <span>Change Profile Image</span>
+                </a>
+                <form id="profileUploadForm" action="/profile-upload" method="post"
+                    enctype="multipart/form-data" class="d-none">
+                    <input type="file" name="image" id="profileImageInput" required style="display: none;">
+                </form>
+            </div>
 
-                <div class="item">
-                    <a href="/changeEmail" style="text-decoration : none;">
-                        <span class="icon">✉️</span>
-                        <span>Change Email</span>
-                    </a>
-                </div>
+            <div class="item">
+                <a href="/changeEmail" style="text-decoration : none;">
+                    <span class="icon">✉️</span>
+                    <span>Change Email</span>
+                </a>
+            </div>
 
-                <div class="item">
-                    <a href="/changePassword" style="text-decoration : none;">
-                        <span class="icon">📝</span>
-                        <span>Change Password</span>
-                    </a>
-                </div>
+            <div class="item">
+                <a href="/changePassword" style="text-decoration : none;">
+                    <span class="icon">📝</span>
+                    <span>Change Password</span>
+                </a>
+            </div>
 
-                <div class="item">
-                    <a href="/" style="text-decoration : none;">
-                        <span class="icon">🏆</span>
-                        <span>Ranking Progress</span>
-                    </a>
-                </div>
+            <div class="item">
+                <a href="/" style="text-decoration : none;">
+                    <span class="icon">🏆</span>
+                    <span>Ranking Progress</span>
+                </a>
             </div>
         </div>
 
         <div class="section">
             <div class="section-title">Security & Privacy</div>
-                <div class="item">
-                    <a href="/" style="text-decoration : none;">
-                        <span class="icon">🔏</span>
-                        <span>Privacy Policy</span>
-                    </a>
-                </div>
+            <div class="item">
+                <a href="/" style="text-decoration : none;">
+                    <span class="icon">🔏</span>
+                    <span>Privacy Policy</span>
+                </a>
             </div>
         </div>
 
         <div class="section">
             <div class="section-title">Help & Support</div>
-                <div class="item">
-                    <a href="/" style="text-decoration : none;">
-                        <span class="icon">🗨️</span>
-                        <span>About Us</span>
-                    </a>
-                </div>
+            <div class="item">
+                <a href="/" style="text-decoration : none;">
+                    <span class="icon">🗨️</span>
+                    <span>About Us</span>
+                </a>
+            </div>
 
-                <div class="item">
-                    <a href="/" style="text-decoration : none;">
-                        <span class="icon">🆘</span>
-                        <span>Help Center</span>
-                    </a>
-                </div>
+            <div class="item">
+                <a href="/" style="text-decoration : none;">
+                    <span class="icon">🆘</span>
+                    <span>Help Center</span>
+                </a>
             </div>
         </div>
+
 
         <div class="section danger-zone">
             <div class="section-title">Danger Zone</div>
@@ -124,13 +125,21 @@
                     <span class="icon">❌</span>
                     <span>Log Out</span>
                 </a>
-            </form>
+                </form>
+            </div>
         </div>
 
         <div class="footer">
             fitup.ai v1.2800 ©All Rights Reserved, 2024
         </div>
     </div>
+
+    <!-- going back function -->
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 
     <!-- one click event for uploading image / mitigating the steps -->
     <script>
@@ -154,4 +163,4 @@
         });
     </script>
 
-<%- include("templates/end") %>
+    <%- include("templates/end") %>
