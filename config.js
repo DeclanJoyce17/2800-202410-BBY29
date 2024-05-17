@@ -291,9 +291,11 @@ async function connectToMongo() {
 				return;
 			}
 
+			var tempArr = new Array(3);
+
 			var hashedPassword = await bcrypt.hash(password, saltRounds);
 			try {
-				const result = await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, currentPoints: 0, user_rank: 'Bronze' });
+				const result = await usersCollection.insertOne({ username: username, email: email, password: hashedPassword, timeCreated: time, points: 0, currentPoints: 0, user_rank: 'Bronze', fitTasks: tempArr, dietTasks: tempArr });
 				console.log("Inserted user");
 				req.session.authenticated = true;
 				req.session.userId = result.insertedId;
@@ -798,7 +800,7 @@ async function connectToMongo() {
 
 		app.get('/profile', sessionValidation, async (req, res) => {
 			console.log(req.session.userId);
-			res.render('profile', { userID: req.session.userId, username: req.session.username });
+			res.render('profile', { userID: req.session.userId, username: req.session.username, email: req.session.email });
 		});
 
 		//ChangeEmail Page
