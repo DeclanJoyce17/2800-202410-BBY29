@@ -804,7 +804,6 @@ async function connectToMongo() {
 		app.get('/images/:userId', async (req, res) => {
 			try {
 				console.log("Session User ID: " + req.params.userId)
-				// Assuming 'userId' is the key where the user ID is stored in the session
 				const userId = req.params.userId;
 				// Find the file in the MongoDB GridFS bucket by metadata userId
 				const files = await bucket.find({ "metadata.userId": userId }).toArray();
@@ -826,10 +825,11 @@ async function connectToMongo() {
 						res.type(file.metadata.contentType);
 					});
 
-					// Pipe the image data to the response
-					downloadStream.pipe(res);
+				// Pipe the image data to the response
+				downloadStream.pipe(res);
 
 				}
+
 			} catch (error) {
 				console.error('Failed to retrieve image:', error);
 				res.status(500).send('Failed to retrieve image due to an internal error.');
