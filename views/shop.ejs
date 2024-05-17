@@ -1,0 +1,13 @@
+<%- include("templates/header") %>
+    </head>
+
+    <br>
+    <h1>Shop</h1>
+    <h2>Spending Points: <%= currentPoints %>
+    </h2>
+    <ol class="shopitems">
+        <% for(let i=0; i < items.length; i++) { %>
+            <%- include('templates/item', {item: items[i]}) %>
+                <% } %>
+    </ol>
+    <%- include("templates/footer") %>

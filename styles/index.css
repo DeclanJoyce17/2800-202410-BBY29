@@ -34,10 +34,3 @@
 body {
     background-image: url(/img/Comp2800BG.png);
 }
-
-.center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
