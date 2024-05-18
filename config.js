@@ -695,6 +695,11 @@ async function connectToMongo() {
 			res.send(doc);
 		});
 
+		app.get('/map', (req, res) => {
+			var doc = fs.readFileSync('./html/map.html', 'utf-8');
+			res.send(doc);
+		});
+
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
 			res.status(404).send('Page not found - 404');

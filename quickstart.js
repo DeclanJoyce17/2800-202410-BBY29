@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// This file is for testing Google Cloud Vision APIs, and probably implementation
+
+
 'use strict';
 
 // sample-metadata:

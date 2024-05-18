@@ -1,3 +1,6 @@
+// This file is used for local testing and debugging
+
+
 const express = require('express');
 const fs = require('fs');
 const app = express();
@@ -114,6 +117,32 @@ app.get('/female', (req, res) => {
     var doc = fs.readFileSync('./html/ai-training-female-body-scan-result.html', 'utf-8');
     res.send(doc);
 });
+
+app.get('/map', (req, res) => {
+    var doc = fs.readFileSync('./html/map.html', 'utf-8');
+    res.send(doc);
+});
+
+app.get('/api/place/nearbysearch/json', (req, res) => {
+    const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+    const options = {
+      method: 'GET',
+      url: url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4'
+      }
+    };
+  
+    request(options, (error, response, body) => {
+      if (error) {
+        res.status(500).send({ message: 'Error fetching data' });
+      } else {
+        const data = JSON.parse(body);
+        res.json(data);
+      }
+    });
+  });
 
 app.listen(3000, () => {
     console.log('Server listening on port 3000');
