@@ -479,6 +479,37 @@ async function connectToMongo() {
 			}
 		});
 
+		app.get('/rankProgress', sessionValidation, async (req,res) =>{
+
+			const usersCollection = db.collection('users');
+			const result = await usersCollection.find({ email: req.session.email }).project({ points: 1, rerolls: 1, user_rank: 1,  _id: 1 }).toArray();
+			var currentPoints = result[0].points;
+			var newRanking;
+			if (currentPoints < 50 && currentPoints >= 0) {
+				newRanking = 50 - currentPoints;
+			}
+			else if (currentPoints > 49 && currentPoints < 100) {
+				newRanking = 100 - currentPoints;
+				console.log('silver');
+			}
+			else if (currentPoints > 99 && currentPoints < 150) {
+				newRanking = 150 - currentPoints;
+				console.log('gold');
+			}
+			else if (currentPoints > 149 && currentPoints < 200) {
+				newRanking = 200 - currentPoints;
+				console.log('platinum');
+			}
+			else if (currentPoints > 199 && currentPoints < 250) {
+				newRanking = 250 - currentPoints;
+				console.log('diamond');
+			}
+			else {
+				newRanking = 0;
+			}
+			res.render('rankProgress', {points: result[0].points, rank: result[0].user_rank, nextRank: newRanking});
+		});
+
 		// Route to handle password reset form submission
 		app.post('/reset-password', async (req, res) => {
 			const { token, newPassword, confirmNewPassword } = req.body;
