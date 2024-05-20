@@ -15,6 +15,11 @@ const { SpeechClient } = require('@google-cloud/speech');
 const { spawn } = require('child_process');
 const sharp = require('sharp');
 const axios = require('axios');
+const textToSpeech = require('@google-cloud/text-to-speech');
+const uuid = require('uuid'); 
+
+const util = require('util');
+
 
 require("./utils.js");
 
@@ -29,6 +34,8 @@ require('dotenv').config();
 const port = process.env.PORT || 3000;
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
+
+app.use(express.json());
 
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
@@ -693,6 +700,56 @@ async function connectToMongo() {
 		app.get('/ai-training-recommendation', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-recommendation.html', 'utf-8');
 			res.send(doc);
+		});
+
+		app.get('/map', (req, res) => {
+			var doc = fs.readFileSync('./html/map.html', 'utf-8');
+			res.send(doc);
+		});
+
+		app.get('/food', (req, res) => {
+			var doc = fs.readFileSync('./html/food-analysis.html', 'utf-8');
+			res.send(doc);
+		});
+
+
+		//-------------------------------------------------------------------------------
+		// Text to Speech
+		// This code is provided by the Google Text to Speech client libraries with modification
+		// our project
+		//------------------------------------------------------------------------------
+	
+
+		app.post("/text-to-speech", async (req, res) => {
+			const text = req.body.text;
+
+			const client = new textToSpeech.TextToSpeechClient();
+	
+			try {
+				// Construct the request
+				const request = {
+					input: { text: text },
+					// Select the language and SSML voice gender (optional)
+					voice: { languageCode: 'en-GB', ssmlGender: "FEMALE" }, // Use appropriate language code and gender
+					// Select the type of audio encoding
+					audioConfig: { audioEncoding: 'MP3' }, // Fix typo in audioConfig
+				};
+
+				// Perform text-to-speech request
+				const [response] = await client.synthesizeSpeech(request);
+				// Write the binary audio content to a local file
+				const writeFile = util.promisify(fs.writeFile);
+
+				// Generate a unique filename for the audio file
+				const fileName = uuid.v4() + '.mp3';
+				const filePath = path.join(__dirname, 'img/text-to-speech-audios', fileName);
+				await writeFile(filePath, response.audioContent, 'binary');
+				console.log('Audio content written to file: output.mp3');
+				res.send(fileName);
+			} catch (error) {
+				console.error("Error synthesizing speech ", error);
+				res.status(500).send('Error synthesizing speech');
+			}
 		});
 
 		// Route for handling 404 Not Found

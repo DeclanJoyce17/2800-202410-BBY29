@@ -1,19 +1,22 @@
 body {
     margin: 0;
     padding: 0;
-    color: black;
-    font-size: 16pt;
+}
+#googleMap {
+    width: 100%;
+    height: 97vh;
+    object-fit: cover;
+    margin: 0;
+    padding: 0;
 }
 
-#personalize-training {
-    font-size: 30pt;
+/* button {
     position: absolute;
-    top: 600px;
-    text-align: center;
-    margin: 0 20px;
-    font-weight: bold;
-    /*  */
-}
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 100px;
+} */
+
 
 footer {
     display: flex;
@@ -133,26 +136,4 @@ footer {
     background-color: white;
     width: 90px;
     height: 50px;
-}
-
-
-
-
-#video-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
-
-#video-background video {
-    object-fit: cover;
-    width: 100%;
-    height: 150%;
-}
-
-#audio-container {
-    display: none;
 }

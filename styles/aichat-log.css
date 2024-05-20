@@ -185,3 +185,6 @@ footer {
     display: none;
 }
 
+#audio-container {
+    display: none;
+}
