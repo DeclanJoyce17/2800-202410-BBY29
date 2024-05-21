@@ -707,11 +707,6 @@ async function connectToMongo() {
 			res.send(doc);
 		});
 
-		app.get('/food', (req, res) => {
-			var doc = fs.readFileSync('./html/food-analysis.html', 'utf-8');
-			res.send(doc);
-		});
-
 
 		//-------------------------------------------------------------------------------
 		// Text to Speech
@@ -750,6 +745,11 @@ async function connectToMongo() {
 				console.error("Error synthesizing speech ", error);
 				res.status(500).send('Error synthesizing speech');
 			}
+		});
+
+		app.get('/map', (req, res) => {
+			var doc = fs.readFileSync('./html/map.html', 'utf-8');
+			res.send(doc);
 		});
 
 		// Route for handling 404 Not Found
