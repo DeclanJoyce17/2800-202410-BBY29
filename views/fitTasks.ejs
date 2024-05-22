@@ -1,54 +1,65 @@
 <%- include("templates/header") %>
-    <!-- Chatbot -->
-    <form id="Chatter">
-        <input type="text" id="question" name="chatbot" placeholder="Ask Me Anything!">
-        <button type="submit">Send</button>
-    </form>
+    <link rel="stylesheet" type="text/css" href="/styles/tasks.css" text="">
 
-    <!--Contents in the body tag-->
-    <img class="title" src="/img/FitnessLogo.png" alt="logo">
-    <div class="container taskCards">
-        <h1>Points: <%= points %>
-        </h1>
-        <div class="card">
-            <div class="card-body">
-                <%= task1 %>
-            </div>
-            <span>
-                <form method="post" action="/addPointFit" style="display: inline">
-                    <button class="btn btn-secondary float-right" type="submit">Done</button>
-                </form>
-                <form method="post" action="/rerollFit1" style="display: inline">
-                    <button class="btn btn-secondary float-right" type="submit">Reroll</button>
-                </form>
-            </span>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <%= task2 %>
-            </div>
-            <span>
-                <form method="post" action="/addPointFit" style="display: inline">
-                    <button class="btn btn-secondary float-right" type="submit">Done</button>
-                </form>
-                <form method="post" action="/rerollFit2" style="display: inline">
-                    <button class="btn btn-secondary float-right" type="submit">Reroll</button>
-                </form>
-            </span>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <%= task3 %>
-            </div>
-            <span>
-                <form method="post" action="/addPointFit" style="display: inline">
-                    <button class="btn btn-secondary float-right" type="submit">Done</button>
-                </form>
-                <form method="post" action="/rerollFit3" style="display: inline">
-                    <button class="btn btn-secondary float-right" type="submit">Reroll</button>
-                </form>
-            </span>
-        </div>
+    </head>
 
-    </div>
-    <%- include("templates/footer") %>
+    <body>
+        <!-- Chatbot -->
+        <form id="Chatter">
+            <input type="text" id="question" name="chatbot" placeholder="Ask Me Anything!">
+            <button type="submit">Send</button>
+        </form>
+
+        <!--Contents in the body tag-->
+        <img class="title" src="/img/FitnessLogo.png" alt="logo">
+        <div class="container taskCards">
+            <h1>Points: <%= points %>
+            </h1>
+            <div class="card">
+                <div class="card-body">
+                    <%= task1 %>
+                </div>
+                <span>
+                    <form method="post" action="/addPointFit" style="display: inline">
+                        <input type="text" name="task" value="<%= task1 %>" hidden>
+                        <button class="btn btn-secondary float-right" type="submit">Done</button>
+                    </form>
+                    <form method="post" action="/rerollFit" style="display: inline">
+                        <input type="text" name="number" value="1" hidden>
+                        <button class="btn btn-secondary float-right" type="submit">Reroll</button>
+                    </form>
+                </span>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <%= task2 %>
+                </div>
+                <span>
+                    <form method="post" action="/addPointFit" style="display: inline">
+                        <input type="text" name="task" value="<%= task2 %>" hidden>
+                        <button class="btn btn-secondary float-right" type="submit">Done</button>
+                    </form>
+                    <form method="post" action="/rerollFit" style="display: inline">
+                        <input type="text" name="number" value="2" hidden>
+                        <button class="btn btn-secondary float-right" type="submit">Reroll</button>
+                    </form>
+                </span>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <%= task3 %>
+                </div>
+                <span>
+                    <form method="post" action="/addPointFit" style="display: inline">
+                        <input type="text" name="task" value="<%= task3 %>" hidden>
+                        <button class="btn btn-secondary float-right" type="submit">Done</button>
+                    </form>
+                    <form method="post" action="/rerollFit" style="display: inline">
+                        <input type="text" name="number" value="3" hidden>
+                        <button class="btn btn-secondary float-right" type="submit">Reroll</button>
+                    </form>
+                </span>
+            </div>
+
+        </div>
+        <%- include("templates/footer") %>

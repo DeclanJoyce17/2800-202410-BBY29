@@ -1,0 +1,63 @@
+body {
+    background-image: url('/img/aibot3.png');
+    background-size: 150%;
+    font-size: 14pt;
+}
+
+#creating-chat {
+    font-size: 30pt;
+    font-weight: bold;
+    color: white;
+    position: absolute;
+    bottom: 250px;
+    margin: 0 20px;
+    text-align: center;
+}
+
+#message {
+    font-size: 16pt;
+    color: white;
+    position: absolute;
+    bottom: 200px;
+    margin: 0 20px;
+    text-align: center;
+}
+
+#plus {
+    position: absolute;
+    bottom: 350px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.loading-bar {
+    height: 30px;
+    position: absolute;
+    bottom: 20px;
+    width: 80%;
+    background-color: white;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px;
+  }
+  
+  .loading-progress {
+    background-color: black;
+    width: 0%; /* initial width is 0% */
+    height: 100%;
+    transition: width 2s; /* add transition for animation */
+    border-radius: 20px;
+  }
+  
+  .loading-progress.animate {
+    animation: progress 2s infinite; /* add animation */
+  }
+  
+  @keyframes progress {
+    0% {
+      width: 0%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
