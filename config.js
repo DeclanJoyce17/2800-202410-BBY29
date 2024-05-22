@@ -17,13 +17,12 @@ const axios = require('axios');
 var nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const Joi = require('joi');
-
+const cloudinary = require('cloudinary').v2;
 
 require("./utils.js");
 
 const app = express();
 const expireTime = 60 * 60 * 1000;
-app.set('view engine', 'ejs')
 
 
 // Load environment variables from .env file
@@ -34,22 +33,32 @@ const speechClient = new SpeechClient();
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
 
+// For upload imgs in community page
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+	secure: true
+});
+
+app.use(express.json());
 app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
-// first, store files in memory as Buffer objects by using multer
+// Middleware to parse form data
+app.use(express.urlencoded({ extended: true }));
+// Store files in memory as Buffer objects by using multer
 const storage = multer.memoryStorage()
-// telling multer to use the previously defined memory storage for storing the files.
+// Telling multer to use the previously defined memory storage for storing the files
 const upload = multer({ storage: storage });
-//to use EJS to render our ejs files as HTML
+// to use EJS to render our ejs files as HTML
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 /************ uploading profile images ***********/
 
-let db, bucket;
 // Initialize MongoDB and GridFS
 // ensuring that the MongoDB connection 
 // and GridFS initialization are completed before proceeding further.
+let db, bucket;
 async function initMongoDB() {
 	const client = new MongoClient(mongoUri);
 	try {
@@ -64,29 +73,26 @@ async function initMongoDB() {
 }
 initMongoDB();
 
-
-/* probably it will be used later on. leave it for now.
-
 // Express route to get an image by filename
-app.get('/images/:filename', async (req, res) => {
-	try {
-		// Assuming 'userId' is the key where the user ID is stored in the session
+// app.get('/images/:filename', async (req, res) => {
+// 	try {
+// 		// Assuming 'userId' is the key where the user ID is stored in the session
 
-		const userId = req.session.userId;
-		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
+// 		const userId = req.session.userId;
+// 		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
 
-		// Set the proper content type before sending the stream
-		downloadStream.on('file', (file) => {
-			res.type(file.contentType);
-		});
-		// Pipe the image data to the response
-		downloadStream.pipe(res);
-	} catch (error) {
-		console.error('Failed to retrieve image:', error);
-		res.status(404).send('Image not found');
-	}
-});
-*/
+// 		// Set the proper content type before sending the stream
+// 		downloadStream.on('file', (file) => {
+// 			res.type(file.contentType);
+// 		});
+// 		// Pipe the image data to the response
+// 		downloadStream.pipe(res);
+// 	} catch (error) {
+// 		console.error('Failed to retrieve image:', error);
+// 		res.status(404).send('Image not found');
+// 	}
+// });
+
 
 // Route to upload images
 app.post('/upload', upload.single('image'), async (req, res) => {
@@ -521,11 +527,6 @@ async function connectToMongo() {
 			}
 		});
 
-
-
-
-
-
 		app.get('/map', (req, res) => {
 			// Resolve the path to map.html using path module
 			const mapFilePath = path.join(__dirname, 'html', 'map.html');
@@ -937,7 +938,7 @@ async function connectToMongo() {
 		//     getGroqChatCompletion
 		// };
 
-		/****************** getting Images *************************/
+		/****************** getting profile Image *************************/
 
 		// Express route to get a profile image by user id
 		app.get('/images/:userId', async (req, res) => {
@@ -981,6 +982,108 @@ async function connectToMongo() {
 			req.session.uploadSuccess = false; // Reset the flag immediately
 			res.render('profile', { userID: req.session.userId, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
 		});
+
+		// Route to upload profile images
+		app.post('/profile-upload', upload.single('image'), async (req, res) => {
+			if (!req.file) {
+				return res.status(400).send('No file uploaded.');
+			}
+			try {
+				console.log("session user id: " + req.session.userId);
+				const userId = req.session.userId;
+				const filename = req.file.originalname;
+				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
+				// Reset the flag after rendering
+				req.session.uploadSuccess = true;
+				res.redirect('/profile');
+			} catch (error) {
+				console.error('Upload error:', error);
+				res.status(500).send(`Failed to upload image: ${error.message}`);
+			}
+		});
+
+		/****************** Saving img community posts *************************/
+
+		let posts = []; // To store posts in memory
+
+		// Define the route to render the postImgtest.ejs file
+		app.get('/postImgtest', async (req, res) => {
+			try {
+				const postsCollection = db.collection('posts');
+				const posts = await postsCollection.find().toArray();
+
+				res.render('postImgtest', { posts });
+			} catch (error) {
+				console.error('Error retrieving posts:', error);
+				res.status(500).send('Failed to retrieve posts.');
+			}
+		});
+
+		// max 4 images can be uploaded
+		app.post('/postImgtest/post', upload.array('images', 4), async (req, res) => {
+			console.log('POST /postImgtest/post');
+
+			// Generate a unique postId
+			const postId = new ObjectId();
+			// Default to empty string if no text is provided
+			const text = req.body.text || "";
+			const createdAt = new Date();
+
+			// Check if at least one field is filled
+			if (!text && (!req.files || req.files.length === 0)) {
+				return res.status(400).send('Please provide either text or images.');
+			}
+
+
+			try {
+				// Handle image uploads if any
+				let imageUrls = [];
+				if (req.files && req.files.length > 0) {
+					imageUrls = await uploadImagesToCloudinary(req.files);
+				}
+
+
+				// Save post data to MongoDB
+				const postsCollection = db.collection('posts');
+				await postsCollection.insertOne({ _id: postId, text, createdAt, imageUrls });
+
+				res.redirect('/postImgtest');
+			} catch (error) {
+				console.error('Post creation error:', error);
+				res.status(500).send(`Failed to create post: ${error.message}`);
+			}
+		});
+
+
+		// Route to handle delete post request
+		app.post('/postImgtest/delete/:id', async (req, res) => {
+			const postId = req.params.id;
+		
+			try {
+				const postsCollection = db.collection('posts');
+				const post = await postsCollection.findOne({ _id: new ObjectId(postId) });
+		
+				if (!post) {
+					return res.status(404).send('Post not found.');
+				}
+		
+				// Delete images from Cloudinary
+				await Promise.all(post.imageUrls.map(async (url) => {
+					const publicId = url.split('/').pop().split('.')[0];
+					await cloudinary.uploader.destroy(publicId);
+				}));
+		
+				// Delete post from MongoDB
+				await postsCollection.deleteOne({ _id: new ObjectId(postId) });
+		
+				res.redirect('/postImgtest');  // Redirect to the postImgtest route
+			} catch (error) {
+				console.error('Error deleting post:', error);
+				res.status(500).send(`Failed to delete post: ${error.message}`);
+			}
+		});
+
+		/****************** Changing User Info *************************/
 
 		//ChangeEmail Page
 		app.get('/changeEmail', sessionValidation, async (req, res) => {
@@ -1047,25 +1150,6 @@ async function connectToMongo() {
 				res.redirect('changePassword');
 			}
 
-		});
-
-		// Route to upload profile images
-		app.post('/profile-upload', upload.single('image'), async (req, res) => {
-			if (!req.file) {
-				return res.status(400).send('No file uploaded.');
-			}
-			try {
-				console.log("session user id: " + req.session.userId);
-				const userId = req.session.userId;
-				const filename = req.file.originalname;
-				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
-				// Reset the flag after rendering
-				req.session.uploadSuccess = true;
-				res.redirect('/profile');
-			} catch (error) {
-				console.error('Upload error:', error);
-				res.status(500).send(`Failed to upload image: ${error.message}`);
-			}
 		});
 
 		// ----------------------------------------------------------
@@ -1269,4 +1353,20 @@ async function resizeImage(fileBuffer, width, height) {
 		console.error('Error resizing image:', error);
 		throw error;
 	}
+}
+
+/************************ helper functions to upload community post ***************************/
+
+async function uploadImagesToCloudinary(files) {
+    return Promise.all(files.map(file => {
+        return new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result.secure_url);
+                }
+            }).end(file.buffer);
+        });
+    }));
 }
