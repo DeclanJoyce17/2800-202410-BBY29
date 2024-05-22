@@ -271,7 +271,7 @@ async function connectToMongo() {
 			var point = req.session.points;
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
-			res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
+			res.render('fitTasks', { points: result[0].points, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
 		});
 
 		//DietTasks Page
@@ -279,7 +279,7 @@ async function connectToMongo() {
 			var point = req.session.points;
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
-			res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2] });
+			res.render('dietTasks', { points: result[0].points, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2] });
 		});
 
 		//Signup POST
