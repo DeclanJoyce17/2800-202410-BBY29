@@ -1004,8 +1004,6 @@ async function connectToMongo() {
 
 		/****************** Saving img community posts *************************/
 
-		let posts = []; // To store posts in memory
-
 		// Define the route to render the postImgtest.ejs file
 		app.get('/postImgtest', async (req, res) => {
 			try {
@@ -1024,7 +1022,7 @@ async function connectToMongo() {
 			console.log('POST /postImgtest/post');
 
 			// Generate a unique postId
-			const postId = new ObjectId();
+			const postId = new ObjectId
 			// Default to empty string if no text is provided
 			const text = req.body.text || "";
 			const createdAt = new Date();
@@ -1058,24 +1056,24 @@ async function connectToMongo() {
 		// Route to handle delete post request
 		app.post('/postImgtest/delete/:id', async (req, res) => {
 			const postId = req.params.id;
-		
+
 			try {
 				const postsCollection = db.collection('posts');
 				const post = await postsCollection.findOne({ _id: new ObjectId(postId) });
-		
+
 				if (!post) {
 					return res.status(404).send('Post not found.');
 				}
-		
+
 				// Delete images from Cloudinary
 				await Promise.all(post.imageUrls.map(async (url) => {
 					const publicId = url.split('/').pop().split('.')[0];
 					await cloudinary.uploader.destroy(publicId);
 				}));
-		
+
 				// Delete post from MongoDB
 				await postsCollection.deleteOne({ _id: new ObjectId(postId) });
-		
+
 				res.redirect('/postImgtest');  // Redirect to the postImgtest route
 			} catch (error) {
 				console.error('Error deleting post:', error);
