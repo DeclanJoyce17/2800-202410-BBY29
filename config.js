@@ -208,7 +208,7 @@ async function connectToMongo() {
 				res.render('signup');
 			}
 		});
-
+		
 		//Shop Page
 		app.get('/shop', sessionValidation, async (req, res) => {
 			const usersCollection = db.collection('shopItems');
@@ -234,7 +234,24 @@ async function connectToMongo() {
 				console.log("Not Enough Points.");
 				return false;
 			}
-			const filter = { username: req.session.username };
+			const filter = { email: req.session.email };
+			if (itemName == '1 Hour Boost') {
+				var currentTime = new Date().getTime();
+				var hourTime = currentTime + (1 * 60 * 1000);
+				req.session.hourTime = hourTime;
+				console.log(currentTime);
+				console.log(hourTime);
+				const updateDoc = {
+					$set: {
+						pointBoost: hourTime
+
+					},
+				};
+
+
+				await userCollection.updateOne(filter, updateDoc);
+
+			}
 			if (itemName == 'Task Reroll') {
 				var rerolls = rerollAmount[0].rerolls;
 				const updateDoc = {
@@ -270,7 +287,8 @@ async function connectToMongo() {
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
 			var point = req.session.points;
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, pointBoost: 1, fitTasks: 1 }).toArray();
+			req.session.hourTime = result[0].pointBoost;
 			res.render('fitTasks', { points: result[0].points, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
 		});
 
@@ -344,7 +362,11 @@ async function connectToMongo() {
 					password: hashedPassword,
 					timeCreated: new Date().getTime(),
 					points: 0,
-					user_rank: 'Bronze', fitTasks: tempArr, dietTasks: tempArr
+					user_rank: 'Bronze',
+					fitTasks: tempArr,
+					dietTasks: tempArr,
+					rerolls: 1,
+					pointBoost: 0
 				});
 
 				console.log("Inserted user");
@@ -355,6 +377,7 @@ async function connectToMongo() {
 				req.session.username = username;
 				req.session.points = 0;
 				req.session.currentPoints = 0;
+				req.session.rerolls = 1;
 				req.session.rank = 'Bronze';
 				req.session.cookie.maxAge = expireTime;
 
@@ -388,7 +411,7 @@ async function connectToMongo() {
 				return;
 			}
 
-			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, rerolls: 1, _id: 1 }).toArray();
+			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, rerolls: 1, pointBoost: 1, _id: 1 }).toArray();
 
 			console.log(result);
 			if (result.length != 1) {
@@ -406,7 +429,7 @@ async function connectToMongo() {
 				req.session.rerolls = result[0].rerolls;
 				req.session.email = email;
 				req.session.cookie.maxAge = expireTime;
-
+				req.session.hourTime = result[0].pointBoost;
 				res.redirect('/main');
 				return;
 			}
@@ -605,7 +628,8 @@ async function connectToMongo() {
 				res.redirect('/login');  // Redirect to login if no user session
 				return;
 			}
-
+			var currentTime = new Date().getTime();
+			console.log(currentTime);
 			// greeting depends on the time user logged in
 			const currentHour = new Date().getHours();
 			let greeting;
@@ -881,10 +905,10 @@ async function connectToMongo() {
 			res.redirect('/dietTasks');
 		});
 
-
+		
 		//Adding points to Fitness Page
 		app.post('/addPointFit', sessionValidation, async (req, res) => {
-
+			var currentTime = new Date().getTime();
 			const tasks1 = db.collection('fitnessTasks');
 			const tasks2 = db.collection('fitnessTasksHard');
 			const usersCollection = db.collection('users');
@@ -892,16 +916,24 @@ async function connectToMongo() {
 			var currentPoint = req.session.currentPoints;
 			var lookingTask = req.body.task;
 			var addingPoints;
-
+			var hourTime = req.session.hourTime;
 			var result1 = await tasks1.find({ task: lookingTask }).project({ points: 1 }).toArray();
 			var result2 = await tasks2.find({ task: lookingTask }).project({ points: 1 }).toArray();
-
+			console.log(currentTime);
+			console.log(hourTime);
 			if (result1.length > 0) {
 				addingPoints = result1[0].points;
 			} else if (result2.length > 0) {
 				addingPoints = result2[0].points;
 			}
-
+			if (currentTime < hourTime) {
+				console.log("yuh" + addingPoints * 2);
+				addingPoints *= 2;
+			}
+			if (currentTime > hourTime) {
+				console.log("nah");
+				req.session.hourTime = 0;
+			}
 			const updateDoc = {
 				$set: {
 					points: point + addingPoints,
