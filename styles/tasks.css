@@ -292,3 +292,8 @@ footer {
 .login {
     font-size:30px;
 }
+
+.boostActive {
+    display:block;
+    font-size: 15pt;
+}

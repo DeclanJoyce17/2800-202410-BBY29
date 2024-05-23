@@ -242,7 +242,7 @@ async function connectToMongo() {
 			const filter = { email: req.session.email };
 			if (itemName == '1 Hour Boost') {
 				var currentTime = new Date().getTime();
-				var hourTime = currentTime + (1 * 60 * 1000);
+				var hourTime = currentTime + (1 * 60 * 60 * 1000);
 				req.session.hourTime = hourTime;
 				console.log(currentTime);
 				console.log(hourTime);
@@ -290,11 +290,13 @@ async function connectToMongo() {
 
 		//FitTasks Page
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
-			var point = req.session.points;
+
+			var currentTime = new Date().getTime();
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, pointBoost: 1, fitTasks: 1 }).toArray();
 			req.session.hourTime = result[0].pointBoost;
-			res.render('fitTasks', { points: result[0].points, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
+			var timeRemaining = (req.session.hourTime - currentTime)/60000;
+			res.render('fitTasks', { points: result[0].points, boostActive: Math.trunc(timeRemaining), show: req.session.hourTime, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
 		});
 
 		//DietTasks Page
@@ -949,6 +951,12 @@ async function connectToMongo() {
 			if (currentTime > hourTime) {
 				console.log("nah");
 				req.session.hourTime = 0;
+				const updateDoc = {
+					$set: {
+						pointBoost: 0
+					},
+				};
+				await usersCollection.updateOne({ email: req.session.email}, updateDoc);
 			}
 			const updateDoc = {
 				$set: {
@@ -958,7 +966,7 @@ async function connectToMongo() {
 				},
 			};
 
-			await usersCollection.updateOne({ username: req.session.username }, updateDoc);
+			await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			req.session.points = point + addingPoints;
 			req.session.currentPoints = currentPoint + addingPoints;
 

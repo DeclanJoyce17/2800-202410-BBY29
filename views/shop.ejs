@@ -1,13 +1,107 @@
 <%- include("templates/header") %>
-    </head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+    }
 
-    <br>
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 30PT; /* Increase font size */
+    }
+
+    h2 {
+        color: #555;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .shop-container {
+        text-align: center;
+    }
+
+    .shop-image {
+        width: 100%;
+        max-width: 100px; /* Maximum width for the image */
+        height: auto;
+        margin: 20px auto;
+        display: block;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .shopitems {
+        list-style-type: none;
+        padding: 0;
+        max-width: 800px;
+        margin: 20px auto;
+        background: #fff;
+        box-shadow: 0 5px 8px rgba(0,0,0,0.2);
+        border-radius: 10px;
+    }
+
+    .shopitems li {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .shopitems li:last-child {
+        border-bottom: none;
+    }
+
+    .shopitems li:hover {
+        background-color: #f1f1f1;
+    }
+
+    .item-name {
+        font-size: 1.2em;
+        color: #333;
+    }
+
+    .item-description {
+        color: #666;
+        margin-top: 5px;
+        font-size: 10pt;
+    }
+
+    .item-price {
+        color: #007bff;
+        font-weight: bold;
+    }
+
+    .buy-button {
+        background-color: #FF8624; /* Original orange color */
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 10px 2px;
+        box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    
+</style>
+</head>
+
+<br>
+<div class="shop-container">
     <h1>Shop</h1>
-    <h2>Spending Points: <%= currentPoints %>
-    </h2>
-    <ol class="shopitems">
-        <% for(let i=0; i < items.length; i++) { %>
-            <%- include('templates/item', {item: items[i]}) %>
-                <% } %>
-    </ol>
-    <%- include("templates/footer") %>
+    <img src="../img/shop.png" alt="Shop Image" class="shop-image">
+    <h2>Spending Points: <%= currentPoints %></h2>
+</div>
+<ol class="shopitems">
+    <% for(let i=0; i < items.length; i++) { %>
+        <%- include('templates/item', {item: items[i]}) %>
+    <% } %>
+</ol>
+<%- include("templates/footer") %>
