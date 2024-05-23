@@ -180,6 +180,24 @@ async function connectToMongo() {
 			}
 		}
 
+		function isAdmin(req) {
+			if (req.session.user_type == 'admin') {
+				return true;
+			}
+			return false;
+		}
+		
+		function adminValidation(req, res, next) {
+			console.log(req);
+			if (isAdmin(req) ) {
+				next();
+			}
+			else {
+				res.status('403');
+				res.render('403');
+			}
+		}
+
 		//Used chatgpt to help figure out the password
 		const transporter = nodemailer.createTransport({
 			service: 'gmail', // e.g., 'gmail', 'yahoo', etc.
@@ -375,7 +393,8 @@ async function connectToMongo() {
 					fitTasks: tempArr,
 					dietTasks: tempArr,
 					rerolls: 1,
-					pointBoost: 0
+					pointBoost: 0,
+					user_type: 'user'
 				});
 
 				console.log("Inserted user");
@@ -389,6 +408,7 @@ async function connectToMongo() {
 				req.session.rerolls = 1;
 				req.session.rank = 'Bronze';
 				req.session.cookie.maxAge = expireTime;
+				req.session.user_type = 'user';
 
 				res.redirect('/main');
 			} catch (err) {
@@ -420,7 +440,7 @@ async function connectToMongo() {
 				return;
 			}
 
-			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, rerolls: 1, pointBoost: 1, _id: 1 }).toArray();
+			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, rerolls: 1, pointBoost: 1, user_type: 1, _id: 1 }).toArray();
 
 			console.log(result);
 			if (result.length != 1) {
@@ -439,6 +459,7 @@ async function connectToMongo() {
 				req.session.email = email;
 				req.session.cookie.maxAge = expireTime;
 				req.session.hourTime = result[0].pointBoost;
+				req.session.user_typer = result[0].user_type;
 				res.redirect('/main');
 				return;
 			}
@@ -1052,6 +1073,49 @@ async function connectToMongo() {
 			res.redirect('/fitTasks');
 		});
 
+		//Admin page
+		app.get('/admin', sessionValidation, adminValidation, async (req,res) => {
+			const userCollection = db.collection('users');
+			const result = await userCollection.find().project({username: 1, user_type: 1}).toArray();
+			res.render('admin', {users: result});
+		});
+
+		app.post('/demoteAdmin/:username2', async (req, res) => {
+			const userCollection = db.collection('users');
+			var username2 = req.params.username2;
+			const filter = { username: username2};
+		
+					const updateDoc = {
+						$set: {
+							user_type: 'user'
+						},
+					};
+		
+				
+					const result = await userCollection.updateOne(filter, updateDoc);
+					if (username2 == req.session.username) {
+						req.session.user_type = 'user';
+					}
+				res.redirect('/members');
+		});
+		
+		app.post('/promoteUser/:username2', async (req, res) => {
+			const userCollection = db.collection('users');
+			var username2 = req.params.username2;
+			const filter = { username: username2 };
+		
+					const updateDoc = {
+						$set: {
+							user_type: 'admin'
+						},
+					};
+		
+					
+					const result = await userCollection.updateOne(filter, updateDoc);
+					
+					res.redirect('/admin');
+		});
+
 		//Adding points to Diet Page
 		app.post('/addPointDiet', sessionValidation, async (req, res) => {
 
@@ -1171,10 +1235,14 @@ async function connectToMongo() {
 		});
 
 		app.get('/profile', sessionValidation, async (req, res) => {
+			const userCollection = db.collection('users');
+			const result = await userCollection.find().project({username: 1, user_type: 1}).toArray();
+			req.session.user_type = result[0].user_type;
 			console.log(req.session.userId);
 			const uploadSuccess = req.session.uploadSuccess;
 			req.session.uploadSuccess = false; // Reset the flag immediately
-			res.render('profile', { userID: req.session.userId, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
+			console.log(req.session.user_type);
+			res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
 		});
 
 		//ChangeEmail Page
