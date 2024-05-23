@@ -1,0 +1,56 @@
+<%- include("templates/header") %>
+<title>Community</title>
+<link rel="stylesheet" type="text/css" href="../../styles/community.css" text="">
+</head>
+
+<body>
+
+    <a class="go-back" onclick="goBack()">Back</a>
+
+    <h1>Posts</h1>
+
+    <div class="posts">
+        <% posts.forEach(post=> { %>
+            <div class="post">
+                <div class="profile">
+                    <img src="<%= post.profileImage %>" alt="Profile Image">
+                    <span class="username">
+                        <%= post.username %>
+                    </span>
+                    <span class="tags">
+                        <% post.tags.forEach(tag => { %>
+                            <span class="tag"><%= tag %></span>
+                        <% }) %>
+                    </span>
+                </div>
+                <p>
+                    <%= post.text %>
+                </p>
+                <div class="data">
+                    <% post.imageUrls.forEach(url=> { %>
+                        <img src="<%= url %>" alt="Image">
+                        <% }) %>
+                </div>
+                <% if (String(post.userId)===String(userId)) { %>
+                    <form action="/community/delete/<%= post._id %>" method="POST">
+                        <button type="submit">Delete</button>
+                    </form>
+                    <% } %>
+            </div>
+            <% }) %>
+    </div>
+
+    <div class="add-post-container">
+        <a href="/communityPost">
+            <input type="image" class="addPost" src="../../img/04-add.svg">
+        </a>
+    </div>
+
+    <!-- going back function -->
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+<%- include("templates/end") %>

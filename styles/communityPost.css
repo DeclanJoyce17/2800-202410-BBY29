@@ -1,0 +1,21 @@
+.preview {
+    display: flex;
+    flex-wrap: wrap;
+}
+.preview img {
+    max-width: 150px;
+    margin: 10px;
+}
+/* .go-back {
+    position: absolute;
+    background-color:#f5f5f5;
+    color:#FF8624;
+    opacity: 0.4;
+    border-radius: 20px;
+    font-size: 20px;
+    border: none; 
+}
+.go-back:hover {
+    color: #ffcc00; 
+    cursor: pointer;
+} */

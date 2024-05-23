@@ -1,0 +1,60 @@
+<%- include("templates/header") %>
+<title>Community</title>
+<link rel="stylesheet" type="text/css" href="../../styles/communityPost.css" text="">
+</head>
+
+<body>
+
+    <a class="go-back" onclick="goBack()">Back</a>
+
+
+
+    <h1>Community Posts</h1>
+
+    <form action="/communityPost/post" method="post" enctype="multipart/form-data">
+        <textarea name="text" rows="4" cols="50" placeholder="Write something...(optional)"></textarea><br>
+        <input type="file" name="images" id="imageInput" multiple accept="image/*">
+        <select name="tags">
+            <option value="fitness">Fitness</option>
+            <option value="diet">Diet</option>
+        </select>
+        <button type="submit">Post</button>
+    </form>
+
+    <div class="preview" id="imagePreview"></div>
+
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function (event) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = ''; // Clear previous previews
+            const files = event.target.files;
+
+            if (files.length > 4) {
+                alert('You can only upload up to 4 images.');
+                event.target.value = ''; // Clear the file input
+                return;
+            }
+
+            if (files) {
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        preview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+        
+    </script>
+
+    <!-- going back function -->
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+<%- include("templates/end") %>

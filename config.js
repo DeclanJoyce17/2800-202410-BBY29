@@ -938,7 +938,7 @@ async function connectToMongo() {
 		//     getGroqChatCompletion
 		// };
 
-		/****************** getting profile Image *************************/
+		/****************** profile Image *************************/
 
 		// Express route to get a profile image by user id
 		app.get('/images/:userId', async (req, res) => {
@@ -1002,30 +1002,65 @@ async function connectToMongo() {
 			}
 		});
 
-		/****************** Saving img community posts *************************/
+		/****************** img community posts *************************/
 
 		// Define the route to render the postImgtest.ejs file
-		app.get('/postImgtest', async (req, res) => {
+		app.get('/community', async (req, res) => {
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
+			const userId = req.session.userId;
+
 			try {
 				const postsCollection = db.collection('posts');
 				const posts = await postsCollection.find().toArray();
 
-				res.render('postImgtest', { posts });
+				res.render('community', { posts, userId });
 			} catch (error) {
 				console.error('Error retrieving posts:', error);
 				res.status(500).send('Failed to retrieve posts.');
 			}
 		});
 
+		app.get('/communityPost', async (req, res) => {
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+		
+			res.render('communityPost');
+		});
+
+
+		// Route to get posts by tag
+		app.get('/posts/:tag', async (req, res) => {
+			const tag = req.params.tag;
+			try {
+				const postsCollection = db.collection('posts');
+				const posts = await postsCollection.find({ tags: tag }).toArray();
+				res.render('community', { posts });
+			} catch (error) {
+				console.error('Error retrieving posts by tag:', error);
+				res.status(500).send('Failed to retrieve posts.');
+			}
+		});
+
 		// max 4 images can be uploaded
-		app.post('/postImgtest/post', upload.array('images', 4), async (req, res) => {
-			console.log('POST /postImgtest/post');
+		app.post('/communityPost/post', upload.array('images', 4), async (req, res) => {
+			console.log('POST /communityPost/post');
+
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
 
 			// Generate a unique postId
-			const postId = new ObjectId
+			const postId = new ObjectId();
 			// Default to empty string if no text is provided
 			const text = req.body.text || "";
 			const createdAt = new Date();
+			// to authorize them to delete the post
+			const userId = req.session.userId;
+			const tags = req.body.tags ? [req.body.tags.trim()] : [];
 
 			// Check if at least one field is filled
 			if (!text && (!req.files || req.files.length === 0)) {
@@ -1034,18 +1069,41 @@ async function connectToMongo() {
 
 
 			try {
+
+				// Retrieve the user details
+				const usersCollection = db.collection('users');
+				const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
+		
 				// Handle image uploads if any
 				let imageUrls = [];
 				if (req.files && req.files.length > 0) {
 					imageUrls = await uploadImagesToCloudinary(req.files);
 				}
 
+				const username = user.username;
+
+				// Find the profile image in GridFS
+				const files = await bucket.find({ 'metadata.userId': userId }).toArray();
+				// Default image
+				let profileImage = '/default-avatar.jpg';
+				if (files.length > 0) {
+					profileImage = `/images/${userId}`;
+				}
 
 				// Save post data to MongoDB
 				const postsCollection = db.collection('posts');
-				await postsCollection.insertOne({ _id: postId, text, createdAt, imageUrls });
+				await postsCollection.insertOne({
+					_id: postId,
+					text,
+					createdAt,
+					imageUrls,
+					tags,
+					userId,
+					username,
+					profileImage
+				 });
 
-				res.redirect('/postImgtest');
+				res.redirect('/community');
 			} catch (error) {
 				console.error('Post creation error:', error);
 				res.status(500).send(`Failed to create post: ${error.message}`);
@@ -1054,8 +1112,13 @@ async function connectToMongo() {
 
 
 		// Route to handle delete post request
-		app.post('/postImgtest/delete/:id', async (req, res) => {
+		app.post('/community/delete/:id', async (req, res) => {
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
 			const postId = req.params.id;
+			const userId = req.session.userId;
 
 			try {
 				const postsCollection = db.collection('posts');
@@ -1063,6 +1126,10 @@ async function connectToMongo() {
 
 				if (!post) {
 					return res.status(404).send('Post not found.');
+				}
+
+				if (post.userId.toString() !== userId) {
+					return res.status(403).send('You do not have permission to delete this post.');
 				}
 
 				// Delete images from Cloudinary
@@ -1074,7 +1141,7 @@ async function connectToMongo() {
 				// Delete post from MongoDB
 				await postsCollection.deleteOne({ _id: new ObjectId(postId) });
 
-				res.redirect('/postImgtest');  // Redirect to the postImgtest route
+				res.redirect('/community');  // Redirect to the postImgtest route
 			} catch (error) {
 				console.error('Error deleting post:', error);
 				res.status(500).send(`Failed to delete post: ${error.message}`);
@@ -1356,15 +1423,15 @@ async function resizeImage(fileBuffer, width, height) {
 /************************ helper functions to upload community post ***************************/
 
 async function uploadImagesToCloudinary(files) {
-    return Promise.all(files.map(file => {
-        return new Promise((resolve, reject) => {
-            cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result.secure_url);
-                }
-            }).end(file.buffer);
-        });
-    }));
+	return Promise.all(files.map(file => {
+		return new Promise((resolve, reject) => {
+			cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+				if (error) {
+					reject(error);
+				} else {
+					resolve(result.secure_url);
+				}
+			}).end(file.buffer);
+		});
+	}));
 }
