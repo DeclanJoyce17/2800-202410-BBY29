@@ -1046,69 +1046,71 @@ async function connectToMongo() {
 		});
 
 		// max 4 images can be uploaded
-		app.post('/communityPost/post', upload.array('images', 4), async (req, res) => {
-			console.log('POST /communityPost/post');
+		// Updated POST route to handle post creation
+app.post('/communityPost/post', upload.array('images', 4), async (req, res) => {
+    console.log('POST /communityPost/post');
 
-			if (!req.session.userId) {
-				return res.status(401).send('Unauthorized');
-			}
+    if (!req.session.userId) {
+        return res.status(401).send('Unauthorized');
+    }
 
-			// Generate a unique postId
-			const postId = new ObjectId();
-			// Default to empty string if no text is provided
-			const text = req.body.text || "";
-			const createdAt = new Date();
-			// to authorize them to delete the post
-			const userId = req.session.userId;
-			const tags = req.body.tags ? [req.body.tags.trim()] : [];
+    // Generate a unique postId
+    const postId = new ObjectId();
+    // Default to empty string if no text is provided
+    const text = req.body.text || "";
+    const createdAt = new Date();
+    // to authorize them to delete the post
+    const userId = req.session.userId;
+    const tags = req.body.tags ? [req.body.tags.trim()] : [];
+    const latitude = req.body.latitude || null;
+    const longitude = req.body.longitude || null;
 
-			// Check if at least one field is filled
-			if (!text && (!req.files || req.files.length === 0)) {
-				return res.status(400).send('Please provide either text or images.');
-			}
+    // Check if at least one field is filled
+    if (!text && (!req.files || req.files.length === 0)) {
+        return res.status(400).send('Please provide either text or images.');
+    }
 
+    try {
+        // Retrieve the user details
+        const usersCollection = db.collection('users');
+        const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
 
-			try {
+        // Handle image uploads if any
+        let imageUrls = [];
+        if (req.files && req.files.length > 0) {
+            imageUrls = await uploadImagesToCloudinary(req.files);
+        }
 
-				// Retrieve the user details
-				const usersCollection = db.collection('users');
-				const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
-		
-				// Handle image uploads if any
-				let imageUrls = [];
-				if (req.files && req.files.length > 0) {
-					imageUrls = await uploadImagesToCloudinary(req.files);
-				}
+        const username = user.username;
 
-				const username = user.username;
+        // Find the profile image in GridFS
+        const files = await bucket.find({ 'metadata.userId': userId }).toArray();
+        // Default image
+        let profileImage = '/default-avatar.jpg';
+        if (files.length > 0) {
+            profileImage = `/images/${userId}`;
+        }
 
-				// Find the profile image in GridFS
-				const files = await bucket.find({ 'metadata.userId': userId }).toArray();
-				// Default image
-				let profileImage = '/default-avatar.jpg';
-				if (files.length > 0) {
-					profileImage = `/images/${userId}`;
-				}
+        // Save post data to MongoDB
+        const postsCollection = db.collection('posts');
+        await postsCollection.insertOne({
+            _id: postId,
+            text,
+            createdAt,
+            imageUrls,
+            tags,
+            userId,
+            username,
+            profileImage,
+            location: latitude && longitude ? { latitude, longitude } : null
+        });
 
-				// Save post data to MongoDB
-				const postsCollection = db.collection('posts');
-				await postsCollection.insertOne({
-					_id: postId,
-					text,
-					createdAt,
-					imageUrls,
-					tags,
-					userId,
-					username,
-					profileImage
-				 });
-
-				res.redirect('/community');
-			} catch (error) {
-				console.error('Post creation error:', error);
-				res.status(500).send(`Failed to create post: ${error.message}`);
-			}
-		});
+        res.redirect('/community');
+    } catch (error) {
+        console.error('Post creation error:', error);
+        res.status(500).send(`Failed to create post: ${error.message}`);
+    }
+});
 
 
 		// Route to handle delete post request

@@ -29,15 +29,18 @@
                 <div class="data">
                     <% post.imageUrls.forEach(url=> { %>
                         <img src="<%= url %>" alt="Image">
-                        <% }) %>
+                    <% }) %>
                 </div>
+                <% if (post.location) { %>
+                    <div class="map" data-latitude="<%= post.location.latitude %>" data-longitude="<%= post.location.longitude %>" style="height: 300px; width: 100%;"></div>
+                <% } %>
                 <% if (String(post.userId)===String(userId)) { %>
                     <form action="/community/delete/<%= post._id %>" method="POST">
                         <button type="submit">Delete</button>
                     </form>
-                    <% } %>
+                <% } %>
             </div>
-            <% }) %>
+        <% }) %>
     </div>
 
     <div class="add-post-container">
@@ -53,4 +56,28 @@
         }
     </script>
 
-<%- include("templates/end") %>
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap" async defer></script>
+    <script>
+        function initMap() {
+            document.querySelectorAll('.map').forEach(mapElement => {
+                const latitude = parseFloat(mapElement.dataset.latitude);
+                const longitude = parseFloat(mapElement.dataset.longitude);
+
+                if (latitude && longitude) {
+                    const map = new google.maps.Map(mapElement, {
+                        center: { lat: latitude, lng: longitude },
+                        zoom: 8
+                    });
+
+                    new google.maps.Marker({
+                        position: { lat: latitude, lng: longitude },
+                        map: map
+                    });
+                }
+            });
+        }
+    </script>
+
+
+<%- include("templates/footer") %>

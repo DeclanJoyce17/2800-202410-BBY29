@@ -7,8 +7,6 @@
 
     <a class="go-back" onclick="goBack()">Back</a>
 
-
-
     <h1>Community Posts</h1>
 
     <form action="/communityPost/post" method="post" enctype="multipart/form-data">
@@ -17,7 +15,13 @@
         <select name="tags">
             <option value="fitness">Fitness</option>
             <option value="diet">Diet</option>
-        </select>
+        </select><br>
+
+        <!-- Map for selecting location -->
+        <div id="map" style="height: 300px; width: 100%;"></div><br>
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+
         <button type="submit">Post</button>
     </form>
 
@@ -47,13 +51,43 @@
                 });
             }
         });
-        
     </script>
 
     <!-- going back function -->
     <script>
         function goBack() {
             window.history.back();
+        }
+    </script>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap" async defer></script>
+    <script>
+        let map, marker;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8
+            });
+
+            map.addListener('click', (event) => {
+                placeMarker(event.latLng);
+            });
+        }
+
+        function placeMarker(location) {
+            if (marker) {
+                marker.setPosition(location);
+            } else {
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+            }
+
+            document.getElementById('latitude').value = location.lat();
+            document.getElementById('longitude').value = location.lng();
         }
     </script>
 
