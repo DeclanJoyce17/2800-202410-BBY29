@@ -27,11 +27,15 @@
 
   <!-- Welcome messsge -->
   <div class="px-4 py-5 my-5 text-center">
-    <h4 style="margin-bottom: 5%;" class="display-4"><%= greeting %>, <%= username %></h4>
+    <h4 style="margin-bottom: 5%;" class="display-4">
+      <%= greeting %>, <%= username %>
+    </h4>
     <div class="col-lg-6 mx-auto">
       <div class="navText">
-        <h1>Rank:<%= rank %></h1>
-          <h1>Points:<%= points %></h1>
+        <h1>Rank:<%= rank %>
+        </h1>
+        <h1>Points:<%= points %>
+        </h1>
       </div>
     </div>
   </div>
@@ -88,15 +92,30 @@
   <!-- tasks list -->
   <div class="px-4 py-5 my-5 text-center">
     <ul>
-      <% if (tasks.length===0) { %>
+      <% if (fitTasks.length===0) { %>
         <li>No tasks on your list</li>
         <% } else { %>
-          <% tasks.forEach(function(task) { %>
+          <% fitTasks.forEach(function(task) { %>
             <li class="task-item">
               <%= task %>
             </li>
             <% }); %>
-        <% } %>
+              <% } %>
+    </ul>
+  </div>
+
+  <!-- tasks list -->
+  <div class="px-4 py-5 my-5 text-center">
+    <ul>
+      <% if (dietTasks.length===0) { %>
+        <li>No tasks on your list</li>
+        <% } else { %>
+          <% dietTasks.forEach(function(task) { %>
+            <li class="task-item">
+              <%= task %>
+            </li>
+            <% }); %>
+              <% } %>
     </ul>
   </div>
 

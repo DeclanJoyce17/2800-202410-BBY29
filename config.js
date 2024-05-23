@@ -17,6 +17,8 @@ const axios = require('axios');
 var nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const Joi = require('joi');
+const alert = require('alert');
+
 
 
 require("./utils.js");
@@ -270,16 +272,16 @@ async function connectToMongo() {
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
 			var point = req.session.points;
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1 }).toArray();
-			res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, rerolls: 1 }).toArray();
+			res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls });
 		});
 
 		//DietTasks Page
 		app.get('/dietTasks', sessionValidation, async (req, res) => {
 			var point = req.session.points;
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
-			res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2] });
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, rerolls: 1 }).toArray();
+			res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls });
 		});
 
 		//Signup POST
@@ -371,12 +373,13 @@ async function connectToMongo() {
 				res.redirect('/main');
 			}
 			else {
-				res.render('login');
+				res.render('login', { input: 0 });
 			}
 		});
 
 		//Login POST
 		app.post('/login', async (req, res) => {
+
 			const usersCollection = db.collection('users');
 			var email = req.body.email;
 			var password = req.body.password;
@@ -384,7 +387,7 @@ async function connectToMongo() {
 			const schema = Joi.string().max(35).required();
 			const validationResult = schema.validate(email);
 			if (validationResult.error != null) {
-				res.send(`Invalid email or password combination. 1<br> <a href='/login'>Try Again</a>`);
+				res.render('login', { input: 1 });
 				return;
 			}
 
@@ -392,7 +395,7 @@ async function connectToMongo() {
 
 			console.log(result);
 			if (result.length != 1) {
-				res.send(`Invalid email or password combination. 2<br> <a href='/login'>Try Again</a>`);
+				res.render('login', { input: 1 });
 				return;
 			}
 			if (await bcrypt.compare(password, result[0].password)) {
@@ -411,7 +414,7 @@ async function connectToMongo() {
 				return;
 			}
 			else {
-				res.send(`Invalid email or password combination. 3<br> <a href='/login'>Try Again</a>`);
+				res.render('login', { input: 1 });
 				return;
 			}
 		});
@@ -644,13 +647,16 @@ async function connectToMongo() {
 			const points = req.session.points
 			const rank = req.session.rank
 			const users = await getAndSortUsersFromDB();
-			let tasks = [];
+			let fitTasks = [];
+			let dietTasks = [];
 
 			try {
 				const current_user = await usersCollection.findOne({ username: req.session.username });
 
 				// Get tasks
-				tasks = current_user.fitTasks.map(task => task);
+				fitTasks = current_user.fitTasks.map(task => task);
+
+				dietTasks = current_user.dietTasks.map(task => task);
 
 			} catch (err) {
 				console.error("Error fetching user or tasks:", err);
@@ -669,7 +675,8 @@ async function connectToMongo() {
 				rank,
 				points,
 				users,
-				tasks,
+				fitTasks,
+				dietTasks,
 				greeting
 			});
 		});

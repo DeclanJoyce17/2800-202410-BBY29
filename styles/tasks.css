@@ -243,11 +243,10 @@ footer {
 }
 
 #Chatter {
-    position: fixed;
-    top:10px;
-    right: 5px;
+    float: right;
     font-size: 18px; 
-    margin: 0;
+    padding-top: 5px;
+    padding-right: 5px;
 }
 
 .title {
@@ -291,4 +290,18 @@ footer {
 
 .login {
     font-size:30px;
+}
+
+.rerolls {
+    border-style: solid;
+    float: left;
+}
+
+.reroll{
+    vertical-align: middle;
+    font-size: 35px;
+}
+
+.rerollImg {
+    vertical-align: middle;
 }
