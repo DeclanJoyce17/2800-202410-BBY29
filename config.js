@@ -301,10 +301,12 @@ async function connectToMongo() {
 
 		//DietTasks Page
 		app.get('/dietTasks', sessionValidation, async (req, res) => {
-			var point = req.session.points;
+			var currentTime = new Date().getTime();
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
-			res.render('dietTasks', { points: result[0].points, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2] });
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, pointBoost: 1, dietTasks: 1 }).toArray();
+			req.session.hourTime = result[0].pointBoost;
+			var timeRemaining = (req.session.hourTime - currentTime)/60000;
+			res.render('dietTasks', { points: result[0].points, boostActive: Math.trunc(timeRemaining), show: req.session.hourTime, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2] });
 		});
 
 		//Signup POST
@@ -848,6 +850,83 @@ async function connectToMongo() {
 			res.redirect('/fitTasks');
 		});
 
+		app.post('/rerollDiet', sessionValidation, async (req, res) => {
+
+			var number = req.body.number;
+
+			const usersCollection = db.collection('users');
+			var result = await usersCollection.find({ email: req.session.email }).project({ dietTasks: 1, user_rank: 1, rerolls: 1 }).toArray();
+			var temp = '';
+			var tempTasks;
+			if (result[0].rerolls < 1) {
+				console.log("no rerolls");
+				return;
+			}
+			req.session.user_rank = result[0].user_rank;
+			req.session.rerolls = result[0].rerolls;
+			var randomVal = Math.random() * 10;
+			var odds;
+
+			if (req.session.user_rank == "Bronze") {
+				odds = 1;
+			} else if (req.session.user_rank == "Silver") {
+				odds = 2;
+			} else if (req.session.user_rank == "Gold") {
+				odds = 5;
+			} else if (req.session.user_rank == "Platinum") {
+				odds = 8;
+			} else if (req.session.user_rank == "Diamond") {
+				odds = 10;
+			}
+
+			if (randomVal > odds) {
+				tempTasks = db.collection('dietTasks');
+			} else {
+				tempTasks = db.collection('dietTasksHard');
+			}
+
+			var taskBankFit = await tempTasks.find({}).project({ task: 1 }).toArray();
+			while (true) {
+				temp = Math.floor(Math.random() * taskBankFit.length);
+				if (taskBankFit[temp].task != result[0].dietTasks[0] && taskBankFit[temp].task != result[0].dietTasks[1] && taskBankFit[temp].task != result[0].dietTasks[2]) {
+					break;
+				}
+			}
+
+			//console.log(taskBankFit[temp].task);
+
+			var updateDoc;
+
+			if (number == 1) {
+				updateDoc = {
+					$set: {
+						dietTasks: [taskBankFit[temp].task, result[0].dietTasks[1], result[0].dietTasks[2]],
+						rerolls: req.session.rerolls - 1
+					},
+				};
+			} else if (number == 2) {
+				updateDoc = {
+					$set: {
+						dietTasks: [result[0].dietTasks[0], taskBankFit[temp].task, result[0].dietTasks[2]],
+						rerolls: req.session.rerolls - 1
+					},
+				};
+			} else if (number == 3) {
+				updateDoc = {
+					$set: {
+						dietTasks: [result[0].dietTasks[0], result[0].dietTasks[1], taskBankFit[temp].task],
+						rerolls: req.session.rerolls - 1
+					},
+				};
+			}
+
+
+
+			result = await usersCollection.updateOne(result[0], updateDoc);
+
+			res.redirect('/dietTasks');
+		});
+
 
 		app.post('/rerollDiet1', sessionValidation, async (req, res) => {
 			const usersCollection = db.collection('users');
@@ -976,23 +1055,50 @@ async function connectToMongo() {
 		//Adding points to Diet Page
 		app.post('/addPointDiet', sessionValidation, async (req, res) => {
 
+			var currentTime = new Date().getTime();
+			const tasks1 = db.collection('dietTasks');
+			const tasks2 = db.collection('dietTasksHard');
+			const usersCollection = db.collection('users');
 			var point = req.session.points;
 			var currentPoint = req.session.currentPoints;
-			const filter = { username: req.session.username };
-
+			var lookingTask = req.body.task;
+			var addingPoints;
+			var hourTime = req.session.hourTime;
+			var result1 = await tasks1.find({ task: lookingTask }).project({ points: 1 }).toArray();
+			var result2 = await tasks2.find({ task: lookingTask }).project({ points: 1 }).toArray();
+			console.log(currentTime);
+			console.log(hourTime);
+			if (result1.length > 0) {
+				addingPoints = result1[0].points;
+			} else if (result2.length > 0) {
+				addingPoints = result2[0].points;
+			}
+			if (currentTime < hourTime) {
+				console.log("yuh" + addingPoints * 2);
+				addingPoints *= 2;
+			}
+			if (currentTime > hourTime) {
+				console.log("nah");
+				req.session.hourTime = 0;
+				const updateDoc = {
+					$set: {
+						pointBoost: 0
+					},
+				};
+				await usersCollection.updateOne({ email: req.session.email}, updateDoc);
+			}
 			const updateDoc = {
 				$set: {
-					points: point + 5,
-					currentPoints: currentPoint + 5
+					points: point + addingPoints,
+					currentPoints: currentPoint + addingPoints
 
 				},
 			};
 
-			const usersCollection = db.collection('users');
-			const result = await usersCollection.updateOne(filter, updateDoc);
-			req.session.points = point + 5;
-			req.session.currentPoints = currentPoint + 5;
-			console.log(result);
+			await usersCollection.updateOne({ email: req.session.email }, updateDoc);
+			req.session.points = point + addingPoints;
+			req.session.currentPoints = currentPoint + addingPoints;
+
 			res.redirect('/dietTasks');
 		});
 
