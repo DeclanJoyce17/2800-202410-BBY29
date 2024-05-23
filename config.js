@@ -220,6 +220,11 @@ async function connectToMongo() {
 			res.render('shop', { items: result, currentPoints: results[0].currentPoints });
 		});
 
+		app.post('/moreinfo/:name', sessionValidation, async (req, res) => {
+			var itemName = req.params.name;
+			res.send(itemName)
+		});
+
 		app.post('/buy/:name', sessionValidation, async (req, res) => {
 			var itemName = req.params.name;
 			var points = req.session.currentPoints;
@@ -664,8 +669,19 @@ async function connectToMongo() {
 				req.session.rank = 'Diamond';
 				console.log('diamond');
 			}
+			else if (currentPoints > 249 && currentPoints < 400) {
+				req.session.rank = 'master';
+				
+			}
+			else if (currentPoints > 400 && currentPoints < 700) {
+				req.session.rank = 'grandmaster';
+			}
+			else if (currentPoints > 700 && currentPoints < 1000) {
+				req.session.rank = 'champion';
+				
+			}
 			else {
-				req.session.rank = 'Limit Reached';
+				req.session.rank = 'god';
 			}
 			const filter = { username: req.session.username };
 

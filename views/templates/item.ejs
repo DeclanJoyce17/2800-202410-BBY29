@@ -1,9 +1,11 @@
-<br>
+
     <%= item.name %> (<%= item.price %> Points)
+    <div>
         <form action='/buy/<%= item.name %>' method='post'>
-            <button class="btn btn-success rounded-pill px-5">Buy</button>
+            <button class="btn custom-btn rounded-pill px-5">Buy</button>
         </form>
-        <form action='/moreinfo/<%= item.moreinfo %>' method='post'>
-            <button class="btn btn-warning rounded-pill px-4">More Info</button>
-            </form>
+        <form action='/moreinfo/<%= item.name %>' method='post'>
+            <button class="btn btn-secondary rounded-pill px-4">More Info</button>
+        </form>
+    </div>
             
