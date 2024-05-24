@@ -118,6 +118,29 @@
       <button type="submit" class="index-btn">Logout</button>
     </form>
   </div>
-  
-  <!-- Footer -->
-  <%- include("templates/footer") %>
+
+
+  <!-- image upload success message -->
+  <div class="px-4 py-5 my-5 text-center">
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const uploadSuccess = urlParams.get('upload');
+
+        if (uploadSuccess === 'success') {
+          const successMessageDiv = document.getElementById('success-message');
+          successMessageDiv.style.display = 'block';
+
+          // Optionally, refresh the page after a short delay
+          setTimeout(() => {
+            window.location.href = window.location.pathname;
+          }, 3000); // Refresh after 3 seconds
+        }
+      });
+    </script>
+  </div>
+
+  <%- include("templates/easteregg") %>
+
+    <!-- Footer -->
+    <%- include("templates/footer") %>
