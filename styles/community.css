@@ -1,0 +1,163 @@
+.header {
+    position: relative;
+    background-color: #FF8624;
+    color: #fff;
+    padding: 20px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    height : 100px;
+    /* height: 130px; *--> AI page */
+    box-shadow: 0 2px 4px rgba(225, 97, 18, 0.961);
+}
+
+.headerTitle {
+    padding-top: 5%;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.header2 {
+    display: flex;
+    margin-top: 10px;
+}
+
+.add-post-container {
+    display: flex wrap;
+    justify-content: center;
+    margin-right: auto;
+}
+
+.addPost {
+    position: relative;
+    text-align: right;
+    margin-left: 10px;
+    margin-top: 10px;
+    background-color: #FF6A00;
+    box-shadow: 0 2px 4px rgba(225, 97, 18, 0.961);
+    color: white;
+    border: none;
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    font-size: 15px; 
+    text-transform: uppercase; 
+    font-weight: bold; 
+}
+
+.filter {
+    position: relative;
+    text-align: right;
+    padding: 10px;
+    margin-top: 5px;
+    font-size: 1.8rem;
+}
+
+.filter label {
+    margin-right: 5px;
+    font-weight: bold;
+    font-size: 1.8rem;
+}
+
+.filter select {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px; 
+    background-color: white;
+    font-size: 1.8rem;
+}
+
+.filter option {
+    font-size: 1.8rem;
+}
+
+.post {
+    border: 1px solid #ccc;
+    box-shadow: 0 3px 5px rgba(231, 224, 220, 0.961);
+    padding: 10px;
+    margin: 10px;
+    font-size: 4rem;
+    font-family:Arial, Helvetica, sans-serif;
+    border-radius: 5px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+}
+.profile img {
+    width: 50px;
+    height: 50px;
+    border-radius: 20%;
+    margin-right: 10px;
+}
+
+.actions {
+    display: flex;
+    margin-left: auto;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+}
+.tag {
+    background-color: #FF8624;
+    color: white;
+    padding: 5px 10px; 
+    border-radius: 5px;
+    font-size: 1.4rem;
+}
+
+.delete {
+    margin-left: 2px;
+    font-size: 1.4rem;
+    align-items: right;
+    text-align: right;
+}
+
+.delete button {
+    background-color: rgb(63, 63, 63);
+    color: white; 
+    border: none; 
+    padding: 5px 10px; 
+    border-radius: 5px; 
+    margin-left: auto;
+}
+
+.username{
+    font-size: 2.3rem;
+    font-weight: bold;
+    color: black;
+}
+
+.text{
+    margin: 10px 0px 10px 3px;
+}
+
+.image {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.image img {
+    height: 300px; 
+    width: 100%;
+    padding: 5px;
+}
+
+#myBtn {
+    display: none; 
+    position: fixed;
+    bottom: 80px;
+    right: 15px; 
+    z-index: 99; /* Make sure it does not overlap */
+    border: none; 
+    outline: none; 
+    background-color:#726d69;
+    color: white; 
+    cursor: pointer; 
+    padding: 15px; 
+    border-radius: 10px; 
+    font-size: 18px; 
+}

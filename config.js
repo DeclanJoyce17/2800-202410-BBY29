@@ -18,8 +18,10 @@ const axios = require('axios');
 var nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const Joi = require('joi');
+const cloudinary = require('cloudinary').v2;
 
-
+// Load environment variables from .env file
+require('dotenv').config();
 require("./utils.js");
 
 const app = express();
@@ -34,22 +36,32 @@ const speechClient = new SpeechClient();
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
 
+// For upload imgs in community page
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+	secure: true
+});
+
+app.use(express.json());
 app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
-// first, store files in memory as Buffer objects by using multer
+// Middleware to parse form data
+app.use(express.urlencoded({ extended: true }));
+// Store files in memory as Buffer objects by using multer
 const storage = multer.memoryStorage()
-// telling multer to use the previously defined memory storage for storing the files.
+// Telling multer to use the previously defined memory storage for storing the files
 const upload = multer({ storage: storage });
-//to use EJS to render our ejs files as HTML
+// to use EJS to render our ejs files as HTML
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 /************ uploading profile images ***********/
 
-let db, bucket;
 // Initialize MongoDB and GridFS
 // ensuring that the MongoDB connection 
 // and GridFS initialization are completed before proceeding further.
+let db, bucket;
 async function initMongoDB() {
 	const client = new MongoClient(mongoUri);
 	try {
@@ -63,30 +75,6 @@ async function initMongoDB() {
 	}
 }
 initMongoDB();
-
-
-/* probably it will be used later on. leave it for now.
-
-// Express route to get an image by filename
-app.get('/images/:filename', async (req, res) => {
-	try {
-		// Assuming 'userId' is the key where the user ID is stored in the session
-
-		const userId = req.session.userId;
-		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
-
-		// Set the proper content type before sending the stream
-		downloadStream.on('file', (file) => {
-			res.type(file.contentType);
-		});
-		// Pipe the image data to the response
-		downloadStream.pipe(res);
-	} catch (error) {
-		console.error('Failed to retrieve image:', error);
-		res.status(404).send('Image not found');
-	}
-});
-*/
 
 // Route to upload images
 app.post('/upload', upload.single('image'), async (req, res) => {
@@ -718,11 +706,6 @@ async function connectToMongo() {
 			}
 		});
 
-
-
-
-
-
 		app.get('/map', (req, res) => {
 			// Resolve the path to map.html using path module
 			const mapFilePath = path.join(__dirname, 'html', 'map.html');
@@ -1155,7 +1138,7 @@ async function connectToMongo() {
 		//     getGroqChatCompletion
 		// };
 
-		/****************** getting Images *************************/
+		/****************** profile Image *************************/
 
 		// Express route to get a profile image by user id
 		app.get('/images/:userId', async (req, res) => {
@@ -1203,6 +1186,196 @@ async function connectToMongo() {
 			console.log(req.session.user_type);
 			res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
 		});
+
+		// Route to upload profile images
+		app.post('/profile-upload', upload.single('image'), async (req, res) => {
+			if (!req.file) {
+				return res.status(400).send('No file uploaded.');
+			}
+			try {
+				console.log("session user id: " + req.session.userId);
+				const userId = req.session.userId;
+				const filename = req.file.originalname;
+				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
+				// Reset the flag after rendering
+				req.session.uploadSuccess = true;
+				res.redirect('/profile');
+			} catch (error) {
+				console.error('Upload error:', error);
+				res.status(500).send(`Failed to upload image: ${error.message}`);
+			}
+		});
+
+		/****************** img community posts *************************/
+
+		// Define the route to render the postImgtest.ejs file
+		app.get('/community', async (req, res) => {
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
+			const userId = req.session.userId;
+			// Get the page number from query parameter or default to 1
+			const page = parseInt(req.query.page) || 1;
+			// Define how many posts per page
+			const postsPerPage = 5;
+			// Get the tag filter from query parameter
+			const tag = req.query.tag || 'all';
+
+			let filter = {};
+
+			if (tag !== 'all') {
+				filter.tags = tag;
+			}
+
+			try {
+				const postsCollection = db.collection('posts');
+				// Get the total number of posts
+				const totalPosts = await postsCollection.countDocuments(filter);
+				// Calculate total number of pages
+				const totalPages = Math.ceil(totalPosts / postsPerPage);
+
+				const posts = await postsCollection.find(filter)
+					// Skip the posts of previous pages
+					.skip((page - 1) * postsPerPage)
+					// Limit the number of posts to display
+					.limit(postsPerPage)
+					.toArray();
+
+				res.render('community', { posts, userId, page, totalPages, tag, cloudinary: cloudinary });
+			} catch (error) {
+				console.error('Error retrieving posts:', error);
+				res.status(500).send('Failed to retrieve posts.');
+			}
+		});
+
+		app.get('/communityPost', async (req, res) => {
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
+			res.render('communityPost');
+		});
+
+
+		// Route to get posts by tag
+		app.get('/posts/:tag', async (req, res) => {
+			const tag = req.params.tag;
+			try {
+				const postsCollection = db.collection('posts');
+				const posts = await postsCollection.find({ tags: tag }).toArray();
+				res.render('community', { posts });
+			} catch (error) {
+				console.error('Error retrieving posts by tag:', error);
+				res.status(500).send('Failed to retrieve posts.');
+			}
+		});
+
+		// max 4 images can be uploaded
+		// Updated POST route to handle post creation
+		app.post('/communityPost/post', upload.array('images', 4), async (req, res) => {
+			console.log('POST /communityPost/post');
+
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
+			// Generate a unique postId
+			const postId = new ObjectId();
+			// Default to empty string if no text is provided
+			const text = req.body.text || "";
+			const createdAt = new Date();
+			// to authorize them to delete the post
+			const userId = req.session.userId;
+			const tags = req.body.tags ? [req.body.tags.trim()] : [];
+			const latitude = req.body.latitude || null;
+			const longitude = req.body.longitude || null;
+
+			// Check if at least one field is filled
+			if (!text && (!req.files || req.files.length === 0)) {
+				return res.status(400).send('Please provide either text or images.');
+			}
+
+			try {
+				// Retrieve the user details
+				const usersCollection = db.collection('users');
+				const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
+
+				// Handle image uploads if any
+				let imageUrls = [];
+				if (req.files && req.files.length > 0) {
+					imageUrls = await uploadImagesToCloudinary(req.files);
+				}
+
+				const username = user.username;
+
+				// Find the profile image in GridFS
+				const files = await bucket.find({ 'metadata.userId': userId }).toArray();
+				// Default image
+				let profileImage = '/default-avatar.jpg';
+				if (files.length > 0) {
+					profileImage = `/images/${userId}`;
+				}
+
+				// Save post data to MongoDB
+				const postsCollection = db.collection('posts');
+				await postsCollection.insertOne({
+					_id: postId,
+					text,
+					createdAt,
+					imageUrls,
+					tags,
+					userId,
+					username,
+					profileImage,
+					location: latitude && longitude ? { latitude, longitude } : null
+				});
+
+				res.redirect('/community');
+			} catch (error) {
+				console.error('Post creation error:', error);
+				res.status(500).send(`Failed to create post: ${error.message}`);
+			}
+		});
+
+		// Route to handle delete post request
+		app.post('/community/delete/:id', async (req, res) => {
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
+			const postId = req.params.id;
+			const userId = req.session.userId;
+
+			try {
+				const postsCollection = db.collection('posts');
+				const post = await postsCollection.findOne({ _id: new ObjectId(postId) });
+
+				if (!post) {
+					return res.status(404).send('Post not found.');
+				}
+
+				if (post.userId.toString() !== userId) {
+					return res.status(403).send('You do not have permission to delete this post.');
+				}
+
+				// Delete images from Cloudinary
+				await Promise.all(post.imageUrls.map(async (url) => {
+					const publicId = url.split('/').pop().split('.')[0];
+					await cloudinary.uploader.destroy(publicId);
+				}));
+
+				// Delete post from MongoDB
+				await postsCollection.deleteOne({ _id: new ObjectId(postId) });
+
+				res.redirect('/community');  // Redirect to the postImgtest route
+			} catch (error) {
+				console.error('Error deleting post:', error);
+				res.status(500).send(`Failed to delete post: ${error.message}`);
+			}
+		});
+
+		/****************** Changing User Info *************************/
 
 		//ChangeEmail Page
 		app.get('/changeEmail', sessionValidation, async (req, res) => {
@@ -1524,4 +1697,40 @@ async function resizeImage(fileBuffer, width, height) {
 		console.error('Error resizing image:', error);
 		throw error;
 	}
+}
+
+/************************ helper functions to upload community post ***************************/
+
+// async function uploadImagesToCloudinary(files) {
+// 	return Promise.all(files.map(file => {
+// 		return new Promise((resolve, reject) => {
+// 			cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+// 				if (error) {
+// 					reject(error);
+// 				} else {
+// 					resolve(result.secure_url);
+// 				}
+// 			}).end(file.buffer);
+// 		});
+// 	}));
+// }
+
+async function uploadImagesToCloudinary(files) {
+	return Promise.all(files.map(file => {
+		return new Promise((resolve, reject) => {
+			resizeImage(file.buffer, 1080, 1080) // Resize the image to 1080x1080
+				.then(resizedBuffer => {
+					cloudinary.uploader.upload_stream({
+						resource_type: 'image'
+					}, (error, result) => {
+						if (error) {
+							reject(error);
+						} else {
+							resolve(result.secure_url);
+						}
+					}).end(resizedBuffer);
+				})
+				.catch(error => reject(error));
+		});
+	}));
 }

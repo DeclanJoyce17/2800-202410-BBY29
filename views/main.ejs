@@ -40,17 +40,6 @@
     </div>
   </div>
 
-  <!-- upload images and display it -->
-  <!-- <div class="px-4 py-5 my-5 text-center">
-    <h1>Upload Your Profile Picture</h1>
-    <form action="/profile-upload" method="post" enctype="multipart/form-data" class="resize">
-      <input type="file" name="image" required>
-      <button type="submit">Upload</button>
-      <div id="success-message" class="success-message" style="display: none;">Image uploaded successfully!</div>
-    </form>
-  </div> -->
-
-
   <!-- Leader board -->
   <div class="px-4 py-5 my-5 text-center">
     <div id="main">
@@ -129,27 +118,6 @@
       <button type="submit" class="index-btn">Logout</button>
     </form>
   </div>
-
-
-  <!-- image upload success message -->
-  <div class="px-4 py-5 my-5 text-center">
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const uploadSuccess = urlParams.get('upload');
-
-        if (uploadSuccess === 'success') {
-          const successMessageDiv = document.getElementById('success-message');
-          successMessageDiv.style.display = 'block';
-
-          // Optionally, refresh the page after a short delay
-          setTimeout(() => {
-            window.location.href = window.location.pathname;
-          }, 3000); // Refresh after 3 seconds
-        }
-      });
-    </script>
-  </div>
-
+  
   <!-- Footer -->
   <%- include("templates/footer") %>
