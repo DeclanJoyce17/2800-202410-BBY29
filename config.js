@@ -309,7 +309,7 @@ async function connectToMongo() {
 		//FitTasks Page
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
 
-			var currentTime = new Date().getTime();
+			var point = req.session.points;
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, rerolls: 1, date: 1 }).toArray();
 
@@ -404,7 +404,7 @@ async function connectToMongo() {
 				await usersCollection.updateOne(result[0], updateDoc);
 				res.redirect('/dietTasks');
 			} else {
-				res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls });
+				res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: false });
 			}
 
 		});
