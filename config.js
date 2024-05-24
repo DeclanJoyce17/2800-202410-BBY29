@@ -272,16 +272,102 @@ async function connectToMongo() {
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
 			var point = req.session.points;
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, rerolls: 1 }).toArray();
-			res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls });
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, rerolls: 1, date: 1 }).toArray();
+
+			if (result[0].date != new Date().getDate()) {
+
+				var taskBankFit = await db.collection('fitnessTasks').find({}).project({ task: 1 }).toArray();
+				var userFitTasks = new Array(3);
+
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						var temp = Math.floor(Math.random() * taskBankFit.length);
+						if (taskBankFit[temp].task != userFitTasks[0] && taskBankFit[temp].task != userFitTasks[1] && taskBankFit[temp].task != userFitTasks[2]) {
+							userFitTasks[i] = taskBankFit[temp].task;
+							break;
+						}
+					}
+				}
+
+				var taskBankDiet = await db.collection('dietTasks').find({}).project({ task: 1 }).toArray();
+				var userDietTasks = new Array(3);
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						var temp = Math.floor(Math.random() * taskBankDiet.length);
+						if (taskBankDiet[temp].task != userDietTasks[0] && taskBankDiet[temp].task != userDietTasks[1] && taskBankDiet[temp].task != userDietTasks[2]) {
+							userDietTasks[i] = taskBankDiet[temp].task;
+							break;
+						}
+					}
+				}
+
+				const updateDoc = {
+					$set: {
+						fitTasks: userFitTasks,
+						dietTasks: userDietTasks,
+						date: new Date().getDate()
+					}
+				}
+
+				await usersCollection.updateOne(result[0], updateDoc);
+				res.redirect('/fitTasks');
+			} else {
+				res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+			}
+
 		});
 
 		//DietTasks Page
 		app.get('/dietTasks', sessionValidation, async (req, res) => {
 			var point = req.session.points;
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, rerolls: 1 }).toArray();
-			res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls });
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, rerolls: 1, date: 1 }).toArray();
+
+			if (result[0].date != new Date().getDate()) {
+
+				var taskBankFit = await db.collection('fitnessTasks').find({}).project({ task: 1 }).toArray();
+				var userFitTasks = new Array(3);
+
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						var temp = Math.floor(Math.random() * taskBankFit.length);
+						if (taskBankFit[temp].task != userFitTasks[0] && taskBankFit[temp].task != userFitTasks[1] && taskBankFit[temp].task != userFitTasks[2]) {
+							userFitTasks[i] = taskBankFit[temp].task;
+							break;
+						}
+					}
+				}
+
+				var taskBankDiet = await db.collection('dietTasks').find({}).project({ task: 1 }).toArray();
+				var userDietTasks = new Array(3);
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						var temp = Math.floor(Math.random() * taskBankDiet.length);
+						if (taskBankDiet[temp].task != userDietTasks[0] && taskBankDiet[temp].task != userDietTasks[1] && taskBankDiet[temp].task != userDietTasks[2]) {
+							userDietTasks[i] = taskBankDiet[temp].task;
+							break;
+						}
+					}
+				}
+
+				const updateDoc = {
+					$set: {
+						fitTasks: userFitTasks,
+						dietTasks: userDietTasks,
+						date: new Date().getDate()
+					}
+				}
+
+				await usersCollection.updateOne(result[0], updateDoc);
+				res.redirect('/dietTasks');
+			} else {
+				res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls });
+			}
+
 		});
 
 		//Signup POST
@@ -339,6 +425,36 @@ async function connectToMongo() {
 				// Hash the password
 				const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+				var temp;
+
+				var taskBankFit = await db.collection('fitnessTasks').find({}).project({ task: 1 }).toArray();
+				var userFitTasks = new Array(3);
+
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						temp = Math.floor(Math.random() * taskBankFit.length);
+						if (taskBankFit[temp].task != userFitTasks[0] && taskBankFit[temp].task != userFitTasks[1] && taskBankFit[temp].task != userFitTasks[2]) {
+							userFitTasks[i] = taskBankFit[temp].task;
+							break;
+						}
+					}
+				}
+
+				var taskBankDiet = await db.collection('dietTasks').find({}).project({ task: 1 }).toArray();
+				var userDietTasks = new Array(3);
+
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						temp = Math.floor(Math.random() * taskBankDiet.length);
+						if (taskBankDiet[temp].task != userDietTasks[0] && taskBankDiet[temp].task != userDietTasks[1] && taskBankDiet[temp].task != userDietTasks[2]) {
+							userDietTasks[i] = taskBankDiet[temp].task;
+							break;
+						}
+					}
+				}
+
 				// Insert the new user into the database
 				const result = await usersCollection.insertOne({
 					username,
@@ -346,7 +462,11 @@ async function connectToMongo() {
 					password: hashedPassword,
 					timeCreated: new Date().getTime(),
 					points: 0,
-					user_rank: 'Bronze', fitTasks: tempArr, dietTasks: tempArr
+					user_rank: 'Bronze',
+					fitTasks: userFitTasks,
+					dietTasks: userDietTasks,
+					date: new Date().getDate(),
+					rerolls: 3
 				});
 
 				console.log("Inserted user");
@@ -359,6 +479,7 @@ async function connectToMongo() {
 				req.session.currentPoints = 0;
 				req.session.rank = 'Bronze';
 				req.session.cookie.maxAge = expireTime;
+				req.session.email = email;
 
 				res.redirect('/main');
 			} catch (err) {
@@ -524,11 +645,6 @@ async function connectToMongo() {
 			}
 		});
 
-
-
-
-
-
 		app.get('/map', (req, res) => {
 			// Resolve the path to map.html using path module
 			const mapFilePath = path.join(__dirname, 'html', 'map.html');
@@ -681,38 +797,18 @@ async function connectToMongo() {
 			});
 		});
 
-		//Adding points POST
-		app.post('/addPoint', sessionValidation, async (req, res) => {
-
-			var currentPoints = req.session.points;
-			const filter = { username: req.session.username };
-			/* Set the upsert option to insert a document if no documents match
-			the filter */
-
-			// Specify the update to set a value for the plot field
-			const updateDoc = {
-				$set: {
-					points: currentPoints + 5
-				},
-			};
-			// Update the first document that matches the filter
-			const usersCollection = db.collection('users');
-			const result = await usersCollection.updateOne(filter, updateDoc);
-			req.session.points = currentPoints + 5;
-			console.log(result);
-			res.redirect('/main');
-		});
-
 		app.post('/rerollFit', sessionValidation, async (req, res) => {
 
 			var number = req.body.number;
 
 			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1 }).toArray();
+			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, rerolls: 1, date: 1, user_rank: 1 }).toArray();
+
 			var temp = '';
 			var tempTasks;
 			if (result[0].rerolls < 1) {
-				console.log("no rerolls");
+				var point = req.session.points;
+				res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: true });
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
@@ -785,11 +881,13 @@ async function connectToMongo() {
 			var number = req.body.number;
 
 			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ dietTasks: 1, user_rank: 1, rerolls: 1 }).toArray();
+			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, rerolls: 1, date: 1, user_rank: 1 }).toArray();
+
 			var temp = '';
 			var tempTasks;
 			if (result[0].rerolls < 1) {
-				console.log("no rerolls");
+				var point = req.session.points;
+				res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: true });
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
@@ -1073,6 +1171,40 @@ async function connectToMongo() {
 			} else {
 
 				res.redirect('changePassword');
+			}
+
+		});
+
+		//ChangePassword Page
+		app.get('/changeUsername', sessionValidation, async (req, res) => {
+			res.render('changeUsername');
+		});
+
+		app.post('/changeUsername', sessionValidation, async (req, res) => {
+			const filter = { email: req.session.email };
+			const username = req.body.username;
+
+			const schema = Joi.object(
+				{
+					username: Joi.string().min(8).max(20).required()
+				}
+			);
+
+			if (schema.validate({ username }) != null) {
+				const updateDoc = {
+					$set: {
+						username: username
+					}
+				};
+
+				const usersCollection = db.collection('users');
+				await usersCollection.updateOne(filter, updateDoc);
+				req.session.username = username;
+
+				res.redirect('profile');
+			} else {
+
+				res.redirect('changeUsername');
 			}
 
 		});
