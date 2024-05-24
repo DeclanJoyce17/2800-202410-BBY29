@@ -260,7 +260,7 @@ async function connectToMongo() {
 			const filter = { email: req.session.email };
 			if (itemName == '1 Hour Boost') {
 				var currentTime = new Date().getTime();
-				var hourTime = currentTime + (1 * 60 * 60 * 1000);
+				var hourTime = currentTime + (1 * 2 * 60 * 1000);
 				req.session.hourTime = hourTime;
 				console.log(currentTime);
 				console.log(hourTime);
@@ -314,6 +314,7 @@ async function connectToMongo() {
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, pointBoost: 1, fitTasks: 1 }).toArray();
 			req.session.hourTime = result[0].pointBoost;
 			var timeRemaining = (req.session.hourTime - currentTime)/60000;
+			console.log("Time remaining" + timeRemaining)
 			res.render('fitTasks', { points: result[0].points, boostActive: Math.trunc(timeRemaining), show: req.session.hourTime, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
 		});
 
