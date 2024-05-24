@@ -1,0 +1,115 @@
+<%- include("templates/header") %>
+<title>Community</title>
+<link rel="stylesheet" type="text/css" href="../../styles/communityPost.css" text="">
+</head>
+
+<body>
+
+    <a class="go-back" onclick="goBack()">Back</a>
+
+    <h1>Community Posts</h1>
+
+    <form action="/communityPost/post" method="post" enctype="multipart/form-data">
+        <textarea name="text" rows="4" cols="50" placeholder="Write something...(optional)"></textarea><br>
+        <input type="file" name="images" id="imageInput" multiple accept="image/*"><br>
+        <div class="preview" id="imagePreview"></div><br>
+        <button type="button" id="clearImagesButton">Clear All Images</button><br>
+        <select name="tags">
+            <option value="fitness">Fitness</option>
+            <option value="diet">Diet</option>
+        </select><br>
+
+        <!-- Map for selecting location -->
+        <div id="map" style="height: 300px; width: 100%;"></div><br>
+        <button type="button" id="clearPinButton">Clear Pin</button><br>
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+
+        <button type="submit">Post</button>
+    </form>
+
+    <script>
+        const preview = document.getElementById('imagePreview');
+        const imageInput = document.getElementById('imageInput');
+        const clearImagesButton = document.getElementById('clearImagesButton');
+        let uploadedImages = [];
+    
+        imageInput.addEventListener('change', function(event) {
+            const files = event.target.files;
+    
+            if (uploadedImages.length + files.length > 4) {
+                alert('You can only upload up to 4 images.');
+                event.target.value = ''; // Clear the file input
+                return;
+            }
+    
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('preview-img');
+                    preview.appendChild(img);
+                    uploadedImages.push(file);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    
+        clearImagesButton.addEventListener('click', function() {
+            uploadedImages = [];
+            preview.innerHTML = '';
+            imageInput.value = '';
+        });
+    </script>
+
+    <!-- going back function -->
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap" async defer></script>
+    <script>
+        let map, marker;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8
+            });
+
+            map.addListener('click', (event) => {
+                placeMarker(event.latLng);
+            });
+
+            document.getElementById('clearPinButton').addEventListener('click', clearMarker);
+        }
+
+        function placeMarker(location) {
+            if (marker) {
+                marker.setPosition(location);
+            } else {
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+            }
+
+            document.getElementById('latitude').value = location.lat();
+            document.getElementById('longitude').value = location.lng();
+        }
+
+        function clearMarker() {
+            if (marker) {
+                marker.setMap(null);
+                marker = null;
+            }
+            document.getElementById('latitude').value = '';
+            document.getElementById('longitude').value = '';
+        }
+    </script>
+
+<%- include("templates/end") %>
