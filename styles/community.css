@@ -131,14 +131,9 @@
     color: black;
 }
 
-/* .delete{
-    margin-left: auto;
-    display: flex;
-    flex-wrap: wrap;
-    padding-right: 5px;
-    gap: 5px; 
-    font-size: 1.4rem;
-} */
+.text{
+    margin: 10px 0px 10px 3px;
+}
 
 .image {
     display: flex;
@@ -152,8 +147,8 @@
 }
 
 #myBtn {
-    display: none; /* Hidden by default */
-    position: fixed; /* Fixed/sticky position */
+    display: none; 
+    position: fixed;
     bottom: 80px;
     right: 15px; 
     z-index: 99; /* Make sure it does not overlap */
