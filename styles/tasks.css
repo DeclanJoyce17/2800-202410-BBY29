@@ -126,3 +126,8 @@ footer {
     text-align: center;
     color: red;
 }
+
+.boostActive {
+    font-size: 15pt;
+    text-align: center;
+}

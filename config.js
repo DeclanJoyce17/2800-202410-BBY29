@@ -296,11 +296,13 @@ async function connectToMongo() {
 
 		//FitTasks Page
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
-
+			var currentTime = new Date().getTime();
 			var point = req.session.points;
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, rerolls: 1, date: 1 }).toArray();
-
+			
+			var timeRemaining = (req.session.hourTime - currentTime)/60000;
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, pointBoost: 1, rerolls: 1, date: 1 }).toArray();
+			req.session.hourTime = result[0].pointBoost;
 			if (result[0].date != new Date().getDate()) {
 
 				var taskBankFit = await db.collection('fitnessTasks').find({}).project({ task: 1 }).toArray();
@@ -341,7 +343,7 @@ async function connectToMongo() {
 				await usersCollection.updateOne(result[0], updateDoc);
 				res.redirect('/fitTasks');
 			} else {
-				res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+				res.render('fitTasks', { points: point, boostActive: Math.trunc(timeRemaining), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: false });
 			}
 
 		});
@@ -349,9 +351,12 @@ async function connectToMongo() {
 		//DietTasks Page
 		app.get('/dietTasks', sessionValidation, async (req, res) => {
 			var point = req.session.points;
+			var currentTime = new Date().getTime();
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, rerolls: 1, date: 1 }).toArray();
-
+			
+			var timeRemaining = (req.session.hourTime - currentTime)/60000;
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, rerolls: 1, pointBoost: 1, date: 1 }).toArray();
+			req.session.hourTime = result[0].pointBoost;
 			if (result[0].date != new Date().getDate()) {
 
 				var taskBankFit = await db.collection('fitnessTasks').find({}).project({ task: 1 }).toArray();
@@ -392,7 +397,7 @@ async function connectToMongo() {
 				await usersCollection.updateOne(result[0], updateDoc);
 				res.redirect('/dietTasks');
 			} else {
-				res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+				res.render('dietTasks', { points: point, boostActive: Math.trunc(timeRemaining), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: false });
 			}
 
 		});
@@ -495,7 +500,9 @@ async function connectToMongo() {
 					fitTasks: userFitTasks,
 					dietTasks: userDietTasks,
 					date: new Date().getDate(),
-					rerolls: 3
+					rerolls: 3,
+					pointBoost: 0,
+					user_type: 'user'
 				});
 
 				console.log("Inserted user");
@@ -509,12 +516,65 @@ async function connectToMongo() {
 				req.session.rank = 'Bronze';
 				req.session.cookie.maxAge = expireTime;
 				req.session.email = email;
+				req.session.user_type = 'user';
 
 				res.redirect('/main');
 			} catch (err) {
 				console.error("Error registering user:", err);
 				res.render('signup', { errorMessage: 'Failed to register user.' });
 			}
+		});
+
+		app.get('/admin', sessionValidation, adminValidation, async (req,res) => {
+			const userCollection = db.collection('users');
+			const result = await userCollection.find().project({username: 1, user_type: 1}).toArray();
+			res.render('admin', {users: result});
+		});
+
+		app.post('/demoteAdmin/:username2', async (req, res) => {
+			const userCollection = db.collection('users');
+			var username2 = req.params.username2;
+			const filter = { username: username2};
+		
+					const updateDoc = {
+						$set: {
+							user_type: 'user'
+						},
+					};
+		
+				
+					const result = await userCollection.updateOne(filter, updateDoc);
+					if (username2 == req.session.username) {
+						req.session.user_type = 'user';
+					}
+				res.redirect('/admin');
+		});
+		
+		app.post('/deleteUser/:username', async (req,res) => {
+			var username = req.params.username;
+			const userCollection = db.collection('users');
+			const doc = {
+				username: username
+			  };
+			const deleteResult = await userCollection.deleteOne(doc);
+			res.redirect('/admin');
+		});
+
+		app.post('/promoteUser/:username2', async (req, res) => {
+			const userCollection = db.collection('users');
+			var username2 = req.params.username2;
+			const filter = { username: username2 };
+		
+					const updateDoc = {
+						$set: {
+							user_type: 'admin'
+						},
+					};
+		
+					
+					const result = await userCollection.updateOne(filter, updateDoc);
+					
+					res.redirect('/admin');
 		});
 
 		//Login Page
@@ -871,17 +931,17 @@ async function connectToMongo() {
 		});
 
 		app.post('/rerollFit', sessionValidation, async (req, res) => {
-
+			
 			var number = req.body.number;
 
 			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, rerolls: 1, date: 1, user_rank: 1 }).toArray();
+			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, rerolls: 1, date: 1, pointBoost: 1, user_rank: 1 }).toArray();
 
 			var temp = '';
 			var tempTasks;
 			if (result[0].rerolls < 1) {
 				var point = req.session.points;
-				res.render('fitTasks', { points: point, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: true });
+				res.render('fitTasks', { points: point, boostActive: result[0].pointBoost, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: true });
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
@@ -1034,7 +1094,7 @@ async function connectToMongo() {
 
 		//Adding points to Fitness Page
 		app.post('/addPointFit', sessionValidation, async (req, res) => {
-
+			var currentTime = new Date().getTime();
 			const tasks1 = db.collection('fitnessTasks');
 			const tasks2 = db.collection('fitnessTasksHard');
 			const usersCollection = db.collection('users');
@@ -1042,17 +1102,30 @@ async function connectToMongo() {
 			var currentPoint = req.session.currentPoints;
 			var lookingTask = req.body.task;
 			var addingPoints;
-
+			var hourTime = req.session.hourTime;
 			var result1 = await tasks1.find({ task: lookingTask }).project({ points: 1 }).toArray();
 			var result2 = await tasks2.find({ task: lookingTask }).project({ points: 1 }).toArray();
-
+			console.log(currentTime);
+			console.log(hourTime);
 			if (result1.length > 0) {
 				addingPoints = result1[0].points;
 			} else if (result2.length > 0) {
 				addingPoints = result2[0].points;
 			}
-
-
+			if (currentTime < hourTime) {
+				console.log("yuh" + addingPoints * 2);
+				addingPoints *= 2;
+			}
+			if (currentTime > hourTime) {
+				console.log("nah");
+				req.session.hourTime = 0;
+				const updateDoc = {
+					$set: {
+						pointBoost: 0
+					},
+				};
+				await usersCollection.updateOne({ email: req.session.email}, updateDoc);
+			}
 			const updateDoc = {
 				$set: {
 					points: point + addingPoints,
@@ -1061,7 +1134,7 @@ async function connectToMongo() {
 				},
 			};
 
-			await usersCollection.updateOne({ username: req.session.username }, updateDoc);
+			await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			req.session.points = point + addingPoints;
 			req.session.currentPoints = currentPoint + addingPoints;
 
@@ -1071,6 +1144,7 @@ async function connectToMongo() {
 		//Adding points to Diet Page
 		app.post('/addPointDiet', sessionValidation, async (req, res) => {
 
+			var currentTime = new Date().getTime();
 			const tasks1 = db.collection('dietTasks');
 			const tasks2 = db.collection('dietTasksHard');
 			const usersCollection = db.collection('users');
@@ -1078,32 +1152,41 @@ async function connectToMongo() {
 			var currentPoint = req.session.currentPoints;
 			var lookingTask = req.body.task;
 			var addingPoints;
-
+			var hourTime = req.session.hourTime;
 			var result1 = await tasks1.find({ task: lookingTask }).project({ points: 1 }).toArray();
 			var result2 = await tasks2.find({ task: lookingTask }).project({ points: 1 }).toArray();
-
+			console.log(currentTime);
+			console.log(hourTime);
 			if (result1.length > 0) {
 				addingPoints = result1[0].points;
-
-				console.log(result1.points);
 			} else if (result2.length > 0) {
 				addingPoints = result2[0].points;
-
-				console.log(result2.points);
 			}
-
+			if (currentTime < hourTime) {
+				console.log("yuh" + addingPoints * 2);
+				addingPoints *= 2;
+			}
+			if (currentTime > hourTime) {
+				console.log("nah");
+				req.session.hourTime = 0;
+				const updateDoc = {
+					$set: {
+						pointBoost: 0
+					},
+				};
+				await usersCollection.updateOne({ email: req.session.email}, updateDoc);
+			}
 			const updateDoc = {
 				$set: {
 					points: point + addingPoints,
 					currentPoints: currentPoint + addingPoints
+
 				},
 			};
 
-			await usersCollection.updateOne({ username: req.session.username }, updateDoc);
+			await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			req.session.points = point + addingPoints;
 			req.session.currentPoints = currentPoint + addingPoints;
-
-			console.log(addingPoints);
 
 			res.redirect('/dietTasks');
 		});
