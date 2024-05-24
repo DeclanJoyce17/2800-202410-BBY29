@@ -15,6 +15,11 @@ const { SpeechClient } = require('@google-cloud/speech');
 const { spawn } = require('child_process');
 const sharp = require('sharp');
 const axios = require('axios');
+const textToSpeech = require('@google-cloud/text-to-speech');
+const uuid = require('uuid');
+
+const util = require('util');
+
 var nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const Joi = require('joi');
@@ -36,15 +41,8 @@ const speechClient = new SpeechClient();
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
 
-// For upload imgs in community page
-cloudinary.config({
-	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-	api_key: process.env.CLOUDINARY_API_KEY,
-	api_secret: process.env.CLOUDINARY_API_SECRET,
-	secure: true
-});
-
 app.use(express.json());
+
 app.use(express.static('public'));
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
@@ -299,8 +297,8 @@ async function connectToMongo() {
 			var currentTime = new Date().getTime();
 			var point = req.session.points;
 			const usersCollection = db.collection('users');
-			
-			var timeRemaining = (req.session.hourTime - currentTime)/60000;
+
+			var timeRemaining = (req.session.hourTime - currentTime) / 60000;
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, pointBoost: 1, rerolls: 1, date: 1 }).toArray();
 			req.session.hourTime = result[0].pointBoost;
 			if (result[0].date != new Date().getDate()) {
@@ -353,8 +351,8 @@ async function connectToMongo() {
 			var point = req.session.points;
 			var currentTime = new Date().getTime();
 			const usersCollection = db.collection('users');
-			
-			var timeRemaining = (req.session.hourTime - currentTime)/60000;
+
+			var timeRemaining = (req.session.hourTime - currentTime) / 60000;
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, rerolls: 1, pointBoost: 1, date: 1 }).toArray();
 			req.session.hourTime = result[0].pointBoost;
 			if (result[0].date != new Date().getDate()) {
@@ -525,37 +523,37 @@ async function connectToMongo() {
 			}
 		});
 
-		app.get('/admin', sessionValidation, adminValidation, async (req,res) => {
+		app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
 			const userCollection = db.collection('users');
-			const result = await userCollection.find().project({username: 1, user_type: 1}).toArray();
-			res.render('admin', {users: result});
+			const result = await userCollection.find().project({ username: 1, user_type: 1 }).toArray();
+			res.render('admin', { users: result });
 		});
 
 		app.post('/demoteAdmin/:username2', async (req, res) => {
 			const userCollection = db.collection('users');
 			var username2 = req.params.username2;
-			const filter = { username: username2};
-		
-					const updateDoc = {
-						$set: {
-							user_type: 'user'
-						},
-					};
-		
-				
-					const result = await userCollection.updateOne(filter, updateDoc);
-					if (username2 == req.session.username) {
-						req.session.user_type = 'user';
-					}
-				res.redirect('/admin');
+			const filter = { username: username2 };
+
+			const updateDoc = {
+				$set: {
+					user_type: 'user'
+				},
+			};
+
+
+			const result = await userCollection.updateOne(filter, updateDoc);
+			if (username2 == req.session.username) {
+				req.session.user_type = 'user';
+			}
+			res.redirect('/admin');
 		});
-		
-		app.post('/deleteUser/:username', async (req,res) => {
+
+		app.post('/deleteUser/:username', async (req, res) => {
 			var username = req.params.username;
 			const userCollection = db.collection('users');
 			const doc = {
 				username: username
-			  };
+			};
 			const deleteResult = await userCollection.deleteOne(doc);
 			res.redirect('/admin');
 		});
@@ -564,17 +562,17 @@ async function connectToMongo() {
 			const userCollection = db.collection('users');
 			var username2 = req.params.username2;
 			const filter = { username: username2 };
-		
-					const updateDoc = {
-						$set: {
-							user_type: 'admin'
-						},
-					};
-		
-					
-					const result = await userCollection.updateOne(filter, updateDoc);
-					
-					res.redirect('/admin');
+
+			const updateDoc = {
+				$set: {
+					user_type: 'admin'
+				},
+			};
+
+
+			const result = await userCollection.updateOne(filter, updateDoc);
+
+			res.redirect('/admin');
 		});
 
 		//Login Page
@@ -931,7 +929,7 @@ async function connectToMongo() {
 		});
 
 		app.post('/rerollFit', sessionValidation, async (req, res) => {
-			
+
 			var number = req.body.number;
 
 			const usersCollection = db.collection('users');
@@ -1124,7 +1122,7 @@ async function connectToMongo() {
 						pointBoost: 0
 					},
 				};
-				await usersCollection.updateOne({ email: req.session.email}, updateDoc);
+				await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			}
 			const updateDoc = {
 				$set: {
@@ -1174,7 +1172,7 @@ async function connectToMongo() {
 						pointBoost: 0
 					},
 				};
-				await usersCollection.updateOne({ email: req.session.email}, updateDoc);
+				await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			}
 			const updateDoc = {
 				$set: {
@@ -1696,6 +1694,61 @@ async function connectToMongo() {
 
 		app.get('/ai-training-recommendation', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-recommendation.html', 'utf-8');
+			res.send(doc);
+		});
+
+		app.get('/map', (req, res) => {
+			var doc = fs.readFileSync('./html/map.html', 'utf-8');
+			res.send(doc);
+		});
+
+
+		//-------------------------------------------------------------------------------
+		// Text to Speech
+		// This code is provided by the Google Text to Speech client libraries with modification
+		// our project
+		//------------------------------------------------------------------------------
+
+
+		app.post("/text-to-speech", async (req, res) => {
+			const text = req.body.text;
+
+			const client = new textToSpeech.TextToSpeechClient();
+
+			try {
+				// Construct the request
+				const request = {
+					input: { text: text },
+					// Select the language and SSML voice gender (optional)
+					voice: { languageCode: 'en-GB', ssmlGender: "FEMALE" }, // Use appropriate language code and gender
+					// Select the type of audio encoding
+					audioConfig: { audioEncoding: 'MP3' }, // Fix typo in audioConfig
+				};
+
+				// Perform text-to-speech request
+				const [response] = await client.synthesizeSpeech(request);
+				// Write the binary audio content to a local file
+				const writeFile = util.promisify(fs.writeFile);
+
+				// Generate a unique filename for the audio file
+				const fileName = uuid.v4() + '.mp3';
+				const filePath = path.join(__dirname, 'img/text-to-speech-audios', fileName);
+				await writeFile(filePath, response.audioContent, 'binary');
+				console.log('Audio content written to file: output.mp3');
+				res.send(fileName);
+			} catch (error) {
+				console.error("Error synthesizing speech ", error);
+				res.status(500).send('Error synthesizing speech');
+			}
+		});
+
+		app.get('/map', (req, res) => {
+			var doc = fs.readFileSync('./html/map.html', 'utf-8');
+			res.send(doc);
+		});
+
+		app.get('/body-motion-capture', (req, res) => {
+			var doc = fs.readFileSync('./html/body-motion-capture.html', 'utf-8');
 			res.send(doc);
 		});
 

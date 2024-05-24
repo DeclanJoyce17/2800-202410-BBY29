@@ -1,18 +1,28 @@
 body {
     margin: 0;
     padding: 0;
-    color: black;
-    font-size: 16pt;
+    color: white;
+    overflow: hidden;
+    background-image: url('/img/aibot2.png');
+    background-size: 150%;
 }
 
-#personalize-training {
+
+#first-para {
     font-size: 30pt;
     position: absolute;
-    top: 600px;
+    bottom: 250px;
     text-align: center;
     margin: 0 20px;
-    font-weight: bold;
-    /*  */
+}
+
+#second-para {
+    font-size: 14pt;
+    position: absolute;
+    bottom: 170px;
+    color: rgb(201, 196, 196);
+    text-align: center;
+    margin: 0 40px;
 }
 
 footer {
@@ -133,26 +143,4 @@ footer {
     background-color: white;
     width: 90px;
     height: 50px;
-}
-
-
-
-
-#video-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
-
-#video-background video {
-    object-fit: cover;
-    width: 100%;
-    height: 150%;
-}
-
-#audio-container {
-    display: none;
 }

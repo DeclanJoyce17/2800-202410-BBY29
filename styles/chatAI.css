@@ -1,0 +1,420 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 14pt;
+}
+
+#content {
+    margin-bottom: 100px;
+}
+
+.fixed-bottom {
+    position: fixed;
+    bottom: 0;
+}
+
+#top-nav {
+    position: relative;
+}
+
+#go-back {
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    background-color: gray;
+    opacity: 0.4;
+    border-radius: 20px;
+    width: 50px;
+    height: 50px;
+}
+
+#go-back-icon {
+    position: absolute;
+    left: 28px;
+    top: 59px;
+}
+
+#setting {
+    position: absolute;
+    right: 20px;
+    top: 50px;
+    background-color: gray;
+    opacity: 0.4;
+    border-radius: 20px;
+    width: 50px;
+    height: 50px;
+}
+
+#setting-icon {
+    position: absolute;
+    right: 29px;
+    top: 59px;
+}
+
+#ai-assistant {
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+    height: 250px;
+    position: absolute;
+    width: 100%;
+}
+
+#new-chat {
+    color: white;
+    font-size: 14pt;
+    position: absolute;
+    bottom: -220px;
+    left: 20px;
+}
+
+#topic {
+    position: relative;
+    padding-top: 280px;
+    margin-left: 20px;
+    margin-right: 20px;
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+#topic-form {
+    position: absolute;
+}
+
+#topic-input {
+    width: 85%;
+    height: 50px;
+    border-radius: 20px;
+    border: thin solid gray;
+    padding-left: 50px;
+    margin-top: 10px;
+    background-color: rgb(245, 245, 245);
+}
+
+#browse-file {
+    position: absolute;
+    left: 10px;
+    top: 323px;
+}
+
+#pencil {
+    position: absolute;
+    right: 20px;
+    top: 323px;
+}
+
+#ai-model {
+    margin: 30px 20px 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+#label {
+    margin-bottom: 10px;
+}
+
+#ai-model-selection {
+    position: absolute;
+    height: auto;
+}
+
+#ai-model-name {
+    width: 99%;
+    height: 40px;
+    border-radius: 20px;
+    padding-left: 50px;
+}
+
+#robot {
+    position: absolute;
+    top: 35px;
+    left: 10px;
+    opacity: 0.6;
+}
+
+#drop-down {
+    position: absolute;
+    right: 15px;
+    top: 35px;
+    opacity: 0.6;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+    background-color: rgb(245, 245, 245);
+}
+
+#llm-range {
+    margin: 10px 20px 20px;
+    position: relative;
+}
+
+#llm-range-value {
+    width: 100%;
+}
+
+/* .form-range::-webkit-slider-runnable-track {
+    background-color: #FF8624; 
+  /* } */
+
+  .form-range::-webkit-slider-thumb {
+    background-color: orange; /* change this to your desired color */
+  } */
+#tensor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: gray
+}
+
+#topic-icons {
+    width: 100%;
+    overflow: scroll;
+    scrollbar-width: none;
+}
+
+#topic-selection {
+    margin-bottom: 10px;
+    margin-left: 20px;
+    margin-top: 0;
+}
+
+#btm-nav-container {
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+    background-color: white;
+    height: 100px;
+}
+
+#weight {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    left: 20px;
+    bottom: 40px;
+    opacity: 0.6;
+}
+
+#weight-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#walking {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 100px;
+    opacity: 0.6;
+}
+
+#walking-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#running {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: #FF8624;
+    position: absolute;
+    bottom: 40px;
+    left: 180px;
+}
+
+#running-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#cycling {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 260px;
+    opacity: 0.6;
+}
+
+#cycling-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#hiking {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 260px;
+    opacity: 0.6;
+}
+
+#hiking-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#karate {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 340px;
+    opacity: 0.6;
+}
+
+#karate-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#skating {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 420px;
+    opacity: 0.6;
+
+}
+
+#skating-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#styling-bar {
+    background-color: black;
+    height: 5px;
+    width: 50%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px;
+    bottom: 5px;
+}
+
+#preferred-name {
+    margin: 0 20px;
+    position: relative;
+    top: -10px;
+}
+
+#name-input {
+    width: 85%;
+    height: 50px;
+    border-radius: 20px;
+    border: thin solid gray;
+    padding-left: 50px;
+    margin-top: 10px;
+    background-color: rgb(245, 245, 245);
+}
+
+#user {
+    position: absolute;
+    top: 40px;
+    left: 10px;
+    opacity: 0.6;
+}
+
+#pencil-1 {
+    position: absolute;
+    top: 40px;
+    right: 20px;
+}
+
+footer {
+    position: fixed;
+    display: flex;
+}
+
+#home {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    left: 90px;
+    bottom: 30px;
+    background-color: black;
+    border-radius: 20px;
+}
+
+#home-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15px;
+}
+
+#initiate-chat {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    left: 175px;
+    transform: translateY(-50%);
+    bottom: 30px;
+    background-color: black;
+    border-radius: 20px;
+}
+
+#initiate-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 20px;
+}
+
+#bookmark {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    left: 280px;
+    bottom: 30px;
+    background-color: black;
+    border-radius: 20px;
+}
+
+#bookmark-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15px;
+}
+
+#styling-bar {
+    background-color: black;
+    height: 3px;
+    width: 50%;
+    position: absolute;
+    bottom: 10px;
+    left: 50px;
+}
+
+#content {
+    margin-bottom: 200px;
+}
+
