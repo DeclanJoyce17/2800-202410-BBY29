@@ -1,3 +1,4 @@
+
 "use strict";
 // Load environment variables from .env file
 require('dotenv').config();
@@ -17,8 +18,6 @@ const axios = require('axios');
 var nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const Joi = require('joi');
-const alert = require('alert');
-
 
 
 require("./utils.js");
@@ -26,7 +25,6 @@ require("./utils.js");
 const app = express();
 const expireTime = 60 * 60 * 1000;
 app.set('view engine', 'ejs')
-
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -182,6 +180,24 @@ async function connectToMongo() {
 			}
 		}
 
+		function isAdmin(req) {
+			if (req.session.user_type == 'admin') {
+				return true;
+			}
+			return false;
+		}
+
+		function adminValidation(req, res, next) {
+			console.log(req);
+			if (isAdmin(req)) {
+				next();
+			}
+			else {
+				res.status('403');
+				res.render('403');
+			}
+		}
+
 		//Used chatgpt to help figure out the password
 		const transporter = nodemailer.createTransport({
 			service: 'gmail', // e.g., 'gmail', 'yahoo', etc.
@@ -222,6 +238,11 @@ async function connectToMongo() {
 			res.render('shop', { items: result, currentPoints: results[0].currentPoints });
 		});
 
+		app.post('/moreinfo/:name', sessionValidation, async (req, res) => {
+			var itemName = req.params.name;
+			res.send(itemName)
+		});
+
 		app.post('/buy/:name', sessionValidation, async (req, res) => {
 			var itemName = req.params.name;
 			var points = req.session.currentPoints;
@@ -236,7 +257,24 @@ async function connectToMongo() {
 				console.log("Not Enough Points.");
 				return false;
 			}
-			const filter = { username: req.session.username };
+			const filter = { email: req.session.email };
+			if (itemName == '1 Hour Boost') {
+				var currentTime = new Date().getTime();
+				var hourTime = currentTime + (1 * 2 * 60 * 1000);
+				req.session.hourTime = hourTime;
+				console.log(currentTime);
+				console.log(hourTime);
+				const updateDoc = {
+					$set: {
+						pointBoost: hourTime
+
+					},
+				};
+
+
+				await userCollection.updateOne(filter, updateDoc);
+
+			}
 			if (itemName == 'Task Reroll') {
 				var rerolls = rerollAmount[0].rerolls;
 				const updateDoc = {
@@ -270,7 +308,8 @@ async function connectToMongo() {
 
 		//FitTasks Page
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
-			var point = req.session.points;
+
+			var currentTime = new Date().getTime();
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, rerolls: 1, date: 1 }).toArray();
 
@@ -372,6 +411,8 @@ async function connectToMongo() {
 
 		//Signup POST
 		app.post('/signup', async (req, res) => {
+
+
 			const usersCollection = db.collection('users');
 			const { username, email, password } = req.body;
 
@@ -530,7 +571,8 @@ async function connectToMongo() {
 				req.session.rerolls = result[0].rerolls;
 				req.session.email = email;
 				req.session.cookie.maxAge = expireTime;
-
+				req.session.hourTime = result[0].pointBoost;
+				req.session.user_typer = result[0].user_type;
 				res.redirect('/main');
 				return;
 			}
@@ -562,7 +604,7 @@ async function connectToMongo() {
 			try {
 				await db.collection('passwordResetTokens').insertOne({ email, token: sessionToken });
 
-				const resetUrl = `http://localhost:2800/reset-password?token=${sessionToken}`;
+				const resetUrl = `https://two800-202410-bby29-63o6.onrender.com/reset-password?token=${sessionToken}`;
 				const mailOptions = {
 					from: process.env.APP_EMAIL,
 					to: email,
@@ -601,6 +643,37 @@ async function connectToMongo() {
 				console.error('Error fetching reset token:', error);
 				res.status(500).send('Error resetting password.');
 			}
+		});
+
+		app.get('/rankProgress', sessionValidation, async (req, res) => {
+
+			const usersCollection = db.collection('users');
+			const result = await usersCollection.find({ email: req.session.email }).project({ points: 1, rerolls: 1, user_rank: 1, _id: 1 }).toArray();
+			var currentPoints = result[0].points;
+			var newRanking;
+			if (currentPoints < 50 && currentPoints >= 0) {
+				newRanking = 50 - currentPoints;
+			}
+			else if (currentPoints > 49 && currentPoints < 100) {
+				newRanking = 100 - currentPoints;
+				console.log('silver');
+			}
+			else if (currentPoints > 99 && currentPoints < 150) {
+				newRanking = 150 - currentPoints;
+				console.log('gold');
+			}
+			else if (currentPoints > 149 && currentPoints < 200) {
+				newRanking = 200 - currentPoints;
+				console.log('platinum');
+			}
+			else if (currentPoints > 199 && currentPoints < 250) {
+				newRanking = 250 - currentPoints;
+				console.log('diamond');
+			}
+			else {
+				newRanking = 0;
+			}
+			res.render('rankProgress', { points: result[0].points, rank: result[0].user_rank, nextRank: newRanking });
 		});
 
 		// Route to handle password reset form submission
@@ -644,6 +717,11 @@ async function connectToMongo() {
 				res.status(500).send('Error resetting password.');
 			}
 		});
+
+
+
+
+
 
 		app.get('/map', (req, res) => {
 			// Resolve the path to map.html using path module
@@ -693,7 +771,8 @@ async function connectToMongo() {
 				res.redirect('/login');  // Redirect to login if no user session
 				return;
 			}
-
+			var currentTime = new Date().getTime();
+			console.log(currentTime);
 			// greeting depends on the time user logged in
 			const currentHour = new Date().getHours();
 			let greeting;
@@ -728,8 +807,19 @@ async function connectToMongo() {
 				req.session.rank = 'Diamond';
 				console.log('diamond');
 			}
+			else if (currentPoints > 249 && currentPoints < 400) {
+				req.session.rank = 'master';
+
+			}
+			else if (currentPoints > 400 && currentPoints < 700) {
+				req.session.rank = 'grandmaster';
+			}
+			else if (currentPoints > 700 && currentPoints < 1000) {
+				req.session.rank = 'champion';
+
+			}
 			else {
-				req.session.rank = 'Limit Reached';
+				req.session.rank = 'god';
 			}
 			const filter = { username: req.session.username };
 
@@ -802,7 +892,7 @@ async function connectToMongo() {
 			var number = req.body.number;
 
 			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, rerolls: 1, date: 1, user_rank: 1 }).toArray();
+			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, rerolls: 1, date: 1, user_rank: 1 }).toArray();
 
 			var temp = '';
 			var tempTasks;
@@ -921,6 +1011,7 @@ async function connectToMongo() {
 				}
 			}
 
+
 			//console.log(taskBankFit[temp].task);
 
 			var updateDoc;
@@ -977,6 +1068,7 @@ async function connectToMongo() {
 			} else if (result2.length > 0) {
 				addingPoints = result2[0].points;
 			}
+
 
 			const updateDoc = {
 				$set: {
@@ -1102,10 +1194,14 @@ async function connectToMongo() {
 		});
 
 		app.get('/profile', sessionValidation, async (req, res) => {
+			const userCollection = db.collection('users');
+			const result = await userCollection.find().project({ username: 1, user_type: 1 }).toArray();
+			req.session.user_type = result[0].user_type;
 			console.log(req.session.userId);
 			const uploadSuccess = req.session.uploadSuccess;
 			req.session.uploadSuccess = false; // Reset the flag immediately
-			res.render('profile', { userID: req.session.userId, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
+			console.log(req.session.user_type);
+			res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
 		});
 
 		//ChangeEmail Page
@@ -1175,7 +1271,6 @@ async function connectToMongo() {
 
 		});
 
-		//ChangePassword Page
 		app.get('/changeUsername', sessionValidation, async (req, res) => {
 			res.render('changeUsername');
 		});
