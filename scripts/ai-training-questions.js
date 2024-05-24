@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Send the user's input to the AI API
-        const response = await fetch('http://localhost:2800/GroqChatCompletion', {
+        const response = await fetch('https://two800-202410-bby29-63o6.onrender.com/GroqChatCompletion', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
