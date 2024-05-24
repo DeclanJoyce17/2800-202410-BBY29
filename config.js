@@ -1097,9 +1097,19 @@ async function connectToMongo() {
 					if (username2 == req.session.username) {
 						req.session.user_type = 'user';
 					}
-				res.redirect('/members');
+				res.redirect('/admin');
 		});
 		
+		app.post('/deleteUser/:username', async (req,res) => {
+			var username = req.params.username;
+			const userCollection = db.collection('users');
+			const doc = {
+				username: username
+			  };
+			const deleteResult = await userCollection.deleteOne(doc);
+			res.redirect('/admin');
+		});
+
 		app.post('/promoteUser/:username2', async (req, res) => {
 			const userCollection = db.collection('users');
 			var username2 = req.params.username2;

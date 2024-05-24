@@ -32,6 +32,9 @@
                 <form action='/demoteAdmin/<%= user.username %>' method='post'>
                     <button class="btn btn-danger rounded-pill px-3">Demote to User</button>
                 </form>
+                <form action='/deleteUser/<%= user.username %>' method='post'>
+                    <button class="btn btn-warning rounded-pill px-3">Delete User</button>
+                </form>
             </div>
         </li>
     </ul>
