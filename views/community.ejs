@@ -1,83 +1,128 @@
 <%- include("templates/header") %>
-<title>Community</title>
-<link rel="stylesheet" type="text/css" href="../../styles/community.css" text="">
-</head>
+    <title>Community</title>
+    <link rel="stylesheet" type="text/css" href="../../styles/community.css" text="">
+    </head>
 
-<body>
+    <body>
 
-    <a class="go-back" onclick="goBack()">Back</a>
+        <div class="header">
+            <p class="headerTitle">Community posts</p>
+        </div>
 
-    <h1>Posts</h1>
-
-    <div class="posts">
-        <% posts.forEach(post=> { %>
-            <div class="post">
-                <div class="profile">
-                    <img src="<%= post.profileImage %>" alt="Profile Image">
-                    <span class="username">
-                        <%= post.username %>
-                    </span>
-                    <span class="tags">
-                        <% post.tags.forEach(tag => { %>
-                            <span class="tag"><%= tag %></span>
-                        <% }) %>
-                    </span>
+        <div class="header2">
+            <!-- add post -->
+            <span class="add-post-container">
+                <a href="/communityPost">
+                    <button class="addPost">Add Post</button>
+                </a>
+            </span>
+            <!-- Tag Filter -->
+            <form method="GET" action="/community" class="filter">
+                <label for="tag">Filter:</label>
+                <select name="tag" id="tag" onchange="this.form.submit()">
+                    <option value="all" <%=tag==='all' ? 'selected' : '' %>>All</option>
+                    <option value="fitness" <%=tag==='fitness' ? 'selected' : '' %>>Fitness</option>
+                    <option value="diet" <%=tag==='diet' ? 'selected' : '' %>>Diet</option>
+                </select>
+            </form>
+        </div>
+        <div class="posts">
+            <% posts.forEach(post=> { %>
+                <div class="post">
+                    <div class="profile">
+                        <img src="<%= post.profileImage %>" alt="Profile Image">
+                        <span class="username">
+                            <%= post.username %>
+                        </span>
+                        <div class="actions">
+                            <span class="tags">
+                                <% post.tags.forEach(tag=> { %>
+                                    <span class="tag">
+                                        <%= tag %>
+                                    </span>
+                                    <% }) %>
+                            </span>
+                            <% if (String(post.userId)===String(userId)) { %>
+                                <form action="/community/delete/<%= post._id %>" method="POST" class="delete">
+                                    <button type="submit">Delete</button>
+                                </form>
+                                <% } %>
+                        </div>
+                    </div>
+                    <p class="text">
+                        <%= post.text %>
+                    </p>
+                    <div class="image">
+                        <% post.imageUrls.forEach(url=> { %>
+                            <img src="<%= cloudinary.url(url, { width: 1080, height: 1080, crop: 'fill' }) %>"
+                                alt="Image">
+                            <% }) %>
+                    </div>
+                    <% if (post.location) { %>
+                        <div class="map" data-latitude="<%= post.location.latitude %>"
+                            data-longitude="<%= post.location.longitude %>" style="height: 300px; width: 100%;"></div>
+                        <% } %>
                 </div>
-                <p>
-                    <%= post.text %>
-                </p>
-                <div class="data">
-                    <% post.imageUrls.forEach(url=> { %>
-                        <img src="<%= url %>" alt="Image">
-                    <% }) %>
-                </div>
-                <% if (post.location) { %>
-                    <div class="map" data-latitude="<%= post.location.latitude %>" data-longitude="<%= post.location.longitude %>" style="height: 300px; width: 100%;"></div>
-                <% } %>
-                <% if (String(post.userId)===String(userId)) { %>
-                    <form action="/community/delete/<%= post._id %>" method="POST">
-                        <button type="submit">Delete</button>
-                    </form>
-                <% } %>
-            </div>
-        <% }) %>
-    </div>
+                <% }) %>
+        </div>
 
-    <div class="add-post-container">
-        <a href="/communityPost">
-            <input type="image" class="addPost" src="../../img/04-add.svg">
-        </a>
-    </div>
+        <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
 
-    <!-- going back function -->
-    <script>
-        function goBack() {
-            window.history.back();
-        }
-    </script>
+        <!-- Pagination Links -->
+        <!-- <div class="pagination">
+        <% if (page > 1) { %>
+            <a href="/community?page=<%= page - 1 %>&tag=<%= tag %>">Previous</a>
+        <% } %>
 
-    <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap" async defer></script>
-    <script>
-        function initMap() {
-            document.querySelectorAll('.map').forEach(mapElement => {
-                const latitude = parseFloat(mapElement.dataset.latitude);
-                const longitude = parseFloat(mapElement.dataset.longitude);
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <a href="/community?page=<%= i %>&tag=<%= tag %>" class="<%= i === page ? 'active' : '' %>"><%= i %></a>
+        <% } %>
 
-                if (latitude && longitude) {
-                    const map = new google.maps.Map(mapElement, {
-                        center: { lat: latitude, lng: longitude },
-                        zoom: 8
-                    });
+        <% if (page < totalPages) { %>
+            <a href="/community?page=<%= page + 1 %>&tag=<%= tag %>">Next</a>
+        <% } %>
+    </div> -->
 
-                    new google.maps.Marker({
-                        position: { lat: latitude, lng: longitude },
-                        map: map
-                    });
+        <!-- Google Maps API -->
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap"
+            async defer></script>
+        <script>
+            function initMap() {
+                document.querySelectorAll('.map').forEach(mapElement => {
+                    const latitude = parseFloat(mapElement.dataset.latitude);
+                    const longitude = parseFloat(mapElement.dataset.longitude);
+
+                    if (latitude && longitude) {
+                        const map = new google.maps.Map(mapElement, {
+                            center: { lat: latitude, lng: longitude },
+                            zoom: 8
+                        });
+
+                        new google.maps.Marker({
+                            position: { lat: latitude, lng: longitude },
+                            map: map
+                        });
+                    }
+                });
+            }
+        </script>
+
+        <script>
+            // Get the button:
+            let mybutton = document.getElementById("myBtn");
+            window.onscroll = function () { scrollFunction() };
+            function scrollFunction() {
+                // When the user scrolls down 30px from the top of the document, show the button
+                if (document.body.scrollTop > 30 || document.documentElement.scrollTop > 30) {
+                    mybutton.style.display = "block";
+                } else {
+                    mybutton.style.display = "none";
                 }
-            });
-        }
-    </script>
-
+            }
+            function topFunction() {
+                document.documentElement.scrollTop = 0;
+            }
+        </script>
 
 <%- include("templates/footer") %>

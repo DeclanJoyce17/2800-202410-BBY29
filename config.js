@@ -19,14 +19,13 @@ const crypto = require('crypto');
 const Joi = require('joi');
 const cloudinary = require('cloudinary').v2;
 
+
+// Load environment variables from .env file
+require('dotenv').config();
 require("./utils.js");
 
 const app = express();
 const expireTime = 60 * 60 * 1000;
-
-
-// Load environment variables from .env file
-require('dotenv').config();
 
 const port = process.env.PORT || 3000;
 const speechClient = new SpeechClient();
@@ -72,27 +71,6 @@ async function initMongoDB() {
 	}
 }
 initMongoDB();
-
-// Express route to get an image by filename
-// app.get('/images/:filename', async (req, res) => {
-// 	try {
-// 		// Assuming 'userId' is the key where the user ID is stored in the session
-
-// 		const userId = req.session.userId;
-// 		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
-
-// 		// Set the proper content type before sending the stream
-// 		downloadStream.on('file', (file) => {
-// 			res.type(file.contentType);
-// 		});
-// 		// Pipe the image data to the response
-// 		downloadStream.pipe(res);
-// 	} catch (error) {
-// 		console.error('Failed to retrieve image:', error);
-// 		res.status(404).send('Image not found');
-// 	}
-// });
-
 
 // Route to upload images
 app.post('/upload', upload.single('image'), async (req, res) => {
@@ -1011,12 +989,34 @@ async function connectToMongo() {
 			}
 
 			const userId = req.session.userId;
+			// Get the page number from query parameter or default to 1
+			const page = parseInt(req.query.page) || 1;
+			// Define how many posts per page
+			const postsPerPage = 5;
+			// Get the tag filter from query parameter
+			const tag = req.query.tag || 'all'; 
+
+			let filter = {};
+
+			if (tag !== 'all') {
+				filter.tags = tag;
+			}
 
 			try {
 				const postsCollection = db.collection('posts');
-				const posts = await postsCollection.find().toArray();
+				// Get the total number of posts
+				const totalPosts = await postsCollection.countDocuments(filter);
+				// Calculate total number of pages
+				const totalPages = Math.ceil(totalPosts / postsPerPage);
+		
+				const posts = await postsCollection.find(filter)
+					// Skip the posts of previous pages
+					.skip((page - 1) * postsPerPage)
+					// Limit the number of posts to display
+					.limit(postsPerPage)
+					.toArray();
 
-				res.render('community', { posts, userId });
+				res.render('community', { posts, userId, page, totalPages, tag, cloudinary: cloudinary });
 			} catch (error) {
 				console.error('Error retrieving posts:', error);
 				res.status(500).send('Failed to retrieve posts.');
@@ -1047,71 +1047,70 @@ async function connectToMongo() {
 
 		// max 4 images can be uploaded
 		// Updated POST route to handle post creation
-app.post('/communityPost/post', upload.array('images', 4), async (req, res) => {
-    console.log('POST /communityPost/post');
+		app.post('/communityPost/post', upload.array('images', 4), async (req, res) => {
+			console.log('POST /communityPost/post');
 
-    if (!req.session.userId) {
-        return res.status(401).send('Unauthorized');
-    }
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
 
-    // Generate a unique postId
-    const postId = new ObjectId();
-    // Default to empty string if no text is provided
-    const text = req.body.text || "";
-    const createdAt = new Date();
-    // to authorize them to delete the post
-    const userId = req.session.userId;
-    const tags = req.body.tags ? [req.body.tags.trim()] : [];
-    const latitude = req.body.latitude || null;
-    const longitude = req.body.longitude || null;
+			// Generate a unique postId
+			const postId = new ObjectId();
+			// Default to empty string if no text is provided
+			const text = req.body.text || "";
+			const createdAt = new Date();
+			// to authorize them to delete the post
+			const userId = req.session.userId;
+			const tags = req.body.tags ? [req.body.tags.trim()] : [];
+			const latitude = req.body.latitude || null;
+			const longitude = req.body.longitude || null;
 
-    // Check if at least one field is filled
-    if (!text && (!req.files || req.files.length === 0)) {
-        return res.status(400).send('Please provide either text or images.');
-    }
+			// Check if at least one field is filled
+			if (!text && (!req.files || req.files.length === 0)) {
+				return res.status(400).send('Please provide either text or images.');
+			}
 
-    try {
-        // Retrieve the user details
-        const usersCollection = db.collection('users');
-        const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
+			try {
+				// Retrieve the user details
+				const usersCollection = db.collection('users');
+				const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
 
-        // Handle image uploads if any
-        let imageUrls = [];
-        if (req.files && req.files.length > 0) {
-            imageUrls = await uploadImagesToCloudinary(req.files);
-        }
+				// Handle image uploads if any
+				let imageUrls = [];
+				if (req.files && req.files.length > 0) {
+					imageUrls = await uploadImagesToCloudinary(req.files);
+				}
 
-        const username = user.username;
+				const username = user.username;
 
-        // Find the profile image in GridFS
-        const files = await bucket.find({ 'metadata.userId': userId }).toArray();
-        // Default image
-        let profileImage = '/default-avatar.jpg';
-        if (files.length > 0) {
-            profileImage = `/images/${userId}`;
-        }
+				// Find the profile image in GridFS
+				const files = await bucket.find({ 'metadata.userId': userId }).toArray();
+				// Default image
+				let profileImage = '/default-avatar.jpg';
+				if (files.length > 0) {
+					profileImage = `/images/${userId}`;
+				}
 
-        // Save post data to MongoDB
-        const postsCollection = db.collection('posts');
-        await postsCollection.insertOne({
-            _id: postId,
-            text,
-            createdAt,
-            imageUrls,
-            tags,
-            userId,
-            username,
-            profileImage,
-            location: latitude && longitude ? { latitude, longitude } : null
-        });
+				// Save post data to MongoDB
+				const postsCollection = db.collection('posts');
+				await postsCollection.insertOne({
+					_id: postId,
+					text,
+					createdAt,
+					imageUrls,
+					tags,
+					userId,
+					username,
+					profileImage,
+					location: latitude && longitude ? { latitude, longitude } : null
+				});
 
-        res.redirect('/community');
-    } catch (error) {
-        console.error('Post creation error:', error);
-        res.status(500).send(`Failed to create post: ${error.message}`);
-    }
-});
-
+				res.redirect('/community');
+			} catch (error) {
+				console.error('Post creation error:', error);
+				res.status(500).send(`Failed to create post: ${error.message}`);
+			}
+		});
 
 		// Route to handle delete post request
 		app.post('/community/delete/:id', async (req, res) => {
@@ -1424,16 +1423,36 @@ async function resizeImage(fileBuffer, width, height) {
 
 /************************ helper functions to upload community post ***************************/
 
+// async function uploadImagesToCloudinary(files) {
+// 	return Promise.all(files.map(file => {
+// 		return new Promise((resolve, reject) => {
+// 			cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+// 				if (error) {
+// 					reject(error);
+// 				} else {
+// 					resolve(result.secure_url);
+// 				}
+// 			}).end(file.buffer);
+// 		});
+// 	}));
+// }
+
 async function uploadImagesToCloudinary(files) {
-	return Promise.all(files.map(file => {
-		return new Promise((resolve, reject) => {
-			cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
-				if (error) {
-					reject(error);
-				} else {
-					resolve(result.secure_url);
-				}
-			}).end(file.buffer);
-		});
-	}));
+    return Promise.all(files.map(file => {
+        return new Promise((resolve, reject) => {
+            resizeImage(file.buffer, 1080, 1080) // Resize the image to 1080x1080
+                .then(resizedBuffer => {
+                    cloudinary.uploader.upload_stream({
+                        resource_type: 'image'
+                    }, (error, result) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(result.secure_url);
+                        }
+                    }).end(resizedBuffer);
+                })
+                .catch(error => reject(error));
+        });
+    }));
 }

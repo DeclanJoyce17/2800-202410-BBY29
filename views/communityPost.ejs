@@ -33,16 +33,16 @@
         const imageInput = document.getElementById('imageInput');
         const clearImagesButton = document.getElementById('clearImagesButton');
         let uploadedImages = [];
-
+    
         imageInput.addEventListener('change', function(event) {
             const files = event.target.files;
-
+    
             if (uploadedImages.length + files.length > 4) {
                 alert('You can only upload up to 4 images.');
                 event.target.value = ''; // Clear the file input
                 return;
             }
-
+    
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -55,36 +55,11 @@
                 reader.readAsDataURL(file);
             });
         });
-
+    
         clearImagesButton.addEventListener('click', function() {
             uploadedImages = [];
             preview.innerHTML = '';
             imageInput.value = '';
-        });
-
-        document.querySelector('form').addEventListener('submit', function(event) {
-            const formData = new FormData(this);
-            uploadedImages.forEach(uploadedImage => {
-                formData.append('images', uploadedImage, uploadedImage.name);
-            });
-
-            event.preventDefault();
-
-            fetch('/communityPost/post', {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                if (response.ok) {
-                    window.location.href = '/community';
-                } else {
-                    response.text().then(text => {
-                        alert(text);
-                    });
-                }
-            }).catch(error => {
-                console.error('Error:', error);
-                alert('Failed to create post.');
-            });
         });
     </script>
 
