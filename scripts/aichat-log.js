@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const userInput = questionInput.value.trim(); // Get the user's input from the form
 
         // Send the user's input to the server
-        const response = await fetch('https://two800-202410-bby29-63o6.onrender.com/GroqChatCompletion', {
+        const response = await fetch('/GroqChatCompletion', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

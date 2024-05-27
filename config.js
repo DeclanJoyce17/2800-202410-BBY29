@@ -246,7 +246,7 @@ async function connectToMongo() {
 			const filter = { email: req.session.email };
 			if (itemName == '1 Hour Boost') {
 				var currentTime = new Date().getTime();
-				var hourTime = currentTime + (1 * 2 * 60 * 1000);
+				var hourTime = currentTime + (1 * 60 * 60 * 1000);
 				req.session.hourTime = hourTime;
 				console.log(currentTime);
 				console.log(hourTime);
@@ -341,7 +341,7 @@ async function connectToMongo() {
 				await usersCollection.updateOne(result[0], updateDoc);
 				res.redirect('/fitTasks');
 			} else {
-				res.render('fitTasks', { points: point, boostActive: Math.trunc(timeRemaining), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+				res.render('fitTasks', { points: point, boostActive: (timeRemaining).toFixed(2), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: false });
 			}
 
 		});
@@ -395,7 +395,7 @@ async function connectToMongo() {
 				await usersCollection.updateOne(result[0], updateDoc);
 				res.redirect('/dietTasks');
 			} else {
-				res.render('dietTasks', { points: point, boostActive: Math.trunc(timeRemaining), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+				res.render('dietTasks', { points: point, boostActive: (timeRemaining).toFixed(2), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: false });
 			}
 
 		});
@@ -952,7 +952,7 @@ async function connectToMongo() {
 			var tempTasks;
 			if (result[0].rerolls < 1) {
 				var point = req.session.points;
-				res.render('fitTasks', { points: point, boostActive: Math.trunc((req.session.hourTime-currentTime)/60000), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: true });
+				res.render('fitTasks', { points: point, boostActive: ((req.session.hourTime-currentTime)/60000).toFixed(2), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: true });
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
@@ -1034,7 +1034,7 @@ async function connectToMongo() {
 			var tempTasks;
 			if (result[0].rerolls < 1) {
 				var point = req.session.points;
-				res.render('dietTasks', { points: point, boostActive: Math.trunc((req.session.hourTime-currentTime)/60000), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: true });
+				res.render('dietTasks', { points: point, boostActive: ((req.session.hourTime-currentTime)/60000).toFixed(2), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: true });
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
