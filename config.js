@@ -889,7 +889,7 @@ async function connectToMongo() {
 			/************ To use the ejs template ***********/
 
 			const username = req.session.username
-			
+
 			const rank = req.session.rank
 			const users = await getAndSortUsersFromDB();
 			let fitTasks = [];
@@ -1535,7 +1535,7 @@ async function connectToMongo() {
 
 			const schema = Joi.object(
 				{
-					username: Joi.string().min(8).max(20).required()
+					username: Joi.string().alphanum.min(8).max(20).required()
 				}
 			);
 
