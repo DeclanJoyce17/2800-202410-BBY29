@@ -11,7 +11,7 @@ recognition.interimResults = true;
 const MAX_TRANSCRIPT_LENGTH = 30000;
 
 // The end point in backend that process the audio and initiates transcribing
-const SERVER_URL = 'http://localhost:2800/audio';
+const SERVER_URL = '/audio';
 
 // Set the recognition language
 recognition.lang = 'en-US';
