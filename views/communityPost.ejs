@@ -1,123 +1,164 @@
 <%- include("templates/header") %>
-<title>Community</title>
-<link rel="stylesheet" type="text/css" href="../../styles/communityPost.css" text="">
-</head>
+    <title>Community</title>
+    <link rel="stylesheet" type="text/css" href="../../styles/communityPost.css" text="">
+    </head>
 
-<body>
+    <body>
 
-    <a class="go-back" onclick="goBack()">Back</a>
+        <a class="go-back" onclick="goBack()">Back</a>
 
-    <h1>Community Posts</h1>
+        <h1>Community Posts</h1>
 
-    <form action="/communityPost/post" method="post" enctype="multipart/form-data" id="communityPostForm">
-        <textarea name="text" rows="4" cols="50" placeholder="Write something...(optional)" id="postText"></textarea><br>
-        <input type="file" name="images" id="imageInput" multiple accept="image/*"><br>
-        <div class="preview" id="imagePreview"></div><br>
-        <button type="button" id="clearImagesButton">Clear All Images</button><br>
-        <select name="tags">
-            <option value="fitness">Fitness</option>
-            <option value="diet">Diet</option>
-        </select><br>
+        <form action="/communityPost/post" method="post" enctype="multipart/form-data" id="communityPostForm">
+            <textarea name="text" rows="4" cols="50" placeholder="Write something...(optional)"
+                id="postText"></textarea><br>
+            <input type="file" name="images" id="imageInput" multiple accept="image/*"><br>
+            <div class="preview" id="imagePreview"></div><br>
+            <button type="button" id="clearImagesButton">Clear All Images</button><br>
+            <select name="tags" id="tags" required>
+                <option value="" selected>Select</option>
+                <option value="fitness">Fitness</option>
+                <option value="diet">Diet</option>
+            </select><br>
 
-        <!-- Map for selecting location -->
-        <div id="map" style="height: 300px; width: 100%;"></div><br>
-        <button type="button" id="clearPinButton">Clear Pin</button><br>
-        <input type="hidden" id="latitude" name="latitude">
-        <input type="hidden" id="longitude" name="longitude">
+            <div id="error-message" class="error-message"></div>
 
-        <button type="submit">Post</button>
-    </form>
+            <!-- Map for selecting location -->
+            <div id="map" style="height: 300px; width: 100%;"></div><br>
+            <button type="button" id="clearPinButton">Clear Pin</button><br>
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
 
-    <script>
-        const preview = document.getElementById('imagePreview');
-        const imageInput = document.getElementById('imageInput');
-        const clearImagesButton = document.getElementById('clearImagesButton');
-        let uploadedImages = [];
-    
-        imageInput.addEventListener('change', function(event) {
-            const files = event.target.files;
-    
-            if (uploadedImages.length + files.length > 4) {
-                alert('You can only upload up to 4 images.');
-                event.target.value = ''; // Clear the file input
-                return;
-            }
-    
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.classList.add('preview-img');
-                    preview.appendChild(img);
-                    uploadedImages.push(file);
-                };
-                reader.readAsDataURL(file);
-            });
-        });
-    
-        clearImagesButton.addEventListener('click', function() {
-            uploadedImages = [];
-            preview.innerHTML = '';
-            imageInput.value = '';
-        });
-    </script>
+            <button type="submit">Post</button>
+        </form>
 
-    <!-- going back function -->
-    <script>
-        function goBack() {
-            window.history.back();
-        }
-    </script>
+        <script>
+            const preview = document.getElementById('imagePreview');
+            const imageInput = document.getElementById('imageInput');
+            const clearImagesButton = document.getElementById('clearImagesButton');
+            let uploadedImages = [];
 
-    <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap" async defer></script>
-    <script>
-        let map, marker;
+            imageInput.addEventListener('change', function (event) {
+                const files = event.target.files;
 
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: -34.397, lng: 150.644 },
-                zoom: 8
-            });
+                if (uploadedImages.length + files.length > 4) {
+                    alert('You can only upload up to 4 images.');
+                    event.target.value = ''; // Clear the file input
+                    return;
+                }
 
-            map.addListener('click', (event) => {
-                placeMarker(event.latLng);
-            });
-
-            document.getElementById('clearPinButton').addEventListener('click', clearMarker);
-        }
-
-        function placeMarker(location) {
-            if (marker) {
-                marker.setPosition(location);
-            } else {
-                marker = new google.maps.Marker({
-                    position: location,
-                    map: map
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.classList.add('preview-img');
+                        preview.appendChild(img);
+                        uploadedImages.push(file);
+                    };
+                    reader.readAsDataURL(file);
                 });
+            });
+
+            clearImagesButton.addEventListener('click', function () {
+                uploadedImages = [];
+                preview.innerHTML = '';
+                imageInput.value = '';
+            });
+        </script>
+
+        <!-- going back function -->
+        <script>
+            function goBack() {
+                window.history.back();
+            }
+        </script>
+
+        <!-- Google Maps API -->
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap"
+            async defer></script>
+        <script>
+            let map, marker;
+
+            function initMap() {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: -34.397, lng: 150.644 },
+                    zoom: 8
+                });
+
+                map.addListener('click', (event) => {
+                    placeMarker(event.latLng);
+                });
+
+                document.getElementById('clearPinButton').addEventListener('click', clearMarker);
             }
 
-            document.getElementById('latitude').value = location.lat();
-            document.getElementById('longitude').value = location.lng();
-        }
+            function placeMarker(location) {
+                if (marker) {
+                    marker.setPosition(location);
+                } else {
+                    marker = new google.maps.Marker({
+                        position: location,
+                        map: map
+                    });
+                }
 
-        function clearMarker() {
-            if (marker) {
-                marker.setMap(null);
-                marker = null;
+                document.getElementById('latitude').value = location.lat();
+                document.getElementById('longitude').value = location.lng();
             }
-            document.getElementById('latitude').value = '';
-            document.getElementById('longitude').value = '';
-        }
-    </script>
 
-    <!-- Trim trailing whitespace before form submission -->
-    <script>
-        document.getElementById('communityPostForm').addEventListener('submit', function(event) {
-            const postText = document.getElementById('postText');
-            postText.value = postText.value.trim();
-        });
-    </script>
+            function clearMarker() {
+                if (marker) {
+                    marker.setMap(null);
+                    marker = null;
+                }
+                document.getElementById('latitude').value = '';
+                document.getElementById('longitude').value = '';
+            }
+        </script>
 
-<%- include("templates/end") %>
+        <!-- Trim trailing whitespace before form submission -->
+        <script>
+            document.getElementById('communityPostForm').addEventListener('submit', function (event) {
+                const postText = document.getElementById('postText');
+                postText.value = postText.value.trim();
+            });
+        </script>
+
+        <!-- Validation for empty tag selection and empty text/images -->
+        <script>
+            document.getElementById('communityPostForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent form submission
+
+                const selectField = document.getElementById('tags');
+                const textField = document.getElementById('postText');
+                const imageField = document.getElementById('imageInput');
+                const errorMessage = document.getElementById('error-message');
+
+                let errorMessages = [];
+
+                // Validate select field
+                if (selectField.value === '') {
+                    errorMessages.push('Please select a valid tag (Fitness or Diet).');
+                }
+
+                // Validate text and image fields
+                if (textField.value.trim() === '' && imageField.files.length === 0) {
+                    errorMessages.push('Please provide either text or images.');
+                }
+
+                if (errorMessages.length > 0) {
+                    errorMessage.innerHTML = errorMessages.join('<br>');
+                    errorMessage.style.display = 'block';
+                    setTimeout(() => {
+                        errorMessage.style.display = 'none';
+                    }, 3000); // Hide after 3 seconds
+                } else {
+                    this.submit(); // No errors, submit the form
+                }
+            });
+        </script>
+
+
+        <%- include("templates/end") %>

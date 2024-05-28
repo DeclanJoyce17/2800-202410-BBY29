@@ -71,7 +71,6 @@ button {
     max-width: 150px;
     margin: 10px;
     border-radius: 10px;
-    /* Add border radius */
 }
 
 .go-back {
@@ -79,15 +78,26 @@ button {
     margin: 10px;
     cursor: pointer;
     color: white;
-    /* Make text white */
     background-color: #FF8624;
-    /* Background color */
     padding: 10px;
     border-radius: 5px;
     text-decoration: none;
-    /* Remove underline */
     font-size: 1.2rem;
-    /* Increase font size */
+}
+
+.error-message {
+    color: red;
+    background-color: #ffe6e6;
+    border: 1px solid #ffcccc;
+    margin-top: 10px;
+    border-radius: 5px;
+    display: none;
+    font-size: 1.8rem;
+    z-index: 1000; 
+    position: absolute; 
+    margin: 5% auto;
+    padding: 25px;
+    width: 80%;
 }
 
 /* Ensure responsiveness */

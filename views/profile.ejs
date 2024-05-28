@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/styles/profile.css">
 </head>
 
-<!-- can't use header.ejs because there is style.css. that ruins the page-->
+<!-- can't use header.ejs because there is style.css. that ruins the page -->
 
 <body>
     <div class="container">
@@ -42,32 +42,14 @@
             </div>
             <% } %>
 
-
                 <div class="section">
                     <div class="section-title">General</div>
-
-                    <!-- possibly use -->
-                    <!-- <div class="item">
-                <span>Notifications</span>
-                <span class="icon">🔔</span>
-            </div> -->
-
-                    <!-- <div class="item">
-                <span>Language</span>
-                <span class="icon">🌐</span>
-                <span class="badge">EN</span>
-            </div> -->
-                    <!-- <div class="item">
-                <span>Dark Mode</span>
-                <input type="checkbox" class="toggle" checked>
-            </div> -->
                     <div class="item">
                         <a href="/changeUsername" style="text-decoration : none;">
                             <span class="icon">👤</span>
                             <span>Change Username</span>
                         </a>
                     </div>
-
                     <div class="item">
                         <a href="/" id="profileImageLink" style="text-decoration: none;">
                             <span class="icon">👤</span>
@@ -78,28 +60,25 @@
                             <input type="file" name="image" id="profileImageInput" required style="display: none;">
                         </form>
                     </div>
-
                     <div class="item">
                         <a href="/changeEmail" style="text-decoration : none;">
                             <span class="icon">✉️</span>
                             <span>Change Email</span>
                         </a>
                     </div>
-
                     <div class="item">
                         <a href="/changePassword" style="text-decoration : none;">
                             <span class="icon">📝</span>
                             <span>Change Password</span>
                         </a>
                     </div>
-
                     <div class="item">
                         <a href="/rankProgress" style="text-decoration : none;">
                             <span class="icon">🏆</span>
                             <span>Ranking Progress</span>
                         </a>
                     </div>
-                    <% if(type =='admin') { %>
+                    <% if(type=='admin' ) { %>
                         <div class="item">
                             <a href="/admin" style="text-decoration : none;">
                                 <span class="icon"></span>
@@ -109,38 +88,10 @@
                         <% } %>
                 </div>
 
-                <!-- <div class="section">
-            <div class="section-title">Security & Privacy</div>
-            <div class="item">
-                <a href="/" style="text-decoration : none;">
-                    <span class="icon">🔏</span>
-                    <span>Privacy Policy</span>
-                </a>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">Help & Support</div>
-            <div class="item">
-                <a href="/" style="text-decoration : none;">
-                    <span class="icon">🗨️</span>
-                    <span>About Us</span>
-                </a>
-            </div>
-
-            <div class="item">
-                <a href="/" style="text-decoration : none;">
-                    <span class="icon">🆘</span>
-                    <span>Help Center</span>
-                </a>
-            </div>
-        </div> -->
-
-
                 <div class="section danger-zone">
                     <div class="section-title">Danger Zone</div>
                     <div class="item" action="/logout" method="get">
-                        <a href="/logout" type="submit" style="text-decoration : none;">
+                        <a href="/logout" type="submit" id="logoutLink" style="text-decoration : none;">
                             <span class="icon">❌</span>
                             <span>Log Out</span>
                         </a>
@@ -149,7 +100,7 @@
                 </div>
 
                 <div class="footer">
-                    fitup.ai v1.2800 ©All Rights Reserved, 2024
+                    fitup. v1.2800 ©All Rights Reserved, 2024
                 </div>
     </div>
 
@@ -174,12 +125,50 @@
         document.addEventListener('DOMContentLoaded', () => {
             const successMessageDiv = document.getElementById('success-message');
             if (successMessageDiv) {
-                // Hide the success message after 3 seconds
                 setTimeout(() => {
                     successMessageDiv.style.display = 'none';
                 }, 3000);
             }
         });
     </script>
+
+    <!-- confirmation message for logout -->
+    <script>
+        document.getElementById('logoutLink').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            const modal = document.getElementById('confirmModal');
+            const modalContent = document.querySelector('.modal-content');
+
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.classList.add('show');
+                modalContent.classList.add('show');
+            }, 10);
+
+            document.getElementById('confirmBtn').onclick = function () {
+                modalContent.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.getElementById('logoutForm').submit();
+                }, 500);
+            };
+
+            document.getElementById('cancelBtn').onclick = function () {
+                modalContent.classList.remove('show');
+                modal.style.display = 'none';
+            };
+        });
+    </script>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to log out?</p>
+            <button id="confirmBtn">Yes</button>
+            <button id="cancelBtn">No</button>
+        </div>
+    </div>
+
 
     <%- include("templates/end") %>
