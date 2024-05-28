@@ -3,128 +3,153 @@
     <link rel="stylesheet" type="text/css" href="../../styles/community.css" text="">
     </head>
 
-    <script>
-        function initMap() {
-            document.querySelectorAll('.map').forEach(mapElement => {
-                const latitude = parseFloat(mapElement.dataset.latitude);
-                const longitude = parseFloat(mapElement.dataset.longitude);
+    <body>
+        <div class="header">
+            <p class="headerTitle">Community posts</p>
+        </div>
 
-                console.log('Latitude:', latitude, 'Longitude:', longitude);
-
-                if (!isNaN(latitude) && !isNaN(longitude)) {
-                    const map = new google.maps.Map(mapElement, {
-                        center: { lat: latitude, lng: longitude },
-                        zoom: 8
-                    });
-
-                    new google.maps.Marker({
-                        position: { lat: latitude, lng: longitude },
-                        map: map
-                    });
-                } 
-            });
-        }
-    </script>
-
-    <div class="header">
-        <p class="headerTitle">Community posts</p>
-    </div>
-
-    <div class="header2">
-        <!-- add post -->
-        <span class="add-post-container">
-            <a href="/communityPost">
-                <button class="addPost">Add Post</button>
-            </a>
-        </span>
-        <!-- Tag Filter -->
-        <form method="GET" action="/community" class="filter">
-            <label for="tag">Filter:</label>
-            <select name="tag" id="tag" onchange="this.form.submit()">
-                <option value="all" <%=tag==='all' ? 'selected' : '' %>>All</option>
-                <option value="fitness" <%=tag==='fitness' ? 'selected' : '' %>>Fitness</option>
-                <option value="diet" <%=tag==='diet' ? 'selected' : '' %>>Diet</option>
-            </select>
-        </form>
-    </div>
-    <div class="posts">
-        <% posts.forEach(post=> { %>
-            <div class="post">
-                <div class="profile">
-                    <img src="<%= post.profileImage %>" alt="Profile Image">
-                    <span class="username">
-                        <%= post.username %>
-                    </span>
-                    <div class="actions">
-                        <span class="tags">
-                            <% post.tags.forEach(tag=> { %>
-                                <span class="tag">
-                                    <%= tag %>
-                                </span>
-                                <% }) %>
+        <div class="header2">
+            <!-- add post -->
+            <span class="add-post-container">
+                <a href="/communityPost">
+                    <button class="addPost">Add Post</button>
+                </a>
+            </span>
+            <!-- Tag Filter -->
+            <form method="GET" action="/community" class="filter">
+                <label for="tag">Filter:</label>
+                <select name="tag" id="tag" onchange="this.form.submit()">
+                    <option value="all" <%=tag==='all' ? 'selected' : '' %>>All</option>
+                    <option value="fitness" <%=tag==='fitness' ? 'selected' : '' %>>Fitness</option>
+                    <option value="diet" <%=tag==='diet' ? 'selected' : '' %>>Diet</option>
+                </select>
+            </form>
+        </div>
+        <div class="posts">
+            <% posts.reverse().forEach(post=> { %>
+                <div class="post">
+                    <div class="profile">
+                        <img src="<%= post.profileImage %>" alt="Profile Image">
+                        <span class="username">
+                            <%= post.username %>
                         </span>
-                        <% if (String(post.userId)===String(userId)) { %>
-                            <form action="/community/delete/<%= post._id %>" method="POST" class="delete">
-                                <button type="submit">Delete</button>
-                            </form>
-                            <% } %>
+                        <div class="actions">
+                            <span class="tags">
+                                <% post.tags.forEach(tag=> { %>
+                                    <span class="tag">
+                                        <%= tag %>
+                                    </span>
+                                    <% }) %>
+                            </span>
+                            <% if (String(post.userId)===String(userId)) { %>
+                                <form action="/community/delete/<%= post._id %>" method="POST" class="delete">
+                                    <button type="submit" onclick="confirmDelete(event)">Delete</button>
+                                </form>
+                                <% } %>
+                        </div>
                     </div>
+                    <p class="text">
+                        <%= post.text %>
+                    </p>
+                    <div class="image">
+                        <% post.imageUrls.forEach(url=> { %>
+                            <img src="<%= cloudinary.url(url, { width: 1080, height: 1080, crop: 'fill' }) %>"
+                                alt="Image">
+                            <% }) %>
+                    </div>
+                    <% if (post.location) { %>
+                        <div class="map" data-latitude="<%= post.location.latitude %>"
+                            data-longitude="<%= post.location.longitude %>" style="height: 300px; width: 100%;"></div>
+
+                        <% } %>
                 </div>
-                <p class="text">
-                    <%= post.text %>
-                </p>
-                <div class="image">
-                    <% post.imageUrls.forEach(url=> { %>
-                        <img src="<%= cloudinary.url(url, { width: 1080, height: 1080, crop: 'fill' }) %>" alt="Image">
-                        <% }) %>
-                </div>
-                <% if (post.location) { %>
-                    <div class="map" data-latitude="<%= post.location.latitude %>"
-                        data-longitude="<%= post.location.longitude %>" style="height: 300px; width: 100%;"></div>
+                <% }) %>
+        </div>
 
-                    <% } %>
-            </div>
-            <% }) %>
-    </div>
+        <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
 
-    <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+        <!-- Google Maps API -->
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap"
+            async defer>
+            </script>
 
-    <!-- Pagination Links -->
-    <!-- <div class="pagination">
-        <% if (page > 1) { %>
-            <a href="/community?page=<%= page - 1 %>&tag=<%= tag %>">Previous</a>
-        <% } %>
-
-        <% for (let i = 1; i <= totalPages; i++) { %>
-            <a href="/community?page=<%= i %>&tag=<%= tag %>" class="<%= i === page ? 'active' : '' %>"><%= i %></a>
-        <% } %>
-
-        <% if (page < totalPages) { %>
-            <a href="/community?page=<%= page + 1 %>&tag=<%= tag %>">Next</a>
-        <% } %>
-    </div> -->
-
-    <!-- Google Maps API -->
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap"
-        async defer></script>
-
-
-    <script>
-        // Get the button:
-        let mybutton = document.getElementById("myBtn");
-        window.onscroll = function () { scrollFunction() };
-        function scrollFunction() {
-            // When the user scrolls down 30px from the top of the document, show the button
-            if (document.body.scrollTop > 30 || document.documentElement.scrollTop > 30) {
-                mybutton.style.display = "block";
-            } else {
-                mybutton.style.display = "none";
+        <!-- bottom-to-top button -->
+        <script>
+            let mybutton = document.getElementById("myBtn");
+            window.onscroll = function () { scrollFunction() };
+            function scrollFunction() {
+                // When the user scrolls down 30px from the top of the document, show the button
+                if (document.body.scrollTop > 30 || document.documentElement.scrollTop > 30) {
+                    mybutton.style.display = "block";
+                } else {
+                    mybutton.style.display = "none";
+                }
             }
-        }
-        function topFunction() {
-            document.documentElement.scrollTop = 0;
-        }
-    </script>
+            function topFunction() {
+                document.documentElement.scrollTop = 0;
+            }
+        </script>
 
-    <%- include("templates/footer") %>
+        <!-- map -->
+        <script>
+            function initMap() {
+                document.querySelectorAll('.map').forEach(mapElement => {
+                    const latitude = parseFloat(mapElement.dataset.latitude);
+                    const longitude = parseFloat(mapElement.dataset.longitude);
+
+                    console.log('Latitude:', latitude, 'Longitude:', longitude);
+
+                    if (!isNaN(latitude) && !isNaN(longitude)) {
+                        const map = new google.maps.Map(mapElement, {
+                            center: { lat: latitude, lng: longitude },
+                            zoom: 8
+                        });
+
+                        new google.maps.Marker({
+                            position: { lat: latitude, lng: longitude },
+                            map: map
+                        });
+                    }
+                });
+            }
+        </script>
+
+        <!-- confirmation message for deleting -->
+        <script>
+            function confirmDelete(event) {
+                event.preventDefault();
+                const modal = document.getElementById('confirmModal');
+                const modalContent = document.querySelector('.modal-content');
+
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('show'); 
+                    modalContent.classList.add('show');
+                }, 10); 
+
+                document.getElementById('confirmBtn').onclick = function () {
+                    modalContent.classList.remove('show');
+                    setTimeout(() => {
+                        event.target.closest('form').submit();
+                    }, 500); 
+                };
+
+                document.getElementById('cancelBtn').onclick = function () {
+                    modalContent.classList.remove('show'); 
+                    modal.style.display = 'none'; 
+                };
+            }
+        </script>
+
+
+        <!-- Confirmation Modal -->
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <p>Are you sure you want to delete this post?</p>
+                <button id="confirmBtn">Yes</button>
+                <button id="cancelBtn">No</button>
+            </div>
+        </div>
+
+        <%- include("templates/footer") %>

@@ -15,7 +15,6 @@ const { SpeechClient } = require('@google-cloud/speech');
 const { spawn } = require('child_process');
 const sharp = require('sharp');
 const axios = require('axios');
-const textToSpeech = require('@google-cloud/text-to-speech');
 const uuid = require('uuid');
 
 const util = require('util');
