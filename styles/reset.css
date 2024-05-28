@@ -1,3 +1,4 @@
+/* General styles */
 
 .button {
     border-radius: 25px;
@@ -31,14 +32,14 @@
 
 .custom-btn {
     background-color: #FF8624;
-    color: #fff;    
+    color: #fff;
 }
 
 .center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }
 
 .login {
@@ -48,13 +49,12 @@
 .index-form {
     padding: 12px 24px;
     font-size: 16px;
-    
 }
 
 .index-btn {
     border-radius: 25px;
     margin-top: 20px;
-    width: 100px;
+    width: 40%;
     padding-top: 10px;
     padding-bottom: 10px;
     text-align: center;
@@ -79,7 +79,25 @@
 
 .resize {
     font-size: 10px;
-
 }
 
+/* Specific styles for password-reset and email-reset */
 
+.login.bg-light {
+    background-color: #f5f5f5; /* Example background color for login forms */
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.index-form.center {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.index-btn.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
