@@ -9,8 +9,8 @@
 
     <h1>Community Posts</h1>
 
-    <form action="/communityPost/post" method="post" enctype="multipart/form-data">
-        <textarea name="text" rows="4" cols="50" placeholder="Write something...(optional)"></textarea><br>
+    <form action="/communityPost/post" method="post" enctype="multipart/form-data" id="communityPostForm">
+        <textarea name="text" rows="4" cols="50" placeholder="Write something...(optional)" id="postText"></textarea><br>
         <input type="file" name="images" id="imageInput" multiple accept="image/*"><br>
         <div class="preview" id="imagePreview"></div><br>
         <button type="button" id="clearImagesButton">Clear All Images</button><br>
@@ -110,6 +110,14 @@
             document.getElementById('latitude').value = '';
             document.getElementById('longitude').value = '';
         }
+    </script>
+
+    <!-- Trim trailing whitespace before form submission -->
+    <script>
+        document.getElementById('communityPostForm').addEventListener('submit', function(event) {
+            const postText = document.getElementById('postText');
+            postText.value = postText.value.trim();
+        });
     </script>
 
 <%- include("templates/end") %>
