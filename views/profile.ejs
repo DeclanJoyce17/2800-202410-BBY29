@@ -61,6 +61,12 @@
                 <span>Dark Mode</span>
                 <input type="checkbox" class="toggle" checked>
             </div> -->
+                    <div class="item">
+                        <a href="/changeUsername" style="text-decoration : none;">
+                            <span class="icon">👤</span>
+                            <span>Change Username</span>
+                        </a>
+                    </div>
 
                     <div class="item">
                         <a href="/" id="profileImageLink" style="text-decoration: none;">
@@ -88,11 +94,19 @@
                     </div>
 
                     <div class="item">
-                        <a href="/" style="text-decoration : none;">
+                        <a href="/rankProgress" style="text-decoration : none;">
                             <span class="icon">🏆</span>
                             <span>Ranking Progress</span>
                         </a>
                     </div>
+                    <% if(type =='admin') { %>
+                        <div class="item">
+                            <a href="/admin" style="text-decoration : none;">
+                                <span class="icon"></span>
+                                <span>Admin</span>
+                            </a>
+                        </div>
+                        <% } %>
                 </div>
 
                 <!-- <div class="section">

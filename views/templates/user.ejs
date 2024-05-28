@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled User List</title>
+    <style>
+        .eachUser {
+            font-size: 10pt;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .user-actions {
+            display: inline-block;
+        }
+        .user-actions form {
+            display: inline;
+        }
+        .user-actions button {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <ul>
+        <li>
+            <div class="eachUser"><%= user.username %> (<%= user.user_type %>)</div>
+            <div class="user-actions">
+                <form action='/promoteUser/<%= user.username %>' method='post'>
+                    <button class="btn btn-success rounded-pill px-3">Promote to Admin</button>
+                </form>
+                <form action='/demoteAdmin/<%= user.username %>' method='post'>
+                    <button class="btn btn-danger rounded-pill px-3">Demote to User</button>
+                </form>
+                <form action='/deleteUser/<%= user.username %>' method='post'>
+                    <button class="btn btn-warning rounded-pill px-3">Delete User</button>
+                </form>
+            </div>
+        </li>
+    </ul>
+</body>
+</html>
