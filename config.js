@@ -672,16 +672,29 @@ async function connectToMongo() {
 				const imgPath1 = path.join(__dirname, 'img', 'Logo.png');
 				const imgPath2 = path.join(__dirname, 'img', 'fitup.png');
 
-				const mailOptions = {
+// Function to escape special characters in HTML
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+const escapedUserName = escapeHtml(userName);
+const escapedResetUrl = escapeHtml(resetUrl);
+
+const mailOptions = {
     from: 'FitUp <' + process.env.APP_EMAIL + '>',
     to: email,
     subject: 'Password Reset',
     html: `
         <div style="text-align: center;">
             <img src="cid:headerLogo" alt="FitUp Logo" width="250" height="250" style="display: block; margin: 0 auto;">
-            <p>Hello ${userName},</p>
+            <p>Hello ${escapedUserName},</p>
             <p>You have requested to reset your password. Please click the link below to reset:</p>
-            <a href="${resetUrl}">${resetUrl}</a>
+            <a href="${escapedResetUrl}">${escapedResetUrl}</a>
             <p>This link will expire in 30 minutes.</p>
             <img src="cid:footerLogo" alt="FitUp Footer Logo" width="150" height="150" style="display: block; margin: 20px auto 0;">
         </div>
@@ -699,7 +712,6 @@ async function connectToMongo() {
         }
     ]
 };
-
 
 				await transporter.sendMail(mailOptions);
 				return res.render('reset-email', { errorMessage: null, successMessage: 'Password reset email sent successfully.' });
