@@ -5,8 +5,15 @@
 		<img src="/img/Logo.png" alt="logo" width="250" height="250">
 	</div>
 
+
 	<div class="login bg-light">
+		<!-- Go Back button -->
+		<button type="button" class="index-btn top-left" style="margin-left: 10px;" onclick="location.href='/';">
+			Go Back
+		</button>
+
 		<br>
+
 
 		<% if (input==1) { %>
 			<div class="alert alert-danger" role="alert">
@@ -23,7 +30,7 @@
 				</form>
 				<br>
 				<form class="index-form center">
-					<a href="/reset-email">Reset password</a>
+					<a href="/reset-email" class="resize">Reset password</a>
 				</form>
 	</div>
 	<%- include("templates/easteregg") %>
