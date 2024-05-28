@@ -672,24 +672,24 @@ async function connectToMongo() {
 				const imgPath1 = path.join(__dirname, 'img', 'Logo.png');
 				const imgPath2 = path.join(__dirname, 'img', 'fitup.png');
 
-// Function to escape special characters in HTML
-function escapeHtml(text) {
-    return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+				// Function to escape special characters in HTML
+				function escapeHtml(text) {
+					return text
+						.replace(/&/g, "&amp;")
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;")
+						.replace(/"/g, "&quot;")
+						.replace(/'/g, "&#039;");
+				}
 
-const escapedUserName = escapeHtml(userName);
-const escapedResetUrl = escapeHtml(resetUrl);
+				const escapedUserName = escapeHtml(userName);
+				const escapedResetUrl = escapeHtml(resetUrl);
 
-const mailOptions = {
-    from: 'FitUp <' + process.env.APP_EMAIL + '>',
-    to: email,
-    subject: 'Password Reset',
-    html: `
+				const mailOptions = {
+					from: 'FitUp <' + process.env.APP_EMAIL + '>',
+					to: email,
+					subject: 'Password Reset',
+					html: `
         <div style="text-align: center;">
             <img src="cid:headerLogo" alt="FitUp Logo" width="250" height="250" style="display: block; margin: 0 auto;">
             <p>Hello ${escapedUserName},</p>
@@ -699,19 +699,19 @@ const mailOptions = {
             <img src="cid:footerLogo" alt="FitUp Footer Logo" width="150" height="150" style="display: block; margin: 20px auto 0;">
         </div>
     `,
-    attachments: [
-        {
-            filename: 'Logo.png',
-            path: imgPath1,
-            cid: 'headerLogo' // Content-ID for the header logo image
-        },
-        {
-            filename: 'fitup.png',
-            path: imgPath2,
-            cid: 'footerLogo' // Content-ID for the footer logo image
-        }
-    ]
-};
+					attachments: [
+						{
+							filename: 'Logo.png',
+							path: imgPath1,
+							cid: 'headerLogo' // Content-ID for the header logo image
+						},
+						{
+							filename: 'fitup.png',
+							path: imgPath2,
+							cid: 'footerLogo' // Content-ID for the footer logo image
+						}
+					]
+				};
 
 				await transporter.sendMail(mailOptions);
 				return res.render('reset-email', { errorMessage: null, successMessage: 'Password reset email sent successfully.' });
