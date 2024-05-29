@@ -75,7 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             body: new URLSearchParams({
                 question: "I want to have a personalized fitness training plan based on the information that I provide as follow"
-                    + goals + "\n" + age + "\n" + freq + "\n" + textContent
+                    + goals + "\n" + age + "\n" + freq + "\n" + textContent + ". Your answer should be concise. Please remove all special characters" 
+                    + "asterisk (*) from your response. Please make appropriate sentences and paragraphs to ensure readibility for humans."
             }),
         });
 

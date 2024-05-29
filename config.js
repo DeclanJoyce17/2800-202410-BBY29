@@ -889,7 +889,7 @@ async function connectToMongo() {
 			/************ To use the ejs template ***********/
 
 			const username = req.session.username
-			
+
 			const rank = req.session.rank
 			const users = await getAndSortUsersFromDB();
 			let fitTasks = [];
@@ -1205,12 +1205,39 @@ async function connectToMongo() {
 		async function getGroqChatCompletion(userInput) {
 			return groq.chat.completions.create({
 				messages: [
+					// Set an optional system message. This sets the behavior of the
+					// assistant and can be used to provide specific instructions for
+					// how it should behave throughout the conversation.
+					{
+						role: "system",
+						content: "you are a helpful assistant. Your answer should be concise. Please remove all " 
+						+ "asterisk (*) from your response. Please make appropriate sentences and paragraphs to ensure readibility for humans."
+					},
+					// Set a user message for the assistant to respond to.
 					{
 						role: "user",
 						content: userInput
 					}
 				],
-				model: "mixtral-8x7b-32768"
+				model: "mixtral-8x7b-32768",
+
+				// Set the rate of accuracy and precision for the answers
+				temperature: 0.3,
+
+				// The maximum number of tokens to generate.
+				max_tokens: 500,
+
+				// Controls diversity via nucleus sampling: 0.5 means half of all
+				// likelihood-weighted options are considered.
+				top_p: 1,
+
+				// Set a stop sequence that signals an AI to stop generating content, ensuring its responses
+				// remain focused and concise. .
+				// stop: [end],
+
+				// // If set, partial message deltas will be sent, instead of waiting for the whole response
+				// // to be completely processed and sent as a big chunk
+				// stream: true
 			});
 		}
 
