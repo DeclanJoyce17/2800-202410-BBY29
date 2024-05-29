@@ -95,13 +95,28 @@
         <script>
             document.getElementById('imageInput').addEventListener('change', function () {
                 const preview = document.getElementById('imagePreview');
+                const errorMessageDiv = document.getElementById('errorMessage');
                 preview.innerHTML = '';
                 const files = this.files;
+                const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+                // Remove previous error message if exists
+                if (errorMessageDiv) {
+                    errorMessageDiv.remove();
+                }
 
                 if (files.length > 4) {
                     showError('You can only upload a maximum of 4 images.');
                     this.value = '';
                     return;
+                }
+
+                for (let file of files) {
+                    if (!allowedMimeTypes.includes(file.type)) {
+                        showError('Invalid file type. Only JPG, PNG, and GIF files are allowed.');
+                        this.value = '';
+                        return;
+                    }
                 }
 
                 if (files) {
@@ -119,6 +134,18 @@
                     });
                 }
             });
+
+            function showError(message) {
+                const errorMessageDiv = document.createElement('div');
+                errorMessageDiv.id = 'error-message';
+                errorMessageDiv.className = 'alert-error';
+                errorMessageDiv.innerText = message;
+                document.body.insertBefore(errorMessageDiv, document.body.firstChild);
+
+                setTimeout(() => {
+                    errorMessageDiv.remove();
+                }, 2000);
+            }
         </script>
 
 

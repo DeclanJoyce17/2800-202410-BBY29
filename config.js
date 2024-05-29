@@ -1397,6 +1397,14 @@ async function connectToMongo() {
 				return res.render('communityPost', { errorMessage: 'You can only upload a maximum of 4 images.' });
 			}
 
+			// Validate file types
+			const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+			for (let file of req.files) {
+				if (!allowedMimeTypes.includes(file.mimetype)) {
+					return res.render('communityPost', { errorMessage: 'Invalid file type. Only JPG, PNG, and GIF files are allowed.' });
+				}
+			}
+
 			const postId = new ObjectId();
 			const createdAt = new Date();
 			const userId = req.session.userId;

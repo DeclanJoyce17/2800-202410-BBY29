@@ -71,25 +71,27 @@ button {
     font-size: 1.2rem;
 }
 
-.alert {
-    width: 100%;
-    text-align: center;
-    padding: 15px;
-    border: 1px solid red;
-    background-color: #f8d7da;
+.alert-error {
     color: #721c24;
-    border-radius: 5px;
-    box-sizing: border-box;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
     position: fixed;
-    /* top: 0; */
-    left: 0;
-    right: 0;
-    z-index: 9999;
+    top: 80px; 
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000; 
+    width: 100%;
+    font-size: 1.4rem;
 }
 
 h2 {
     font-family: "Rubik", sans-serif;
-    font-size: 1.7rem;
     font-weight: bold;
     color: #141a39;
     text-transform: uppercase;
