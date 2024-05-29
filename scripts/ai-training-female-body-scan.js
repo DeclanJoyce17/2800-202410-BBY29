@@ -1,6 +1,6 @@
-// setTimeout(function() {
-//   window.location.href = '/ai-training-male-body-scan-result'; 
-// }, 6000); // redirect after 6 seconds
+setTimeout(function() {
+  window.location.href = '/ai-training-female-body-scan-result'; 
+}, 6000); // redirect after 6 seconds
 
 const cancelBtn = document.getElementById('cancel-ctn');
 cancelBtn.addEventListener('click', () => {
