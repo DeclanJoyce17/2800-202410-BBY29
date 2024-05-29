@@ -5,9 +5,9 @@
   </head>
 
   <div id="header-top">
-    <video loop="" autoplay="" muted="" playsinline="">
+    <!-- <video loop="" autoplay="" muted="" playsinline="">
       <source src="/img/friendly-bot.mp4" type="video/mp4">
-    </video>
+    </video> -->
     <div id="date">
       <svg id="calendar-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -136,12 +136,14 @@
   <!-- AI Chat-->
   <div id="ai-chat-container"> Configure Your AI Model
     <div id="ai-chat-bg"></div>
-
+    <span id="get-started-ai">Get Started</span>
     <!-- AI Config -->
     <p class="d-inline-flex gap-1">
       <button class="btn index-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample"
         aria-expanded="false" aria-controls="collapseExample">
-        Initiate
+        <svg class="get-started-icon" width="32" height="32"   viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.40994 4.60259L9.56599 4.6416C13.0626 5.51575 16.1078 7.66179 18.1071 10.6607C18.6478 11.4718 18.6478 12.5285 18.1071 13.3396C16.1078 16.3384 13.0626 18.4845 9.56599 19.3586L9.40994 19.3976C8.07899 19.7304 6.7303 18.9212 6.39756 17.5902L6.20004 16.8001C5.41216 13.6486 5.41216 10.3516 6.20004 7.20011L6.39756 6.41001C6.7303 5.07906 8.07899 4.26985 9.40994 4.60259Z" fill="white"/>
+          </svg>          
       </button>
     </p>
     <div class="collapse" id="collapseExample">
@@ -354,7 +356,7 @@
               xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" clip-rule="evenodd"
                 d="M12.4472 4.10547L17.7199 6.74183L17.2848 7.61209L17.7199 6.74183C18.3855 7.07464 18.9253 7.61435 19.2581 8.27996C20.4289 10.6217 20.4289 13.3781 19.2581 15.7198C18.9253 16.3854 18.3855 16.9252 17.7199 17.258L12.4472 19.8943L11.5528 18.1055L16.8255 15.4691C17.1041 15.3298 17.3299 15.104 17.4692 14.8254C17.7603 14.2433 17.9561 13.6274 18.0566 12.9999H4V10.9999H18.0566C17.9561 10.3724 17.7603 9.75652 17.4692 9.17438C17.3299 8.89583 17.1041 8.66996 16.8255 8.53069L17.2727 7.63626L16.8255 8.53069L11.5528 5.89432L12.4472 4.10547Z"
-                fill="black" />
+                fill="#FF8624" />
             </svg>
           </div>
         </div>
@@ -363,20 +365,79 @@
   </div>
   </div>
 
-  <!-- Fitness Training Plan Recommendations -->
-  <!-- <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <div id="ai-rec-main" class='ai-recommendation'></div>
+  <div id="training-plan">Training Plan & AI Recommendation</div>
+  <div id="training-card-container" class="card-container carousel slide pointer-event" data-bs-ride="carousel">
+    <div id="ai-rec-initiate" class="training-card">
+      <!-- Card 1 content -->
+      <h2 class="training-plan-text">Get Started</h2>   
+      <div id="start-training-plan">
+        <svg class="start-training-icon" width="32" height="32"   viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.40994 4.60259L9.56599 4.6416C13.0626 5.51575 16.1078 7.66179 18.1071 10.6607C18.6478 11.4718 18.6478 12.5285 18.1071 13.3396C16.1078 16.3384 13.0626 18.4845 9.56599 19.3586L9.40994 19.3976C8.07899 19.7304 6.7303 18.9212 6.39756 17.5902L6.20004 16.8001C5.41216 13.6486 5.41216 10.3516 6.20004 7.20011L6.39756 6.41001C6.7303 5.07906 8.07899 4.26985 9.40994 4.60259Z" fill="white"/>
+          </svg>          
+      </div>   
+    </div>
+    <div class="training-card individual-plan">
+      <!-- Card 2 content -->
+      <h2>Chest Exercise</h2>
+      <div id="chest" class="body-part">
       </div>
-    <div class="carousel-item">
-      <div class="ai-rec-single ai-recommendation" ></div>
     </div>
+    <div class="training-card individual-plan">
+      <!-- Card 2 content -->
+      <h2>Back Exercise</h2>
+      <div id="back" class="body-part"></div>
     </div>
-  </div> -->
+    <div class="training-card individual-plan">
+      <!-- Card 2 content -->
+      <h2>Light Cardio</h2>
+      <div id="light-cardio" class="body-part"></div>
+    </div>
 
+    <div class="training-card individual-plan">
+      <!-- Card 2 content -->
+      <h2>Intensive Cardio</h2>
+      <div id="intensive-cardio" class="body-part"></div>
+    </div>
+    <div class="training-card individual-plan">
+      <!-- Card 2 content -->
+      <h2>Boxing - Basics</h2>
+      <div id="basic-boxing" class="body-part"></div>
+    </div>
+    <div class="training-card individual-plan">
+      <!-- Card 2 content -->
+      <h2>Agility Training</h2>
+      <div id="agility" class="body-part"></div>
+    </div>
+  </div>
 
-
+  <div id="diet-nutrition">Diet & Nutrition</div>
+  <div id="diet-card-container" class="card-container carousel slide pointer-event" data-bs-ride="carousel">
+    <div id="diet-rec-initiate" class="training-card">
+      <!-- Card 1 content -->
+      <h2 class="training-plan-text">Get Started</h2>   
+      <div id="start-diet-plan">
+        <svg class="start-training-icon" width="32" height="32"   viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.40994 4.60259L9.56599 4.6416C13.0626 5.51575 16.1078 7.66179 18.1071 10.6607C18.6478 11.4718 18.6478 12.5285 18.1071 13.3396C16.1078 16.3384 13.0626 18.4845 9.56599 19.3586L9.40994 19.3976C8.07899 19.7304 6.7303 18.9212 6.39756 17.5902L6.20004 16.8001C5.41216 13.6486 5.41216 10.3516 6.20004 7.20011L6.39756 6.41001C6.7303 5.07906 8.07899 4.26985 9.40994 4.60259Z" fill="white"/>
+          </svg>          
+      </div>   
+    </div>
+    <div class="training-card individual-plan">
+      <!-- Card 2 content -->
+      <h2>Low Carb Diet</h2>
+      <div id="low-carb" class="body-part">
+      </div>
+    </div>
+    <div class="training-card individual-plan">
+      <!-- Card 2 content -->
+      <h2>Bulking</h2>
+      <div id="bulking" class="body-part"></div>
+    </div>
+    <div class="training-card individual-plan">
+      <!-- Card 2 content -->
+      <h2>Healthy Meal Recipes</h2>
+      <div id="healthy-meal" class="body-part"></div>
+    </div>
+  </div>
 
   <!-- Leader board -->
   <div class="px-4 py-5 my-5 text-center">

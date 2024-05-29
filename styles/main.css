@@ -18,19 +18,20 @@ nav {
 }
 
 .navText {
-    position: relative; top: 20px;
+    position: relative;
+    top: 20px;
     padding: 14px 0;
     margin-left: 20px;
     font-size: 30px;
 }
 
-#chart{
+#chart {
     align-content: center;
     text-align: center;
     align-items: center;
 }
 
-#tropohy{
+#tropohy {
     width: 20%;
 }
 
@@ -43,13 +44,13 @@ nav {
 }
 
 .task-entry {
-    width: 80%; 
-    min-height: 100px; 
-    background-color: #f9f9f9; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    width: 80%;
+    min-height: 100px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    margin-bottom: 20px; 
-    border-radius: 5px; 
+    margin-bottom: 20px;
+    border-radius: 5px;
 }
 
 
@@ -255,14 +256,14 @@ td {
 
 .custom-btn {
     background-color: #FF8624;
-    color: #fff;    
+    color: #fff;
 }
 
 .center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }
 
 .login {
@@ -272,24 +273,17 @@ td {
 .index-form {
     padding: 12px 24px;
     font-size: 16px;
-    
+
 }
 
 .index-btn {
-    border-radius: 25px;
-    margin-top: 20px;
-    width: 40%;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    text-align: center;
-    text-decoration: none;
-    margin-right: 200px;
-    color: rgb(255, 255, 255);
-    font-size: 15px;
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
     background-color: #FF8624;
-    border: none;
-    cursor: pointer;
-    transition-duration: 0.4s;
+    bottom: 60px;
+    right: 20px;
 }
 
 .task-nav {
@@ -297,8 +291,10 @@ td {
     padding-right: 10%;
     height: 100%;
     width: 80%;
-    display: flex; /* Use flexbox */
-    justify-content: space-between; /* Space items evenly */
+    display: flex;
+    /* Use flexbox */
+    justify-content: space-between;
+    /* Space items evenly */
 }
 
 .resize {
@@ -306,6 +302,13 @@ td {
 
 }
 
+#get-started-ai {
+    position: absolute;
+    left: 20px;
+    bottom: 70px;
+    color:white;
+    
+}
 footer {
     display: flex;
     position: fixed;
@@ -428,12 +431,14 @@ footer {
 
 #header-top {
     position: relative;
-    height: 320px;
+    height: 250px;
     color: white;
-    border-radius: 30px;
-  }
-  
-  #header-top video {
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+    background-image: url('/img/wallpaper-header.png');
+}
+
+#header-top video {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -442,56 +447,56 @@ footer {
     left: 0;
     border-bottom-left-radius: 50px;
     border-bottom-right-radius: 50px;
-  }
+}
 
-  #header-top #date {
+#header-top #date {
     position: absolute;
     top: 30%;
     left: 20px;
     z-index: 1;
     font-size: 14pt;
     opacity: 0.8;
-  }
+}
 
-  #calendar {
+#calendar {
     opacity: 0.8;
-  }
+}
 
-  #hello-container {
+#hello-container {
     position: absolute;
     top: 65%;
     left: 20px;
     font-size: 18pt;
     width: 90%;
-  }
+}
 
-  #avatar {
+#avatar {
     background-color: white;
     border-radius: 50%;
     width: 80px;
     height: 80px;
-  }
+}
 
-  #hello-user {
+#hello-user {
     position: absolute;
     left: 100px;
     top: 25%;
-  }
+}
 
-  #health-icon {
+#health-icon {
     position: absolute;
     left: 100px;
     top: 90%;
-  }
+}
 
-  #health-metrics {
+#health-metrics {
     font-size: 14pt;
     position: absolute;
     left: 130px;
     bottom: -25px;
-  }
+}
 
-  #notification {
+#notification {
     position: absolute;
     top: 70px;
     right: 20px;
@@ -500,15 +505,15 @@ footer {
     border-radius: 20px;
     background-color: rgb(225, 225, 225);
     opacity: 0.4;
-  }
+}
 
-  #notification-icon {
+#notification-icon {
     position: absolute;
     top: 85px;
     right: 35px;
-  }
+}
 
-  #notification-metric {
+#notification-metric {
     width: 12px;
     height: 12px;
     border-radius: 5px;
@@ -516,28 +521,28 @@ footer {
     position: absolute;
     top: 85px;
     right: 38px;
-  }
+}
 
- #rank {
+#rank {
     font-size: 14pt;
-    
- }
 
- .todo {
+}
+
+.todo {
     font-size: 24pt;
     font-weight: bold;
     margin: 20px;
- }
+}
 
- #fit-task-container {
+#fit-task-container {
     width: 90%;
     border-radius: 20px;
     margin: 20px auto;
     align-items: center;
     position: relative;
- }
+}
 
- 
+
 .task-item {
     width: 100%;
     height: 100px;
@@ -579,6 +584,7 @@ footer {
     margin: 30px 20px;
     font-size: 24pt;
     font-weight: bold;
+    position: relative;
 }
 
 #ai-chat {
@@ -588,6 +594,7 @@ footer {
     display: flex;
     align-items: center;
 }
+
 #configure-text {
     margin: auto 20px;
 }
@@ -707,9 +714,11 @@ select {
 
 
 
-  .form-range::-webkit-slider-thumb {
-    background-color: orange; /* change this to your desired color */
-  } 
+.form-range::-webkit-slider-thumb {
+    background-color: orange;
+    /* change this to your desired color */
+}
+
 #tensor {
     position: absolute;
     top: 0;
@@ -896,7 +905,7 @@ select {
 
 ::-webkit-scrollbar {
     display: none;
-  }
+}
 
 #start-chat-container {
     width: 90%;
@@ -905,7 +914,7 @@ select {
     padding-bottom: 20px;
     border-radius: 50px;
     background-color: black;
-    color: white;
+    color: #FF8624;
     font-size: 20pt;
     text-align: center;
     margin: 20px auto;
@@ -928,4 +937,169 @@ select {
     left: 50%;
     transform: translateX(-50%);
     top: 5px;
+}
+
+#training-plan {
+    margin: 10px 0 10px 20px;
+    font-weight: bold;
+}
+
+#training-card-container {
+    display: flex;
+    overflow-x: scroll;
+    gap: 16px;
+    margin: 0 20px;
+    width: 90%;
+}
+
+.training-card {
+    width: 300px;
+    height: 250px;
+    /* background-color: #FF8624; */
+    border-radius: 40px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: solid 1px #FF8624;
+}
+
+#ai-rec-initiate {
+    background-image: url('/img/workout-paperwall-4.png');
+    background-size: cover;
+    position: relative;
+}
+
+.training-plan-text {
+    position: absolute;
+    bottom: 20px;
+    right: 10px;
+    font-weight: bold;
+    color: white;
+}
+
+#start-training-plan {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    background-color: #FF8624;
+    bottom: 10px;
+    left: 30px;
+    border-radius: 20px;
+}
+
+.start-training-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 25%;
+}
+
+h2 {
+    height: 40px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+#chest {
+    background-image: url('/img/chest-benchpress.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#back {
+    background-image: url('/img/back-seated-cable.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#intensive-cardio {
+    background-image: url('/img/moutain-climb.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#light-cardio {
+    background-image: url('/img/ai-training-scan.png');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#basic-boxing {
+    background-image: url('/img/boxing-basic.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#agility {
+    background-image: url('/img/agility.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#diet-nutrition {
+    margin: 30px 20px 0;
+    font-weight: bold;
+}
+
+#diet-card-container {
+    display: flex;
+    overflow-x: scroll;
+    gap: 16px;
+    margin: 0 20px;
+    width: 90%;
+    margin: 10px 20px 30px;
+}
+
+#diet-rec-initiate {
+    background-image: url('/img/diet-nutrition.png');
+    background-size: cover;
+    position: relative;
+}
+
+
+
+#start-diet-plan {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    background-color: #FF8624;
+    bottom: 10px;
+    left: 30px;
+    border-radius: 20px;
+}
+
+#low-carb {
+    background-image: url('/img/low-carbs.png');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#bulking {
+    background-image: url('/img/bulking-diet.jpg');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#healthy-meal {
+    background-image: url('/img/healthy-meal.png');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
 }

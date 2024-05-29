@@ -20,4 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initBtn.style.display = 'none';
     document.getElementById('ai-chat-bg').style.display = 'none';
     aiChatConfig.style.transition = '2s';
+  });
+
+  const startAIChatBtn = document.getElementById('start-chat-container');
+  startAIChatBtn.addEventListener('click', () => {
+    window.location.href = '/aichat-loading';
   })
