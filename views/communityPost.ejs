@@ -14,12 +14,18 @@
                 id="postText"></textarea><br>
             <input type="file" name="images" id="imageInput" multiple accept="image/*"><br>
             <div class="preview" id="imagePreview"></div><br>
+
             <button type="button" id="clearImagesButton">Clear All Images</button><br>
             <select name="tags" id="tags" required>
                 <option value="" selected>Select</option>
                 <option value="fitness">Fitness</option>
                 <option value="diet">Diet</option>
             </select><br>
+
+            <!-- error message -->
+            <div class="alert alert-danger" role="alert" id="errorMessage" style="display:none;">
+                <h2 id="errorText"></h2>
+            </div>
 
             <!-- Map for selecting location -->
             <div id="map" style="height: 300px; width: 100%;"></div><br>
@@ -30,12 +36,44 @@
             <button type="submit">Post</button>
         </form>
 
-        <div id="error-message" class="error-message"></div>
-
         <!-- going back function -->
         <script>
             function goBack() {
                 window.history.back();
+            }
+        </script>
+
+        <!-- error message -->
+        <script>
+            document.getElementById('communityPostForm').addEventListener('submit', function (event) {
+                const text = document.getElementById('postText').value.trim();
+                const imageInput = document.getElementById('imageInput');
+                const images = imageInput.files;
+
+                if (!text && images.length === 0) {
+                    event.preventDefault();
+                    showError('Please provide either text or images.');
+                }
+            });
+
+            document.getElementById('clearImagesButton').addEventListener('click', function () {
+                document.getElementById('imageInput').value = '';
+                document.getElementById('imagePreview').innerHTML = '';
+            });
+
+            document.getElementById('clearPinButton').addEventListener('click', function () {
+                document.getElementById('latitude').value = '';
+                document.getElementById('longitude').value = '';
+            });
+
+            function showError(message) {
+                const errorMessage = document.getElementById('errorMessage');
+                const errorText = document.getElementById('errorText');
+                errorText.textContent = message;
+                errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 2000);
             }
         </script>
 
@@ -91,71 +129,4 @@
             });
         </script>
 
-        <!-- validation for post & error message -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const preview = document.getElementById('imagePreview');
-                const imageInput = document.getElementById('imageInput');
-                const clearImagesButton = document.getElementById('clearImagesButton');
-                let uploadedImages = [];
-
-                imageInput.addEventListener('change', function (event) {
-                    const files = event.target.files;
-
-                    if (uploadedImages.length + files.length > 4) {
-                        alert('You can only upload up to 4 images.');
-                        event.target.value = '';
-                        return;
-                    }
-
-                    Array.from(files).forEach(file => {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            const img = document.createElement('img');
-                            img.src = e.target.result;
-                            img.classList.add('preview-img');
-                            preview.appendChild(img);
-                            uploadedImages.push(file);
-                        };
-                        reader.readAsDataURL(file);
-                    });
-                });
-
-                clearImagesButton.addEventListener('click', function () {
-                    uploadedImages = [];
-                    preview.innerHTML = '';
-                    imageInput.value = '';
-                });
-
-                document.getElementById('communityPostForm').addEventListener('submit', function (event) {
-                    event.preventDefault(); 
-
-                    const selectField = document.getElementById('tags');
-                    const textField = document.getElementById('postText');
-                    const imageField = document.getElementById('imageInput');
-                    const errorMessage = document.getElementById('error-message');
-
-                    let errorMessages = [];
-
-                    if (selectField.value === '') {
-                        errorMessages.push('Please select a valid tag (Fitness or Diet).');
-                    }
-
-                    if (textField.value.trim() === '' && imageField.files.length === 0) {
-                        errorMessages.push('Please provide either text or images.');
-                    }
-
-                    if (errorMessages.length > 0) {
-                        errorMessage.innerHTML = errorMessages.join('<br>');
-                        errorMessage.style.display = 'block';
-                        setTimeout(() => {
-                            errorMessage.style.display = 'none';
-                        }, 3000); 
-                    } else {
-                        this.submit();
-                    }
-                });
-            });
-        </script>
-
-<%- include("templates/end") %>
+        <%- include("templates/end") %>

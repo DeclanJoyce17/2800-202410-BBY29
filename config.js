@@ -1366,23 +1366,23 @@ async function connectToMongo() {
 				return res.status(401).send('Unauthorized');
 			}
 
-			const postId = new ObjectId();
-			const text = req.body.text || "";
-			const createdAt = new Date();
-			const userId = req.session.userId;
-			const tags = req.body.tags ? [req.body.tags.trim()] : [];
-			const latitude = req.body.latitude || null;
-			const longitude = req.body.longitude || null;
+			const { text, tags, latitude, longitude } = req.body;
 
-			// Check if a valid tag is selected
-			if (!tags.length || tags[0] === 'Select') {
+			// Validate input: check if text or images are provided
+			if (!text && (!req.files || req.files.length === 0)) {
+				return res.render('communityPost', { errorMessage: 'Please provide either text or images.' });
+			}
+		
+			 // Validate tags
+			 if (!tags || tags === 'Select') {
 				return res.status(400).send('Please select a valid tag (Fitness or Diet).');
 			}
+			
 
-			// Check if at least one field is filled
-			if (!text && (!req.files || req.files.length === 0)) {
-				return res.status(400).send('Please provide either text or images.');
-			}
+			const postId = new ObjectId();
+			const createdAt = new Date();
+			const userId = req.session.userId;
+			const formattedTags  = req.body.tags ? [req.body.tags.trim()] : [];
 
 			// Retrieve the user details
 			try {
@@ -1394,8 +1394,6 @@ async function connectToMongo() {
 				if (req.files && req.files.length > 0) {
 					imageUrls = await uploadImagesToCloudinary(req.files);
 				}
-
-				console.log("Image URLS: " + imageUrls)
 
 				const username = user.username;
 
@@ -1410,10 +1408,10 @@ async function connectToMongo() {
 				const postsCollection = db.collection('posts');
 				await postsCollection.insertOne({
 					_id: postId,
-					text,
+					text: text || "",
 					createdAt,
 					imageUrls,
-					tags,
+					tags: formattedTags,
 					userId,
 					username,
 					profileImage,
