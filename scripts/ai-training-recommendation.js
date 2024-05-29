@@ -43,3 +43,8 @@ async function textToSpeech() {
 }
 
 textToSpeech();
+
+const homeBtn = document.getElementById('home');
+homeBtn.addEventListener('click', () => {
+  window.location.href = '/main';
+});

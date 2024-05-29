@@ -91,3 +91,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/ai-training-scan-request';
     });
 });
+
+const homeBtn = document.getElementById('home');
+homeBtn.addEventListener('click', () => {
+  window.location.href = '/main';
+});

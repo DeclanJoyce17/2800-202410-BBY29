@@ -68,7 +68,7 @@ footer {
     top: 20px;
 }
 
-#bookmark {
+#skip {
     width: 60px;
     height: 60px;
     position: absolute;
@@ -78,7 +78,7 @@ footer {
     border-radius: 20px;
 }
 
-#bookmark-icon {
+#skip-icon {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);

@@ -69,3 +69,9 @@ function displayInstructions() {
 
 displayInstructions();
 
+
+// Skip scanning and redirect to the recommendation page
+const skipBtn = document.getElementById('skip');
+skipBtn.addEventListener('click', () => {
+  window.location.href = '/ai-training-recommendation';
+})
