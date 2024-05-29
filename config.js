@@ -1825,7 +1825,7 @@ async function connectToMongo() {
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
-			res.status(404).send('Page not found - 404');
+			res.render('404');
 		});
 
 		app.listen(port, () => {
