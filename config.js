@@ -1315,7 +1315,7 @@ async function connectToMongo() {
 				const postsCollection = db.collection('posts');
 
 				const posts = await postsCollection.find(filter)
-				    .sort({ createdAt: -1 })
+					.sort({ createdAt: -1 })
 					// Skip the posts of previous pages
 					.skip((page - 1) * limit)
 					// Limit the number of posts to display
@@ -1372,17 +1372,21 @@ async function connectToMongo() {
 			if (!text && (!req.files || req.files.length === 0)) {
 				return res.render('communityPost', { errorMessage: 'Please provide either text or images.' });
 			}
-		
-			 // Validate tags
-			 if (!tags || tags === 'Select') {
-				return res.status(400).send('Please select a valid tag (Fitness or Diet).');
+
+			// Validate tags
+			if (!tags || tags === 'Select') {
+				return res.render('communityPost', { errorMessage: 'Please select a valid tag (Fitness or Diet).' });
 			}
-			
+
+			// Validate the number of images
+			if (req.files.length > 4) {
+				return res.render('communityPost', { errorMessage: 'You can only upload a maximum of 4 images.' });
+			}
 
 			const postId = new ObjectId();
 			const createdAt = new Date();
 			const userId = req.session.userId;
-			const formattedTags  = req.body.tags ? [req.body.tags.trim()] : [];
+			const formattedTags = tags ? [tags.trim()] : [];
 
 			// Retrieve the user details
 			try {

@@ -49,10 +49,24 @@
                 const text = document.getElementById('postText').value.trim();
                 const imageInput = document.getElementById('imageInput');
                 const images = imageInput.files;
+                const tags = document.getElementById('tags').value;
 
                 if (!text && images.length === 0) {
                     event.preventDefault();
                     showError('Please provide either text or images.');
+                    return;
+                }
+
+                if (!tags || tags === 'Select') {
+                    event.preventDefault();
+                    showError('Please select a valid tag (Fitness or Diet).');
+                    return;
+                }
+
+                if (images.length > 4) {
+                    event.preventDefault();
+                    showError('You can only upload a maximum of 4 images.');
+                    return;
                 }
             });
 
@@ -76,6 +90,37 @@
                 }, 2000);
             }
         </script>
+
+        <!-- preview images -->
+        <script>
+            document.getElementById('imageInput').addEventListener('change', function () {
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = '';
+                const files = this.files;
+
+                if (files.length > 4) {
+                    showError('You can only upload a maximum of 4 images.');
+                    this.value = '';
+                    return;
+                }
+
+                if (files) {
+                    Array.from(files).forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.style.maxWidth = '150px';
+                            img.style.margin = '10px';
+                            img.style.borderRadius = '10px';
+                            preview.appendChild(img);
+                        }
+                        reader.readAsDataURL(file);
+                    });
+                }
+            });
+        </script>
+
 
         <!-- Google Maps API -->
         <script
