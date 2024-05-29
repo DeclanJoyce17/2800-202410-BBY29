@@ -28,6 +28,13 @@
             </form>
         </div>
 
+        <!-- Success Message -->
+        <% if (postSuccess) { %>
+            <div id="success-message" class="alert-success">
+                Post created successfully!
+            </div>
+        <% } %>
+
         <!-- initial posts - pages has content immediately -->
         <div class="posts" id="posts">
             <% posts.forEach((post, postIndex) => { %>
@@ -223,6 +230,18 @@
                 <button id="cancelBtn">No</button>
             </div>
         </div>
+
+        <!-- success message -->
+        <script>
+            window.addEventListener('DOMContentLoaded', (event) => {
+                const successMessage = document.getElementById('success-message');
+                if (successMessage) {
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 2000);
+                }
+            });
+        </script>
 
 
         <%- include("templates/footer") %>

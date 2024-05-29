@@ -9,23 +9,25 @@
 
         <h1>Community Posts</h1>
 
+        <!-- Error Message -->
+        <% if (errorMessage) { %>
+            <div id="error-message" class="alert-error">
+                <%= errorMessage %>
+            </div>
+        <% } %>
+        
+        <!-- Form for creating a new post -->
         <form action="/communityPost/post" method="post" enctype="multipart/form-data" id="communityPostForm">
             <textarea name="text" rows="4" cols="50" placeholder="Write something...(optional)"
                 id="postText"></textarea><br>
             <input type="file" name="images" id="imageInput" multiple accept="image/*"><br>
             <div class="preview" id="imagePreview"></div><br>
-
             <button type="button" id="clearImagesButton">Clear All Images</button><br>
-            <select name="tags" id="tags" required>
+            <select name="tags" id="tags">
                 <option value="" selected>Select</option>
                 <option value="fitness">Fitness</option>
                 <option value="diet">Diet</option>
             </select><br>
-
-            <!-- error message -->
-            <div class="alert alert-danger" role="alert" id="errorMessage" style="display:none;">
-                <h2 id="errorText"></h2>
-            </div>
 
             <!-- Map for selecting location -->
             <div id="map" style="height: 300px; width: 100%;"></div><br>

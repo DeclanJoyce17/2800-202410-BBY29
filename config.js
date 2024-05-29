@@ -1266,13 +1266,13 @@ async function connectToMongo() {
 			const uploadError = req.session.uploadError;
 			req.session.uploadSuccess = false; // Reset the flag immediately
 			req.session.uploadError = null; // Reset the error message immediately
-			res.render('profile', { 
-				userID: req.session.userId, 
-				type: req.session.user_type, 
-				username: req.session.username, 
-				email: req.session.email, 
-				uploadSuccess: uploadSuccess, 
-				uploadError: uploadError 
+			res.render('profile', {
+				userID: req.session.userId,
+				type: req.session.user_type,
+				username: req.session.username,
+				email: req.session.email,
+				uploadSuccess: uploadSuccess,
+				uploadError: uploadError
 			});
 		});
 
@@ -1287,7 +1287,7 @@ async function connectToMongo() {
 				req.session.uploadError = 'Invalid file type. Only JPG, PNG, and GIF files are allowed.';
 				return res.redirect('/profile');
 			}
-			
+
 			try {
 				console.log("session user id: " + req.session.userId);
 				const userId = req.session.userId;
@@ -1339,10 +1339,13 @@ async function connectToMongo() {
 				// Preprocess image URLs
 				const imageUrls = posts.map(post => post.imageUrls.map(url => cloudinary.url(url, { width: 1080, height: 1080, crop: 'fill' })));
 
+				const postSuccess = req.session.postSuccess;
+				req.session.postSuccess = false; // Reset the flag
+
 				if (req.query.json) {
 					res.json({ posts, imageUrls });
 				} else {
-					res.render('community', { posts, imageUrls, userId, tag });
+					res.render('community', { posts, imageUrls, userId, tag, postSuccess });
 				}
 			} catch (error) {
 				console.error('Error retrieving posts:', error);
@@ -1355,7 +1358,9 @@ async function connectToMongo() {
 				return res.status(401).send('Unauthorized');
 			}
 
-			res.render('communityPost');
+			const errorMessage = req.session.errorMessage;
+			req.session.errorMessage = null; // Reset the error message
+			res.render('communityPost', { errorMessage });
 		});
 
 
@@ -1384,24 +1389,28 @@ async function connectToMongo() {
 
 			// Validate input: check if text or images are provided
 			if (!text && (!req.files || req.files.length === 0)) {
-				return res.render('communityPost', { errorMessage: 'Please provide either text or images.' });
+				req.session.errorMessage = 'Please provide either text or images.';
+				return res.redirect('/communityPost');
 			}
 
 			// Validate tags
 			if (!tags || tags === 'Select') {
-				return res.render('communityPost', { errorMessage: 'Please select a valid tag (Fitness or Diet).' });
+				req.session.errorMessage = 'Please select a valid tag (Fitness or Diet).';
+				return res.redirect('/communityPost');
 			}
 
 			// Validate the number of images
 			if (req.files.length > 4) {
-				return res.render('communityPost', { errorMessage: 'You can only upload a maximum of 4 images.' });
+				req.session.errorMessage = 'You can only upload a maximum of 4 images.';
+				return res.redirect('/communityPost');
 			}
 
 			// Validate file types
 			const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
 			for (let file of req.files) {
 				if (!allowedMimeTypes.includes(file.mimetype)) {
-					return res.render('communityPost', { errorMessage: 'Invalid file type. Only JPG, PNG, and GIF files are allowed.' });
+					req.session.errorMessage = 'Invalid file type. Only JPG, PNG, and GIF files are allowed.';
+					return res.redirect('/communityPost');
 				}
 			}
 
@@ -1444,6 +1453,7 @@ async function connectToMongo() {
 					location: latitude && longitude ? { latitude, longitude } : null
 				});
 
+				req.session.postSuccess = true;
 				res.redirect('/community');
 			} catch (error) {
 				console.error('Post creation error:', error);
