@@ -30,7 +30,7 @@ require('dotenv').config();
 require("./utils.js");
 
 const app = express();
-const expireTime = 60 * 60 * 1000;
+const expireTime = 12 * 60 * 60 * 1000;
 app.set('view engine', 'ejs')
 
 // Load environment variables from .env file
