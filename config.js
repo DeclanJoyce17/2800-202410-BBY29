@@ -246,7 +246,7 @@ async function connectToMongo() {
 			const filter = { email: req.session.email };
 			if (itemName == '1 Hour Boost') {
 				var currentTime = new Date().getTime();
-				var hourTime = currentTime + (1 * 60 * 60 * 1000);
+				var hourTime = currentTime + (1 * 2 * 60 * 1000);
 				req.session.hourTime = hourTime;
 				console.log(currentTime);
 				console.log(hourTime);
@@ -341,9 +341,8 @@ async function connectToMongo() {
 				await usersCollection.updateOne(result[0], updateDoc);
 				res.redirect('/fitTasks');
 			} else {
-				res.render('fitTasks', { points: point, boostActive: (timeRemaining).toFixed(2), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+				res.render('fitTasks', { points: point, boostActive: Math.trunc(timeRemaining), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: false });
 			}
-
 		});
 
 		//DietTasks Page
@@ -395,9 +394,8 @@ async function connectToMongo() {
 				await usersCollection.updateOne(result[0], updateDoc);
 				res.redirect('/dietTasks');
 			} else {
-				res.render('dietTasks', { points: point, boostActive: (timeRemaining).toFixed(2), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+				res.render('dietTasks', { points: point, boostActive: Math.trunc(timeRemaining), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: false });
 			}
-
 		});
 
 		//Signup POST
@@ -499,7 +497,6 @@ async function connectToMongo() {
 					dietTasks: userDietTasks,
 					date: new Date().getDate(),
 					rerolls: 3,
-					currentPoints: 0,
 					pointBoost: 0,
 					user_type: 'user'
 				});
@@ -525,14 +522,8 @@ async function connectToMongo() {
 		});
 
 		app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
-			console.log(req.session.user_type);
-			if (req.session.user_type != 'admin') {
-				res.render('403');
-			}
 			const userCollection = db.collection('users');
-			const result = await userCollection.find({}).project({ username: 1, user_type: 1 }).toArray();
-			req.session.user_type = result[0].user_type;
-			console.log(result[0].user_type)
+			const result = await userCollection.find().project({ username: 1, user_type: 1 }).toArray();
 			res.render('admin', { users: result });
 		});
 
@@ -606,7 +597,7 @@ async function connectToMongo() {
 				return;
 			}
 
-			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, user_type: 1, rerolls: 1, _id: 1 }).toArray();
+			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, rerolls: 1, _id: 1 }).toArray();
 
 			console.log(result);
 			if (result.length != 1) {
@@ -625,10 +616,8 @@ async function connectToMongo() {
 				req.session.email = email;
 				req.session.cookie.maxAge = expireTime;
 				req.session.hourTime = result[0].pointBoost;
-				req.session.user_type = result[0].user_type;
-				console.log(req.session.user_type);
+				req.session.user_typer = result[0].user_type;
 				res.redirect('/main');
-
 				return;
 			}
 			else {
@@ -900,7 +889,7 @@ async function connectToMongo() {
 			/************ To use the ejs template ***********/
 
 			const username = req.session.username
-			const points = req.session.points
+			
 			const rank = req.session.rank
 			const users = await getAndSortUsersFromDB();
 			let fitTasks = [];
@@ -925,6 +914,9 @@ async function connectToMongo() {
 			// console.log("USERS: " + users);
 			// console.log("tasks: " + tasks);
 
+			var results = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, points: 1 }).toArray();
+			const points = results[0].points;
+			req.session.points = points;
 			res.render('main', {
 				// Pass data to the template here
 				username,
@@ -940,19 +932,15 @@ async function connectToMongo() {
 		app.post('/rerollFit', sessionValidation, async (req, res) => {
 
 			var number = req.body.number;
-			var currentTime = new Date().getTime();
-		
+
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, rerolls: 1, date: 1, pointBoost: 1, user_rank: 1 }).toArray();
-			req.session.hourTime = result[0].pointBoost;
-			if (currentTime >= req.session.hourTime) {
-				req.session.hourTime = 0;
-			}
+
 			var temp = '';
 			var tempTasks;
 			if (result[0].rerolls < 1) {
 				var point = req.session.points;
-				res.render('fitTasks', { points: point, boostActive: ((req.session.hourTime-currentTime)/60000).toFixed(2), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: true });
+				res.render('fitTasks', { points: point, boostActive: result[0].pointBoost, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: true });
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
@@ -1021,20 +1009,17 @@ async function connectToMongo() {
 		});
 
 		app.post('/rerollDiet', sessionValidation, async (req, res) => {
-			var currentTime = new Date().getTime();
+
 			var number = req.body.number;
 
 			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, pointBoost: 1, rerolls: 1, date: 1, user_rank: 1 }).toArray();
-			req.session.hourTime = result[0].pointBoost;
-			if (currentTime >= req.session.hourTime) {
-				req.session.hourTime = 0;
-			}
+			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, rerolls: 1, date: 1, user_rank: 1 }).toArray();
+
 			var temp = '';
 			var tempTasks;
 			if (result[0].rerolls < 1) {
 				var point = req.session.points;
-				res.render('dietTasks', { points: point, boostActive: ((req.session.hourTime-currentTime)/60000).toFixed(2), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: true });
+				res.render('dietTasks', { points: point, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: true });
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
@@ -1112,10 +1097,13 @@ async function connectToMongo() {
 			const tasks1 = db.collection('fitnessTasks');
 			const tasks2 = db.collection('fitnessTasksHard');
 			const usersCollection = db.collection('users');
+			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, rerolls: 1, date: 1, pointBoost: 1, user_rank: 1 }).toArray();
 			var point = req.session.points;
+			
 			var currentPoint = req.session.currentPoints;
 			var lookingTask = req.body.task;
 			var addingPoints;
+			var updateDoc;
 			var hourTime = req.session.hourTime;
 			var result1 = await tasks1.find({ task: lookingTask }).project({ points: 1 }).toArray();
 			var result2 = await tasks2.find({ task: lookingTask }).project({ points: 1 }).toArray();
@@ -1133,14 +1121,14 @@ async function connectToMongo() {
 			if (currentTime > hourTime) {
 				console.log("nah");
 				req.session.hourTime = 0;
-				const updateDoc = {
+				updateDoc = {
 					$set: {
 						pointBoost: 0
 					},
 				};
 				await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			}
-			const updateDoc = {
+			updateDoc = {
 				$set: {
 					points: point + addingPoints,
 					currentPoints: currentPoint + addingPoints
@@ -1151,21 +1139,99 @@ async function connectToMongo() {
 			await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			req.session.points = point + addingPoints;
 			req.session.currentPoints = currentPoint + addingPoints;
+			var number = 1;
+			console.log(lookingTask);
+			console.log(number);
+			if (result[0].fitTasks[1] == lookingTask) {
+				number = 2;
+			}
+			if (result[0].fitTasks[2] == lookingTask) {
+				number = 3;
+			}
+			if (result[0].fitTasks[3] == lookingTask) {
+				number = 0;
+			}
+			var temp = '';
+			var tempTasks;
+			
+			req.session.user_rank = result[0].user_rank;
+			req.session.rerolls = result[0].rerolls;
+			var randomVal = Math.random() * 10;
+			var odds;
+
+			if (req.session.user_rank == "Bronze") {
+				odds = 1;
+			} else if (req.session.user_rank == "Silver") {
+				odds = 2;
+			} else if (req.session.user_rank == "Gold") {
+				odds = 5;
+			} else if (req.session.user_rank == "Platinum") {
+				odds = 8;
+			} else if (req.session.user_rank == "Diamond") {
+				odds = 10;
+			}
+
+			if (randomVal > odds) {
+				tempTasks = db.collection('fitnessTasks');
+			} else {
+				tempTasks = db.collection('fitnessTasksHard');
+			}
+
+			var taskBankFit = await tempTasks.find({}).project({ task: 1 }).toArray();
+			while (true) {
+				temp = Math.floor(Math.random() * taskBankFit.length);
+				if (taskBankFit[temp].task != result[0].fitTasks[0] && taskBankFit[temp].task != result[0].fitTasks[1] && taskBankFit[temp].task != result[0].fitTasks[2]) {
+					break;
+				}
+			}
+
+			//console.log(taskBankFit[temp].task);
+
+		
+
+			if (number == 1) {
+				updateDoc = {
+					$set: {
+						fitTasks: [taskBankFit[temp].task, result[0].fitTasks[1], result[0].fitTasks[2]],
+						
+					},
+				};
+			} else if (number == 2) {
+				updateDoc = {
+					$set: {
+						fitTasks: [result[0].fitTasks[0], taskBankFit[temp].task, result[0].fitTasks[2]],
+						
+					},
+				};
+			} else if (number == 3) {
+				updateDoc = {
+					$set: {
+						fitTasks: [result[0].fitTasks[0], result[0].fitTasks[1], taskBankFit[temp].task],
+						
+					},
+				};
+			}
+
+
+
+			result = await usersCollection.updateOne(result[0], updateDoc);
 
 			res.redirect('/fitTasks');
 		});
 
 		//Adding points to Diet Page
 		app.post('/addPointDiet', sessionValidation, async (req, res) => {
-
 			var currentTime = new Date().getTime();
 			const tasks1 = db.collection('dietTasks');
 			const tasks2 = db.collection('dietTasksHard');
 			const usersCollection = db.collection('users');
+			var result = await usersCollection.find({ email: req.session.email }).project({ dietTasks: 1, user_rank: 1, rerolls: 1, rerolls: 1, date: 1, pointBoost: 1, user_rank: 1 }).toArray();
 			var point = req.session.points;
+			
 			var currentPoint = req.session.currentPoints;
 			var lookingTask = req.body.task;
 			var addingPoints;
+			var updateDoc;
 			var hourTime = req.session.hourTime;
 			var result1 = await tasks1.find({ task: lookingTask }).project({ points: 1 }).toArray();
 			var result2 = await tasks2.find({ task: lookingTask }).project({ points: 1 }).toArray();
@@ -1190,7 +1256,7 @@ async function connectToMongo() {
 				};
 				await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			}
-			const updateDoc = {
+			updateDoc = {
 				$set: {
 					points: point + addingPoints,
 					currentPoints: currentPoint + addingPoints
@@ -1201,6 +1267,82 @@ async function connectToMongo() {
 			await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			req.session.points = point + addingPoints;
 			req.session.currentPoints = currentPoint + addingPoints;
+			var number = 1;
+			console.log(lookingTask);
+			console.log(number);
+			if (result[0].dietTasks[1] == lookingTask) {
+				number = 2;
+			}
+			if (result[0].dietTasks[2] == lookingTask) {
+				number = 3;
+			}
+			if (result[0].dietTasks[3] == lookingTask) {
+				number = 0;
+			}
+			var temp = '';
+			var tempTasks;
+			
+			req.session.user_rank = result[0].user_rank;
+			req.session.rerolls = result[0].rerolls;
+			var randomVal = Math.random() * 10;
+			var odds;
+
+			if (req.session.user_rank == "Bronze") {
+				odds = 1;
+			} else if (req.session.user_rank == "Silver") {
+				odds = 2;
+			} else if (req.session.user_rank == "Gold") {
+				odds = 5;
+			} else if (req.session.user_rank == "Platinum") {
+				odds = 8;
+			} else if (req.session.user_rank == "Diamond") {
+				odds = 10;
+			}
+
+			if (randomVal > odds) {
+				tempTasks = db.collection('dietTasks');
+			} else {
+				tempTasks = db.collection('dietTasksHard');
+			}
+
+			var taskBankDiet = await tempTasks.find({}).project({ task: 1 }).toArray();
+			while (true) {
+				temp = Math.floor(Math.random() * taskBankDiet.length);
+				if (taskBankDiet[temp].task != result[0].dietTasks[0] && taskBankDiet[temp].task != result[0].dietTasks[1] && taskBankDiet[temp].task != result[0].dietTasks[2]) {
+					break;
+				}
+			}
+
+			//console.log(taskBankFit[temp].task);
+
+		
+
+			if (number == 1) {
+				updateDoc = {
+					$set: {
+						dietTasks: [taskBankDiet[temp].task, result[0].dietTasks[1], result[0].dietTasks[2]],
+						
+					},
+				};
+			} else if (number == 2) {
+				updateDoc = {
+					$set: {
+						dietTasks: [result[0].dietTasks[0], taskBankDiet[temp].task, result[0].dietTasks[2]],
+						
+					},
+				};
+			} else if (number == 3) {
+				updateDoc = {
+					$set: {
+						dietTasks: [result[0].dietTasks[0], result[0].dietTasks[1], taskBankDiet[temp].task],
+						
+					},
+				};
+			}
+
+
+
+			result = await usersCollection.updateOne(result[0], updateDoc);
 
 			res.redirect('/dietTasks');
 		});
@@ -1275,12 +1417,12 @@ async function connectToMongo() {
 
 		app.get('/profile', sessionValidation, async (req, res) => {
 			const userCollection = db.collection('users');
-			const result = await userCollection.find({email: req.session.email}).project({ username: 1, user_type: 1 }).toArray();
+			const result = await userCollection.find().project({ username: 1, user_type: 1 }).toArray();
 			req.session.user_type = result[0].user_type;
 			console.log(req.session.userId);
 			const uploadSuccess = req.session.uploadSuccess;
 			req.session.uploadSuccess = false; // Reset the flag immediately
-			console.log("user type: " + req.session.user_type);
+			console.log(req.session.user_type);
 			res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
 		});
 
