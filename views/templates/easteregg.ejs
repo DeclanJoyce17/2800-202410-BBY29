@@ -1,0 +1,106 @@
+<style>
+  /* CSS styles for Mario */
+  .mario {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    /* Adjust as needed */
+    height: 50px;
+    /* Adjust as needed */
+    background-image: url('img/mario.png');
+    /* Updated path to Mario image */
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: none;
+    /* Initially hidden */
+  }
+
+.konami-button {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px; /* Reduce padding */
+    font-size: 0.75rem; /* Reduce font size */
+    background-color: white;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.konami-button:hover {
+    background-color: #d1d1d1;
+}
+
+</style>
+
+<!-- Mario element -->
+<div class="mario" id="mario"></div>
+
+<button class="konami-button" id="konamiButton"></button>
+
+<!-- Hidden jump sound effect -->
+<audio id="jumpSound" volume="0.1">
+  <source src="img/jump.mp3" type="audio/mpeg"> <!-- Updated path to jump sound file -->
+</audio>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // Konami Code sequence
+    let konamiIndex = 0;
+    const mario = document.getElementById('mario');
+    const jumpSound = document.getElementById('jumpSound');
+    const konamiButton = document.getElementById('konamiButton');
+
+    document.addEventListener('keydown', (e) => {
+      if (e.keyCode === konamiCode[konamiIndex]) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+          activateKonamiEasterEgg();
+          konamiIndex = 0; // Reset index for future attempts
+        }
+      } else {
+        konamiIndex = 0; // Reset index if wrong key pressed
+      }
+    });
+
+    konamiButton.addEventListener('click', activateKonamiEasterEgg);
+
+    function activateKonamiEasterEgg() {
+      // Show Mario
+      mario.style.display = 'block';
+
+      // Play jump sound
+      jumpSound.currentTime = 0; // Rewind to start
+      jumpSound.volume = 0.01; // Set volume to 1%
+      jumpSound.play();
+
+      // Animate Mario jumping and falling
+      const jumpHeight = 200; // Adjust jump height as needed
+      const jumpDuration = 1000; // Adjust jump duration (in milliseconds)
+      const initialBottom = parseInt(window.getComputedStyle(mario).bottom, 10);
+      const jumpEndTime = performance.now() + jumpDuration;
+
+      function jumpAnimation(currentTime) {
+        const remainingTime = jumpEndTime - currentTime;
+
+        if (remainingTime > 0) {
+          const progress = 1 - (remainingTime / jumpDuration);
+          const jumpStep = jumpHeight * Math.sin(progress * Math.PI);
+
+          mario.style.bottom = initialBottom + jumpStep + 'px';
+          requestAnimationFrame(jumpAnimation);
+        } else {
+          // Reset Mario's position
+          mario.style.bottom = initialBottom + 'px';
+          mario.style.display = 'none'; // Hide Mario after jump
+        }
+      }
+
+      requestAnimationFrame(jumpAnimation);
+    }
+  });
+</script>

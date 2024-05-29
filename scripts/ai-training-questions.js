@@ -40,16 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     continueButton.addEventListener("click", async () => {
 
-        let selectedValues = {
-            checkboxes: [],
-            list: 'My age is' + 0,
-            link: 'I want to exercise ' + 0 + " times a week",
-            button: "I want to do these activities: " + textContent,
-        };
-
-        // selectedValues.button = button;
-        console.log(selectedValues);
-
         // Get the values of the checked checkboxes
         var goals = 'My fiteness goals are: ';
         const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
@@ -78,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Send the user's input to the AI API
-        const response = await fetch('http://localhost:2800/GroqChatCompletion', {
+        const response = await fetch('/GroqChatCompletion', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

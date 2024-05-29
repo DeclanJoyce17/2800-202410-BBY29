@@ -1,3 +1,4 @@
+
 "use strict";
 // Load environment variables from .env file
 require('dotenv').config();
@@ -14,17 +15,23 @@ const { SpeechClient } = require('@google-cloud/speech');
 const { spawn } = require('child_process');
 const sharp = require('sharp');
 const axios = require('axios');
+const textToSpeech = require('@google-cloud/text-to-speech');
+const uuid = require('uuid');
+
+const util = require('util');
+
 var nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const Joi = require('joi');
+const cloudinary = require('cloudinary').v2;
 
-
+// Load environment variables from .env file
+require('dotenv').config();
 require("./utils.js");
 
 const app = express();
 const expireTime = 60 * 60 * 1000;
 app.set('view engine', 'ejs')
-
 
 // Load environment variables from .env file
 require('dotenv').config();
@@ -34,22 +41,25 @@ const speechClient = new SpeechClient();
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
 
+app.use(express.json());
+
 app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
-// first, store files in memory as Buffer objects by using multer
+// Middleware to parse form data
+app.use(express.urlencoded({ extended: true }));
+// Store files in memory as Buffer objects by using multer
 const storage = multer.memoryStorage()
-// telling multer to use the previously defined memory storage for storing the files.
+// Telling multer to use the previously defined memory storage for storing the files
 const upload = multer({ storage: storage });
-//to use EJS to render our ejs files as HTML
+// to use EJS to render our ejs files as HTML
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 /************ uploading profile images ***********/
 
-let db, bucket;
 // Initialize MongoDB and GridFS
 // ensuring that the MongoDB connection 
 // and GridFS initialization are completed before proceeding further.
+let db, bucket;
 async function initMongoDB() {
 	const client = new MongoClient(mongoUri);
 	try {
@@ -63,30 +73,6 @@ async function initMongoDB() {
 	}
 }
 initMongoDB();
-
-
-/* probably it will be used later on. leave it for now.
-
-// Express route to get an image by filename
-app.get('/images/:filename', async (req, res) => {
-	try {
-		// Assuming 'userId' is the key where the user ID is stored in the session
-
-		const userId = req.session.userId;
-		const downloadStream = bucket.openDownloadStreamByName(req.params.filename);
-
-		// Set the proper content type before sending the stream
-		downloadStream.on('file', (file) => {
-			res.type(file.contentType);
-		});
-		// Pipe the image data to the response
-		downloadStream.pipe(res);
-	} catch (error) {
-		console.error('Failed to retrieve image:', error);
-		res.status(404).send('Image not found');
-	}
-});
-*/
 
 // Route to upload images
 app.post('/upload', upload.single('image'), async (req, res) => {
@@ -186,10 +172,10 @@ async function connectToMongo() {
 			}
 			return false;
 		}
-		
+
 		function adminValidation(req, res, next) {
 			console.log(req);
-			if (isAdmin(req) ) {
+			if (isAdmin(req)) {
 				next();
 			}
 			else {
@@ -226,7 +212,7 @@ async function connectToMongo() {
 				res.render('signup');
 			}
 		});
-		
+
 		//Shop Page
 		app.get('/shop', sessionValidation, async (req, res) => {
 			const usersCollection = db.collection('shopItems');
@@ -260,7 +246,7 @@ async function connectToMongo() {
 			const filter = { email: req.session.email };
 			if (itemName == '1 Hour Boost') {
 				var currentTime = new Date().getTime();
-				var hourTime = currentTime + (1 * 2 * 60 * 1000);
+				var hourTime = currentTime + (1 * 60 * 60 * 1000);
 				req.session.hourTime = hourTime;
 				console.log(currentTime);
 				console.log(hourTime);
@@ -308,28 +294,116 @@ async function connectToMongo() {
 
 		//FitTasks Page
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
-
 			var currentTime = new Date().getTime();
+			var point = req.session.points;
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, pointBoost: 1, fitTasks: 1 }).toArray();
+
+			var timeRemaining = (req.session.hourTime - currentTime) / 60000;
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, fitTasks: 1, pointBoost: 1, rerolls: 1, date: 1 }).toArray();
 			req.session.hourTime = result[0].pointBoost;
-			var timeRemaining = (req.session.hourTime - currentTime)/60000;
-			console.log("Time remaining" + timeRemaining)
-			res.render('fitTasks', { points: result[0].points, boostActive: Math.trunc(timeRemaining), show: req.session.hourTime, task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2] });
+			if (result[0].date != new Date().getDate()) {
+
+				var taskBankFit = await db.collection('fitnessTasks').find({}).project({ task: 1 }).toArray();
+				var userFitTasks = new Array(3);
+
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						var temp = Math.floor(Math.random() * taskBankFit.length);
+						if (taskBankFit[temp].task != userFitTasks[0] && taskBankFit[temp].task != userFitTasks[1] && taskBankFit[temp].task != userFitTasks[2]) {
+							userFitTasks[i] = taskBankFit[temp].task;
+							break;
+						}
+					}
+				}
+
+				var taskBankDiet = await db.collection('dietTasks').find({}).project({ task: 1 }).toArray();
+				var userDietTasks = new Array(3);
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						var temp = Math.floor(Math.random() * taskBankDiet.length);
+						if (taskBankDiet[temp].task != userDietTasks[0] && taskBankDiet[temp].task != userDietTasks[1] && taskBankDiet[temp].task != userDietTasks[2]) {
+							userDietTasks[i] = taskBankDiet[temp].task;
+							break;
+						}
+					}
+				}
+
+				const updateDoc = {
+					$set: {
+						fitTasks: userFitTasks,
+						dietTasks: userDietTasks,
+						date: new Date().getDate()
+					}
+				}
+
+				await usersCollection.updateOne(result[0], updateDoc);
+				res.redirect('/fitTasks');
+			} else {
+				res.render('fitTasks', { points: point, boostActive: (timeRemaining).toFixed(2), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+			}
+
 		});
 
 		//DietTasks Page
 		app.get('/dietTasks', sessionValidation, async (req, res) => {
+			var point = req.session.points;
 			var currentTime = new Date().getTime();
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, pointBoost: 1, dietTasks: 1 }).toArray();
+
+			var timeRemaining = (req.session.hourTime - currentTime) / 60000;
+			const result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, rerolls: 1, pointBoost: 1, date: 1 }).toArray();
 			req.session.hourTime = result[0].pointBoost;
-			var timeRemaining = (req.session.hourTime - currentTime)/60000;
-			res.render('dietTasks', { points: result[0].points, boostActive: Math.trunc(timeRemaining), show: req.session.hourTime, task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2] });
+			if (result[0].date != new Date().getDate()) {
+
+				var taskBankFit = await db.collection('fitnessTasks').find({}).project({ task: 1 }).toArray();
+				var userFitTasks = new Array(3);
+
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						var temp = Math.floor(Math.random() * taskBankFit.length);
+						if (taskBankFit[temp].task != userFitTasks[0] && taskBankFit[temp].task != userFitTasks[1] && taskBankFit[temp].task != userFitTasks[2]) {
+							userFitTasks[i] = taskBankFit[temp].task;
+							break;
+						}
+					}
+				}
+
+				var taskBankDiet = await db.collection('dietTasks').find({}).project({ task: 1 }).toArray();
+				var userDietTasks = new Array(3);
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						var temp = Math.floor(Math.random() * taskBankDiet.length);
+						if (taskBankDiet[temp].task != userDietTasks[0] && taskBankDiet[temp].task != userDietTasks[1] && taskBankDiet[temp].task != userDietTasks[2]) {
+							userDietTasks[i] = taskBankDiet[temp].task;
+							break;
+						}
+					}
+				}
+
+				const updateDoc = {
+					$set: {
+						fitTasks: userFitTasks,
+						dietTasks: userDietTasks,
+						date: new Date().getDate()
+					}
+				}
+
+				await usersCollection.updateOne(result[0], updateDoc);
+				res.redirect('/dietTasks');
+			} else {
+				res.render('dietTasks', { points: point, boostActive: (timeRemaining).toFixed(2), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+			}
+
 		});
 
 		//Signup POST
 		app.post('/signup', async (req, res) => {
+
+
 			const usersCollection = db.collection('users');
 			const { username, email, password } = req.body;
 
@@ -383,6 +457,36 @@ async function connectToMongo() {
 				// Hash the password
 				const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+				var temp;
+
+				var taskBankFit = await db.collection('fitnessTasks').find({}).project({ task: 1 }).toArray();
+				var userFitTasks = new Array(3);
+
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						temp = Math.floor(Math.random() * taskBankFit.length);
+						if (taskBankFit[temp].task != userFitTasks[0] && taskBankFit[temp].task != userFitTasks[1] && taskBankFit[temp].task != userFitTasks[2]) {
+							userFitTasks[i] = taskBankFit[temp].task;
+							break;
+						}
+					}
+				}
+
+				var taskBankDiet = await db.collection('dietTasks').find({}).project({ task: 1 }).toArray();
+				var userDietTasks = new Array(3);
+
+
+				for (var i = 0; i < 3; i++) {
+					while (true) {
+						temp = Math.floor(Math.random() * taskBankDiet.length);
+						if (taskBankDiet[temp].task != userDietTasks[0] && taskBankDiet[temp].task != userDietTasks[1] && taskBankDiet[temp].task != userDietTasks[2]) {
+							userDietTasks[i] = taskBankDiet[temp].task;
+							break;
+						}
+					}
+				}
+
 				// Insert the new user into the database
 				const result = await usersCollection.insertOne({
 					username,
@@ -391,9 +495,11 @@ async function connectToMongo() {
 					timeCreated: new Date().getTime(),
 					points: 0,
 					user_rank: 'Bronze',
-					fitTasks: tempArr,
-					dietTasks: tempArr,
-					rerolls: 1,
+					fitTasks: userFitTasks,
+					dietTasks: userDietTasks,
+					date: new Date().getDate(),
+					rerolls: 3,
+					currentPoints: 0,
 					pointBoost: 0,
 					user_type: 'user'
 				});
@@ -406,9 +512,9 @@ async function connectToMongo() {
 				req.session.username = username;
 				req.session.points = 0;
 				req.session.currentPoints = 0;
-				req.session.rerolls = 1;
 				req.session.rank = 'Bronze';
 				req.session.cookie.maxAge = expireTime;
+				req.session.email = email;
 				req.session.user_type = 'user';
 
 				res.redirect('/main');
@@ -418,18 +524,77 @@ async function connectToMongo() {
 			}
 		});
 
+		app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
+			console.log(req.session.user_type);
+			if (req.session.user_type != 'admin') {
+				res.render('403');
+			}
+			const userCollection = db.collection('users');
+			const result = await userCollection.find({}).project({ username: 1, user_type: 1 }).toArray();
+			req.session.user_type = result[0].user_type;
+			console.log(result[0].user_type)
+			res.render('admin', { users: result });
+		});
+
+		app.post('/demoteAdmin/:username2', async (req, res) => {
+			const userCollection = db.collection('users');
+			var username2 = req.params.username2;
+			const filter = { username: username2 };
+
+			const updateDoc = {
+				$set: {
+					user_type: 'user'
+				},
+			};
+
+
+			const result = await userCollection.updateOne(filter, updateDoc);
+			if (username2 == req.session.username) {
+				req.session.user_type = 'user';
+			}
+			res.redirect('/admin');
+		});
+
+		app.post('/deleteUser/:username', async (req, res) => {
+			var username = req.params.username;
+			const userCollection = db.collection('users');
+			const doc = {
+				username: username
+			};
+			const deleteResult = await userCollection.deleteOne(doc);
+			res.redirect('/admin');
+		});
+
+		app.post('/promoteUser/:username2', async (req, res) => {
+			const userCollection = db.collection('users');
+			var username2 = req.params.username2;
+			const filter = { username: username2 };
+
+			const updateDoc = {
+				$set: {
+					user_type: 'admin'
+				},
+			};
+
+
+			const result = await userCollection.updateOne(filter, updateDoc);
+
+			res.redirect('/admin');
+		});
+
 		//Login Page
 		app.get('/login', (req, res) => {
 			if (req.session.authenticated) {
 				res.redirect('/main');
 			}
 			else {
-				res.render('login');
+				res.render('login', { input: 0 });
 			}
 		});
 
 		//Login POST
 		app.post('/login', async (req, res) => {
+
 			const usersCollection = db.collection('users');
 			var email = req.body.email;
 			var password = req.body.password;
@@ -437,15 +602,15 @@ async function connectToMongo() {
 			const schema = Joi.string().max(35).required();
 			const validationResult = schema.validate(email);
 			if (validationResult.error != null) {
-				res.send(`Invalid email or password combination. 1<br> <a href='/login'>Try Again</a>`);
+				res.render('login', { input: 1 });
 				return;
 			}
 
-			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, rerolls: 1, pointBoost: 1, user_type: 1, _id: 1 }).toArray();
+			const result = await usersCollection.find({ email: email }).project({ email: 1, username: 1, password: 1, points: 1, currentPoints: 1, user_type: 1, rerolls: 1, _id: 1 }).toArray();
 
 			console.log(result);
 			if (result.length != 1) {
-				res.send(`Invalid email or password combination. 2<br> <a href='/login'>Try Again</a>`);
+				res.render('login', { input: 1 });
 				return;
 			}
 			if (await bcrypt.compare(password, result[0].password)) {
@@ -460,12 +625,14 @@ async function connectToMongo() {
 				req.session.email = email;
 				req.session.cookie.maxAge = expireTime;
 				req.session.hourTime = result[0].pointBoost;
-				req.session.user_typer = result[0].user_type;
+				req.session.user_type = result[0].user_type;
+				console.log(req.session.user_type);
 				res.redirect('/main');
+
 				return;
 			}
 			else {
-				res.send(`Invalid email or password combination. 3<br> <a href='/login'>Try Again</a>`);
+				res.render('login', { input: 1 });
 				return;
 			}
 		});
@@ -533,10 +700,10 @@ async function connectToMongo() {
 			}
 		});
 
-		app.get('/rankProgress', sessionValidation, async (req,res) =>{
+		app.get('/rankProgress', sessionValidation, async (req, res) => {
 
 			const usersCollection = db.collection('users');
-			const result = await usersCollection.find({ email: req.session.email }).project({ points: 1, rerolls: 1, user_rank: 1,  _id: 1 }).toArray();
+			const result = await usersCollection.find({ email: req.session.email }).project({ points: 1, rerolls: 1, user_rank: 1, _id: 1 }).toArray();
 			var currentPoints = result[0].points;
 			var newRanking;
 			if (currentPoints < 50 && currentPoints >= 0) {
@@ -561,7 +728,7 @@ async function connectToMongo() {
 			else {
 				newRanking = 0;
 			}
-			res.render('rankProgress', {points: result[0].points, rank: result[0].user_rank, nextRank: newRanking});
+			res.render('rankProgress', { points: result[0].points, rank: result[0].user_rank, nextRank: newRanking });
 		});
 
 		// Route to handle password reset form submission
@@ -605,11 +772,6 @@ async function connectToMongo() {
 				res.status(500).send('Error resetting password.');
 			}
 		});
-
-
-
-
-
 
 		app.get('/map', (req, res) => {
 			// Resolve the path to map.html using path module
@@ -697,14 +859,14 @@ async function connectToMongo() {
 			}
 			else if (currentPoints > 249 && currentPoints < 400) {
 				req.session.rank = 'master';
-				
+
 			}
 			else if (currentPoints > 400 && currentPoints < 700) {
 				req.session.rank = 'grandmaster';
 			}
 			else if (currentPoints > 700 && currentPoints < 1000) {
 				req.session.rank = 'champion';
-				
+
 			}
 			else {
 				req.session.rank = 'god';
@@ -738,16 +900,19 @@ async function connectToMongo() {
 			/************ To use the ejs template ***********/
 
 			const username = req.session.username
-			
+			const points = req.session.points
 			const rank = req.session.rank
 			const users = await getAndSortUsersFromDB();
-			let tasks = [];
+			let fitTasks = [];
+			let dietTasks = [];
 
 			try {
 				const current_user = await usersCollection.findOne({ username: req.session.username });
 
 				// Get tasks
-				tasks = current_user.fitTasks.map(task => task);
+				fitTasks = current_user.fitTasks.map(task => task);
+
+				dietTasks = current_user.dietTasks.map(task => task);
 
 			} catch (err) {
 				console.error("Error fetching user or tasks:", err);
@@ -760,51 +925,34 @@ async function connectToMongo() {
 			// console.log("USERS: " + users);
 			// console.log("tasks: " + tasks);
 
-			var results = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, points: 1 }).toArray();
-			const points = results[0].points;
 			res.render('main', {
 				// Pass data to the template here
 				username,
 				rank,
 				points,
 				users,
-				tasks,
+				fitTasks,
+				dietTasks,
 				greeting
 			});
-		});
-
-		//Adding points POST
-		app.post('/addPoint', sessionValidation, async (req, res) => {
-
-			var currentPoints = req.session.points;
-			const filter = { username: req.session.username };
-			/* Set the upsert option to insert a document if no documents match
-			the filter */
-
-			// Specify the update to set a value for the plot field
-			const updateDoc = {
-				$set: {
-					points: currentPoints + 5
-				},
-			};
-			// Update the first document that matches the filter
-			const usersCollection = db.collection('users');
-			const result = await usersCollection.updateOne(filter, updateDoc);
-			req.session.points = currentPoints + 5;
-			console.log(result);
-			res.redirect('/main');
 		});
 
 		app.post('/rerollFit', sessionValidation, async (req, res) => {
 
 			var number = req.body.number;
-
+			var currentTime = new Date().getTime();
+		
 			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1 }).toArray();
+			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, rerolls: 1, date: 1, pointBoost: 1, user_rank: 1 }).toArray();
+			req.session.hourTime = result[0].pointBoost;
+			if (currentTime >= req.session.hourTime) {
+				req.session.hourTime = 0;
+			}
 			var temp = '';
 			var tempTasks;
 			if (result[0].rerolls < 1) {
-				console.log("no rerolls");
+				var point = req.session.points;
+				res.render('fitTasks', { points: point, boostActive: ((req.session.hourTime-currentTime)/60000).toFixed(2), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: true });
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
@@ -873,15 +1021,20 @@ async function connectToMongo() {
 		});
 
 		app.post('/rerollDiet', sessionValidation, async (req, res) => {
-
+			var currentTime = new Date().getTime();
 			var number = req.body.number;
 
 			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ dietTasks: 1, user_rank: 1, rerolls: 1 }).toArray();
+			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1, pointBoost: 1, rerolls: 1, date: 1, user_rank: 1 }).toArray();
+			req.session.hourTime = result[0].pointBoost;
+			if (currentTime >= req.session.hourTime) {
+				req.session.hourTime = 0;
+			}
 			var temp = '';
 			var tempTasks;
 			if (result[0].rerolls < 1) {
-				console.log("no rerolls");
+				var point = req.session.points;
+				res.render('dietTasks', { points: point, boostActive: ((req.session.hourTime-currentTime)/60000).toFixed(2), task1: result[0].dietTasks[0], task2: result[0].dietTasks[1], task3: result[0].dietTasks[2], rerolls: result[0].rerolls, noRerolls: true });
 				return;
 			}
 			req.session.user_rank = result[0].user_rank;
@@ -915,6 +1068,7 @@ async function connectToMongo() {
 				}
 			}
 
+
 			//console.log(taskBankFit[temp].task);
 
 			var updateDoc;
@@ -942,89 +1096,16 @@ async function connectToMongo() {
 				};
 			}
 
-
-
-			result = await usersCollection.updateOne(result[0], updateDoc);
-
-			res.redirect('/dietTasks');
-		});
-
-
-		app.post('/rerollDiet1', sessionValidation, async (req, res) => {
-			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
-			var temp = '';
-			const tempTasks = db.collection('dietTasks');
-			var taskBankDiet = await tempTasks.find({}).project({ task: 1 }).toArray();
-			while (true) {
-				temp = Math.floor(Math.random() * taskBankDiet.length);
-				if (taskBankDiet[temp].task != result[0].dietTasks[0] && taskBankDiet[temp].task != result[0].dietTasks[1] && taskBankDiet[temp].task != result[0].dietTasks[2]) {
-					break;
-				}
-			}
-
-			const updateDoc = {
-				$set: {
-					dietTasks: [taskBankDiet[temp].task, result[0].dietTasks[1], result[0].dietTasks[2]]
-				},
-			};
+			console.log(updateDoc);
 
 			result = await usersCollection.updateOne(result[0], updateDoc);
+
 			console.log(result);
+
 			res.redirect('/dietTasks');
 		});
 
-		app.post('/rerollDiet2', sessionValidation, async (req, res) => {
-			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
-			var temp = '';
-			const tempTasks = db.collection('dietTasks');
-			var taskBankDiet = await tempTasks.find({}).project({ task: 1 }).toArray();
-			while (true) {
-				temp = Math.floor(Math.random() * taskBankDiet.length);
-				if (taskBankDiet[temp].task != result[0].dietTasks[0] && taskBankDiet[temp].task != result[0].dietTasks[1] && taskBankDiet[temp].task != result[0].dietTasks[2]) {
-					break;
-				}
-			}
 
-
-			const updateDoc = {
-				$set: {
-					dietTasks: [result[0].dietTasks[0], taskBankDiet[temp].task, result[0].dietTasks[2]]
-				},
-			};
-
-			result = await usersCollection.updateOne(result[0], updateDoc);
-			console.log(result);
-			res.redirect('/dietTasks');
-		});
-
-		app.post('/rerollDiet3', sessionValidation, async (req, res) => {
-			const usersCollection = db.collection('users');
-			var result = await usersCollection.find({ email: req.session.email }).project({ email: 1, username: 1, password: 1, points: 1, _id: 1, dietTasks: 1 }).toArray();
-			var temp = '';
-			const tempTasks = db.collection('dietTasks');
-			var taskBankDiet = await tempTasks.find({}).project({ task: 1 }).toArray();
-			while (true) {
-				temp = Math.floor(Math.random() * taskBankDiet.length);
-				if (taskBankDiet[temp].task != result[0].dietTasks[0] && taskBankDiet[temp].task != result[0].dietTasks[1] && taskBankDiet[temp].task != result[0].dietTasks[2]) {
-					break;
-				}
-			}
-
-
-			const updateDoc = {
-				$set: {
-					dietTasks: [result[0].dietTasks[0], result[0].dietTasks[1], taskBankDiet[temp].task]
-				},
-			};
-
-			result = await usersCollection.updateOne(result[0], updateDoc);
-			console.log(result);
-			res.redirect('/dietTasks');
-		});
-
-		
 		//Adding points to Fitness Page
 		app.post('/addPointFit', sessionValidation, async (req, res) => {
 			var currentTime = new Date().getTime();
@@ -1057,7 +1138,7 @@ async function connectToMongo() {
 						pointBoost: 0
 					},
 				};
-				await usersCollection.updateOne({ email: req.session.email}, updateDoc);
+				await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			}
 			const updateDoc = {
 				$set: {
@@ -1072,59 +1153,6 @@ async function connectToMongo() {
 			req.session.currentPoints = currentPoint + addingPoints;
 
 			res.redirect('/fitTasks');
-		});
-
-		//Admin page
-		app.get('/admin', sessionValidation, adminValidation, async (req,res) => {
-			const userCollection = db.collection('users');
-			const result = await userCollection.find().project({username: 1, user_type: 1}).toArray();
-			res.render('admin', {users: result});
-		});
-
-		app.post('/demoteAdmin/:username2', async (req, res) => {
-			const userCollection = db.collection('users');
-			var username2 = req.params.username2;
-			const filter = { username: username2};
-		
-					const updateDoc = {
-						$set: {
-							user_type: 'user'
-						},
-					};
-		
-				
-					const result = await userCollection.updateOne(filter, updateDoc);
-					if (username2 == req.session.username) {
-						req.session.user_type = 'user';
-					}
-				res.redirect('/admin');
-		});
-		
-		app.post('/deleteUser/:username', async (req,res) => {
-			var username = req.params.username;
-			const userCollection = db.collection('users');
-			const doc = {
-				username: username
-			  };
-			const deleteResult = await userCollection.deleteOne(doc);
-			res.redirect('/admin');
-		});
-
-		app.post('/promoteUser/:username2', async (req, res) => {
-			const userCollection = db.collection('users');
-			var username2 = req.params.username2;
-			const filter = { username: username2 };
-		
-					const updateDoc = {
-						$set: {
-							user_type: 'admin'
-						},
-					};
-		
-					
-					const result = await userCollection.updateOne(filter, updateDoc);
-					
-					res.redirect('/admin');
 		});
 
 		//Adding points to Diet Page
@@ -1160,7 +1188,7 @@ async function connectToMongo() {
 						pointBoost: 0
 					},
 				};
-				await usersCollection.updateOne({ email: req.session.email}, updateDoc);
+				await usersCollection.updateOne({ email: req.session.email }, updateDoc);
 			}
 			const updateDoc = {
 				$set: {
@@ -1207,7 +1235,7 @@ async function connectToMongo() {
 		//     getGroqChatCompletion
 		// };
 
-		/****************** getting Images *************************/
+		/****************** profile Image *************************/
 
 		// Express route to get a profile image by user id
 		app.get('/images/:userId', async (req, res) => {
@@ -1247,14 +1275,204 @@ async function connectToMongo() {
 
 		app.get('/profile', sessionValidation, async (req, res) => {
 			const userCollection = db.collection('users');
-			const result = await userCollection.find().project({username: 1, user_type: 1}).toArray();
+			const result = await userCollection.find({email: req.session.email}).project({ username: 1, user_type: 1 }).toArray();
 			req.session.user_type = result[0].user_type;
 			console.log(req.session.userId);
 			const uploadSuccess = req.session.uploadSuccess;
 			req.session.uploadSuccess = false; // Reset the flag immediately
-			console.log(req.session.user_type);
+			console.log("user type: " + req.session.user_type);
 			res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
 		});
+
+		// Route to upload profile images
+		app.post('/profile-upload', upload.single('image'), async (req, res) => {
+			if (!req.file) {
+				return res.status(400).send('No file uploaded.');
+			}
+			try {
+				console.log("session user id: " + req.session.userId);
+				const userId = req.session.userId;
+				const filename = req.file.originalname;
+				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
+				// Reset the flag after rendering
+				req.session.uploadSuccess = true;
+				res.redirect('/profile');
+			} catch (error) {
+				console.error('Upload error:', error);
+				res.status(500).send(`Failed to upload image: ${error.message}`);
+			}
+		});
+
+		/****************** img community posts *************************/
+
+		// Define the route to render the postImgtest.ejs file
+		app.get('/community', async (req, res) => {
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
+			const userId = req.session.userId;
+			// Get the page number from query parameter or default to 1
+			const page = parseInt(req.query.page) || 1;
+			// Define how many posts per page
+			const postsPerPage = 5;
+			// Get the tag filter from query parameter
+			const tag = req.query.tag || 'all';
+
+			let filter = {};
+
+			if (tag !== 'all') {
+				filter.tags = tag;
+			}
+
+			try {
+				const postsCollection = db.collection('posts');
+				// Get the total number of posts
+				const totalPosts = await postsCollection.countDocuments(filter);
+				// Calculate total number of pages
+				const totalPages = Math.ceil(totalPosts / postsPerPage);
+
+				const posts = await postsCollection.find(filter)
+					// Skip the posts of previous pages
+					.skip((page - 1) * postsPerPage)
+					// Limit the number of posts to display
+					.limit(postsPerPage)
+					.toArray();
+
+				res.render('community', { posts, userId, page, totalPages, tag, cloudinary: cloudinary });
+			} catch (error) {
+				console.error('Error retrieving posts:', error);
+				res.status(500).send('Failed to retrieve posts.');
+			}
+		});
+
+		app.get('/communityPost', async (req, res) => {
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
+			res.render('communityPost');
+		});
+
+
+		// Route to get posts by tag
+		app.get('/posts/:tag', async (req, res) => {
+			const tag = req.params.tag;
+			try {
+				const postsCollection = db.collection('posts');
+				const posts = await postsCollection.find({ tags: tag }).toArray();
+				res.render('community', { posts });
+			} catch (error) {
+				console.error('Error retrieving posts by tag:', error);
+				res.status(500).send('Failed to retrieve posts.');
+			}
+		});
+
+		// max 4 images can be uploaded
+		// Updated POST route to handle post creation
+		app.post('/communityPost/post', upload.array('images', 4), async (req, res) => {
+			console.log('POST /communityPost/post');
+
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
+			// Generate a unique postId
+			const postId = new ObjectId();
+			// Default to empty string if no text is provided
+			const text = req.body.text || "";
+			const createdAt = new Date();
+			// to authorize them to delete the post
+			const userId = req.session.userId;
+			const tags = req.body.tags ? [req.body.tags.trim()] : [];
+			const latitude = req.body.latitude || null;
+			const longitude = req.body.longitude || null;
+
+			// Check if at least one field is filled
+			if (!text && (!req.files || req.files.length === 0)) {
+				return res.status(400).send('Please provide either text or images.');
+			}
+
+			try {
+				// Retrieve the user details
+				const usersCollection = db.collection('users');
+				const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
+
+				// Handle image uploads if any
+				let imageUrls = [];
+				if (req.files && req.files.length > 0) {
+					imageUrls = await uploadImagesToCloudinary(req.files);
+				}
+
+				const username = user.username;
+
+				// Find the profile image in GridFS
+				const files = await bucket.find({ 'metadata.userId': userId }).toArray();
+				// Default image
+				let profileImage = '/default-avatar.jpg';
+				if (files.length > 0) {
+					profileImage = `/images/${userId}`;
+				}
+
+				// Save post data to MongoDB
+				const postsCollection = db.collection('posts');
+				await postsCollection.insertOne({
+					_id: postId,
+					text,
+					createdAt,
+					imageUrls,
+					tags,
+					userId,
+					username,
+					profileImage,
+					location: latitude && longitude ? { latitude, longitude } : null
+				});
+
+				res.redirect('/community');
+			} catch (error) {
+				console.error('Post creation error:', error);
+				res.status(500).send(`Failed to create post: ${error.message}`);
+			}
+		});
+
+		// Route to handle delete post request
+		app.post('/community/delete/:id', async (req, res) => {
+			if (!req.session.userId) {
+				return res.status(401).send('Unauthorized');
+			}
+
+			const postId = req.params.id;
+			const userId = req.session.userId;
+
+			try {
+				const postsCollection = db.collection('posts');
+				const post = await postsCollection.findOne({ _id: new ObjectId(postId) });
+
+				if (!post) {
+					return res.status(404).send('Post not found.');
+				}
+
+				if (post.userId.toString() !== userId) {
+					return res.status(403).send('You do not have permission to delete this post.');
+				}
+
+				// Delete images from Cloudinary
+				await Promise.all(post.imageUrls.map(async (url) => {
+					const publicId = url.split('/').pop().split('.')[0];
+					await cloudinary.uploader.destroy(publicId);
+				}));
+
+				// Delete post from MongoDB
+				await postsCollection.deleteOne({ _id: new ObjectId(postId) });
+
+				res.redirect('/community');  // Redirect to the postImgtest route
+			} catch (error) {
+				console.error('Error deleting post:', error);
+				res.status(500).send(`Failed to delete post: ${error.message}`);
+			}
+		});
+
+		/****************** Changing User Info *************************/
 
 		//ChangeEmail Page
 		app.get('/changeEmail', sessionValidation, async (req, res) => {
@@ -1319,6 +1537,39 @@ async function connectToMongo() {
 			} else {
 
 				res.redirect('changePassword');
+			}
+
+		});
+
+		app.get('/changeUsername', sessionValidation, async (req, res) => {
+			res.render('changeUsername');
+		});
+
+		app.post('/changeUsername', sessionValidation, async (req, res) => {
+			const filter = { email: req.session.email };
+			const username = req.body.username;
+
+			const schema = Joi.object(
+				{
+					username: Joi.string().min(8).max(20).required()
+				}
+			);
+
+			if (schema.validate({ username }) != null) {
+				const updateDoc = {
+					$set: {
+						username: username
+					}
+				};
+
+				const usersCollection = db.collection('users');
+				await usersCollection.updateOne(filter, updateDoc);
+				req.session.username = username;
+
+				res.redirect('profile');
+			} else {
+
+				res.redirect('changeUsername');
 			}
 
 		});
@@ -1462,6 +1713,61 @@ async function connectToMongo() {
 			res.send(doc);
 		});
 
+		app.get('/map', (req, res) => {
+			var doc = fs.readFileSync('./html/map.html', 'utf-8');
+			res.send(doc);
+		});
+
+
+		//-------------------------------------------------------------------------------
+		// Text to Speech
+		// This code is provided by the Google Text to Speech client libraries with modification
+		// our project
+		//------------------------------------------------------------------------------
+
+
+		app.post("/text-to-speech", async (req, res) => {
+			const text = req.body.text;
+
+			const client = new textToSpeech.TextToSpeechClient();
+
+			try {
+				// Construct the request
+				const request = {
+					input: { text: text },
+					// Select the language and SSML voice gender (optional)
+					voice: { languageCode: 'en-GB', ssmlGender: "FEMALE" }, // Use appropriate language code and gender
+					// Select the type of audio encoding
+					audioConfig: { audioEncoding: 'MP3' }, // Fix typo in audioConfig
+				};
+
+				// Perform text-to-speech request
+				const [response] = await client.synthesizeSpeech(request);
+				// Write the binary audio content to a local file
+				const writeFile = util.promisify(fs.writeFile);
+
+				// Generate a unique filename for the audio file
+				const fileName = uuid.v4() + '.mp3';
+				const filePath = path.join(__dirname, 'img/text-to-speech-audios', fileName);
+				await writeFile(filePath, response.audioContent, 'binary');
+				console.log('Audio content written to file: output.mp3');
+				res.send(fileName);
+			} catch (error) {
+				console.error("Error synthesizing speech ", error);
+				res.status(500).send('Error synthesizing speech');
+			}
+		});
+
+		app.get('/map', (req, res) => {
+			var doc = fs.readFileSync('./html/map.html', 'utf-8');
+			res.send(doc);
+		});
+
+		app.get('/body-motion-capture', (req, res) => {
+			var doc = fs.readFileSync('./html/body-motion-capture.html', 'utf-8');
+			res.send(doc);
+		});
+
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
 			res.status(404).send('Page not found - 404');
@@ -1543,4 +1849,40 @@ async function resizeImage(fileBuffer, width, height) {
 		console.error('Error resizing image:', error);
 		throw error;
 	}
+}
+
+/************************ helper functions to upload community post ***************************/
+
+// async function uploadImagesToCloudinary(files) {
+// 	return Promise.all(files.map(file => {
+// 		return new Promise((resolve, reject) => {
+// 			cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
+// 				if (error) {
+// 					reject(error);
+// 				} else {
+// 					resolve(result.secure_url);
+// 				}
+// 			}).end(file.buffer);
+// 		});
+// 	}));
+// }
+
+async function uploadImagesToCloudinary(files) {
+	return Promise.all(files.map(file => {
+		return new Promise((resolve, reject) => {
+			resizeImage(file.buffer, 1080, 1080) // Resize the image to 1080x1080
+				.then(resizedBuffer => {
+					cloudinary.uploader.upload_stream({
+						resource_type: 'image'
+					}, (error, result) => {
+						if (error) {
+							reject(error);
+						} else {
+							resolve(result.secure_url);
+						}
+					}).end(resizedBuffer);
+				})
+				.catch(error => reject(error));
+		});
+	}));
 }

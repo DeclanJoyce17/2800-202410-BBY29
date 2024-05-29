@@ -1,10 +1,15 @@
 <li>
-    <div class="item-name"><%= item.name %> </div><div class="item-price">(<%= item.price %> Points)</div>
-    <div class="item-description"><%= item.description %> </div>
+    <div class="item-name">
+        <%= item.name %>
+    </div>
+    <div class="item-price">(<%= item.price %> Points)</div>
+    <div class="item-description">
+        <%= item.description %>
+    </div>
     <div>
         <form action='/buy/<%= item.name %>' method='post'>
             <button class="btn custom-btn rounded-pill buy-button px-5">Buy</button>
         </form>
-    
+
     </div>
-</li>       
+</li>

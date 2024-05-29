@@ -1,5 +1,6 @@
 //--------------------------------------------------------------------------------------
 // Credit: https://github.com/gjmolter/web-3dmodel-threejs
+// This code has been modified for our project
 
 //Import the THREE.js library
 import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";

@@ -4,65 +4,87 @@
     </head>
 
     <body>
-        <!-- Chatbot -->
-        <form action="/aichat-home" method="get" class="">
-            <button type="submit" class="index-btn ">ChatBot</button>
-          </form>
-          <% if(boostActive > 0) { %>
-            <div class="boostActive">You have <%= boostActive %> minutes of boost time left.</div>
-          <% } %>
-        <!--Contents in the body tag-->
-        <div class="dietTaskImage">
-            <img class="title" src="/img/DietLogo.png" alt="logo">
+
+        <div>
+            <form action="/shop" method="get">
+                <button type="submit" class="rerolls">
+                    <img class="rerollImg" src="/img/reroll.png">
+                    <span class="reroll">: <%=rerolls%>
+                    </span>
+                </button>
+            </form>
         </div>
+
+        <!-- Chatbot -->
+        <div class="Chatter">
+            <form action="/aichat-home" method="get">
+                <button type="submit" class="btner"><img src="/img/chatBotImg.png"></button>
+            </form>
+        </div>
+        
+        <!--Contents in the body tag-->
+        <img class="title" src="/img/DietLogo.png" alt="logo">
+
+       
         <div class="container taskCards">
-            <h1>Points: <%= points %>
-            </h1>
-            <div class="card">
-                <div class="card-body">
-                    <%= task1 %>
-                </div>
-                <span>
-                    <form method="post" action="/addPointDiet" style="display: inline">
-                        <input type="text" name="task" value="<%= task1 %>" hidden>
-                        <button class="btn custom-btn float-right" type="submit">Done</button>
-                    </form>
-                    <form method="post" action="/rerollDiet" style="display: inline">
-                        <input type="text" name="number" value="1" hidden>
-                        <button class="btn btn-secondary float-right" type="submit">Reroll</button>
-                    </form>
-                </span>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <%= task2 %>
-                </div>
-                <span>
-                    <form method="post" action="/addPointDiet" style="display: inline">
-                        <input type="text" name="task" value="<%= task2 %>" hidden>
-                        <button class="btn custom-btn float-right" type="submit">Done</button>
-                    </form>
-                    <form method="post" action="/rerollDiet" style="display: inline">
-                        <input type="text" name="number" value="2" hidden>
-                        <button class="btn btn-secondary float-right" type="submit">Reroll</button>
-                    </form>
-                </span>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <%= task3 %>
-                </div>
-                <span>
-                    <form method="post" action="/addPointDiet" style="display: inline">
-                        <input type="text" name="task" value="<%= task3 %>" hidden>
-                        <button class="btn custom-btn float-right" type="submit">Done</button>
-                    </form>
-                    <form method="post" action="/rerollDiet" style="display: inline">
-                        <input type="text" name="number" value="3" hidden>
-                        <button class="btn btn-secondary float-right" type="submit">Reroll</button>
-                    </form>
-                </span>
-            </div>
+            <% if (noRerolls) { %>
+                <h1 class="error">Lacking Rerolls</h1>
+                <% } %>
+                    <h1>Points: <%= points %>
+                    </h1>
+                    <div class="card">
+                        <div class="card-body">
+                            <%= task1 %>
+                        </div>
+                        <span>
+                            <form method="post" action="/addPointDiet" style="display: inline">
+                                <input type="text" name="task" value="<%= task1 %>" hidden>
+                                <button class="btn btnz btn-primary float-right" type="submit">Done</button>
+                            </form>
+                            <form method="post" action="/rerollDiet" style="display: inline">
+                                <input type="text" name="number" value="1" hidden>
+                                <button class="btn btns btn-secondary float-right" type="submit"><img class="rerollbtn"
+                                        src="/img/reroll.png" alt="logo"></button>
+                            </form>
+                        </span>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <%= task2 %>
+                        </div>
+                        <span>
+                            <form method="post" action="/addPointDiet" style="display: inline">
+                                <input type="text" name="task" value="<%= task2 %>" hidden>
+                                <button class="btn btnz btn-primary float-right" type="submit">Done</button>
+                            </form>
+                            <form method="post" action="/rerollDiet" style="display: inline">
+                                <input type="text" name="number" value="2" hidden>
+                                <button class="btn btns btn-secondary float-right" type="submit"><img class="rerollbtn"
+                                        src="/img/reroll.png" alt="logo"></button>
+                            </form>
+                        </span>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <%= task3 %>
+                        </div>
+                        <span>
+                            <form method="post" action="/addPointDiet" style="display: inline">
+                                <input type="text" name="task" value="<%= task3 %>" hidden>
+                                <button class="btn btnz btn-primary float-right" type="submit">Done</button>
+                            </form>
+                            <form method="post" action="/rerollDiet" style="display: inline">
+                                <input type="text" name="number" value="3" hidden>
+                                <button class="btn btns btn-secondary float-right" type="submit"><img class="rerollbtn"
+                                        src="/img/reroll.png" alt="logo"></button>
+                            </form>
+                        </span>
+                    </div>
 
         </div>
-        <%- include("templates/taskFooter") %>
+        <div>
+            <% if(boostActive > 0) { %>
+                <div class="boostActive">You have <%= boostActive %> minutes of boost time left.</div>
+              <% } %>
+            </div>
+        <%- include("templates/footer") %>
