@@ -2,28 +2,28 @@ body {
     margin: 0;
     font-family: "Montserrat", sans-serif;
     background-color: #646464;
-  }
-  
-  header {
+}
+
+header {
     margin-top: 3em;
     text-align: center;
     color: white;
-  }
-  
-  header h1 {
+}
+
+header h1 {
     font-size: 2em;
     font-weight: 900;
-  }
-  
-  #container3D canvas {
+}
+
+#container3D canvas {
     width: 100vw !important;
     height: 100vh !important;
     position: absolute;
     top: 0;
     left: 0;
-  }
+}
 
-  footer {
+footer {
     position: fixed;
     bottom: 0;
     display: flex;
@@ -123,4 +123,15 @@ body {
     background-color: white;
     width: 90px;
     height: 50px;
+}
+
+body {
+    overflow: hidden;
+}
+
+video {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
 }
