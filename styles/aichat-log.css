@@ -49,6 +49,7 @@ body {
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
     height: 130px;
+    z-index: 1000;
 }
 
 #coach-info {
@@ -116,6 +117,7 @@ input {
     background-color: rgb(221, 218, 218);
     padding-left: 70px;
     margin-left: 10px;
+    font-size: 14pt;
 }
 
 #submit-button {
@@ -156,34 +158,51 @@ footer {
 
 #chat-log-here {
     position: relative;
-    margin: 150px 20px;
+    margin: 150px 20px 200px;
+    height: auto;
 }
 
-#user-input-test {
-    position: absolute;
-    right: 0;
+.user-message {
+    position: relative;
     background-color: black;
     color: white;
     padding: 20px;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    border-bottom-left-radius: 20px;
-    display: none;
-} 
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    border-bottom-left-radius: 40px;
+    margin-bottom: 50px;
+    text-align: right;
+}
 
-#ai-response-test {
-    position: absolute;
-    top: 100px;
-    left: 0;
+.ai-response {
+    position: relative;
     background-color: white;
     padding: 20px;
-    width: fit-content;
-    padding: 20px;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
-    display: none;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    border-bottom-right-radius: 40px;
+    margin-bottom: 50px;
 }
+
+.user-avatar, .ai-avatar {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+.user-avatar {
+    right: -10px;
+    bottom: -70px;
+}
+
+.ai-avatar {
+    left: -10px;
+    bottom: -70px;
+}
+
+
 
 #audio-container {
     display: none;
