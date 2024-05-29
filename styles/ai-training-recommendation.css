@@ -156,3 +156,51 @@ footer {
 #audio-container {
     display: none;
 }
+
+#go-back {
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    background-color: rgb(221, 218, 218);
+    opacity: 0.6;
+    border-radius: 20px;
+    width: 60px;
+    height: 60px;
+}
+
+#go-back-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15px;
+}
+
+#setting {
+    position: absolute;
+    right: 20px;
+    top: 50px;
+    background-color: rgb(221, 218, 218);
+    opacity: 0.6;
+    border-radius: 20px;
+    width: 60px;
+    height: 60px;
+}
+
+#setting-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15px;
+}
+
+#top-nav {
+    position: fixed;
+    top: 0;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    height: 300px;
+    z-index: 1000;
+}
