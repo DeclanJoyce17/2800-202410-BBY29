@@ -7,19 +7,17 @@
 
 
 	<div class="login bg-light">
-		<!-- Go Back button -->
-		<button type="button" class="index-btn top-left" style="margin-left: 10px;" onclick="location.href='/';">
-			Go Back
-		</button>
-
 		<br>
-
-
 		<% if (input==1) { %>
 			<div class="alert alert-danger" role="alert">
 				<h1>Invalid Email or Password</h1>
 			</div>
 			<% } %>
+				<!-- Go Back button -->
+				<button type="button" class="index-btn top-left" style="margin-left: 10px;"
+					onclick="location.href='/';">
+					Go Back
+				</button>
 
 				<form action="/login" method="POST" class="index-form center">
 					<h1>Login</h1>

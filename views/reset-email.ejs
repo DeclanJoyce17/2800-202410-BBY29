@@ -8,11 +8,13 @@
 <div class="reset-password bg-light">
     <!-- Display error message -->
     <% if (errorMessage) { %>
-        <div class="alert alert-danger resize"><%= errorMessage %></div>
+        <div class="alert alert-danger resize">
+            <h1><%= errorMessage %></h1>
+        </div>
     <% } %>
     <!-- Display success message -->
     <% if (successMessage) { %>
-        <div class="alert alert-success resize"><%= successMessage %></div>
+        <div class="alert alert-success resize"><h1><%= successMessage %></h1></div>
         <button type="button" onclick="location.href='/login'" class="index-btn" style="margin-left: 10px;">Login</button>
         <br><br><br>
  <% } else { %>
