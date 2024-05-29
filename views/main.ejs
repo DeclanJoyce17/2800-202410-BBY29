@@ -9,7 +9,7 @@
       <source src="/img/friendly-bot.mp4" type="video/mp4">
     </video> -->
     <div id="date">
-      <svg id="calendar-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg id="calendar-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M7 3V4.94992C6.4828 5.09415 5.97032 5.2612 5.46404 5.45105C4.54314 5.79639 3.84054 6.55793 3.57035 7.5036L3.3285 8.35007C3.26686 8.56584 3.20959 8.78252 3.15669 9H20.8432C20.7903 8.78252 20.733 8.56584 20.6713 8.35007L20.4295 7.5036C20.1593 6.55793 19.4567 5.79639 18.5358 5.45105C18.0296 5.26122 17.5171 5.09418 17 4.94996V3H15V4.50918C13.0133 4.18477 10.9867 4.18477 9 4.50916V3H7Z"
           fill="white" />
@@ -17,7 +17,7 @@
           d="M21.204 11H2.79582C2.53151 13.2212 2.70907 15.4821 3.32851 17.6501L3.37014 17.7958C3.75983 19.1598 4.84778 20.2121 6.22393 20.5561C10.0162 21.5042 13.9836 21.5042 17.7759 20.5561C19.1521 20.2121 20.24 19.1598 20.6297 17.7958L20.6713 17.6501C21.2908 15.4821 21.4683 13.2212 21.204 11ZM6.75 13.375C6.58772 13.4561 6.45614 13.5877 6.375 13.75C6.13893 14.2221 6.13893 14.7779 6.375 15.25C6.45614 15.4123 6.58772 15.5439 6.75 15.625C7.22214 15.8611 7.77786 15.8611 8.25 15.625C8.41228 15.5439 8.54386 15.4123 8.625 15.25C8.86107 14.7779 8.86107 14.2221 8.625 13.75C8.54386 13.5877 8.41228 13.4561 8.25 13.375C7.77786 13.1389 7.22214 13.1389 6.75 13.375ZM10.875 13.75C10.9561 13.5877 11.0877 13.4561 11.25 13.375C11.7221 13.1389 12.2779 13.1389 12.75 13.375C12.9123 13.4561 13.0439 13.5877 13.125 13.75C13.3611 14.2221 13.3611 14.7779 13.125 15.25C13.0439 15.4123 12.9123 15.5439 12.75 15.625C12.2779 15.8611 11.7221 15.8611 11.25 15.625C11.0877 15.5439 10.9561 15.4123 10.875 15.25C10.6389 14.7779 10.6389 14.2221 10.875 13.75ZM15.75 13.375C15.5877 13.4561 15.4561 13.5877 15.375 13.75C15.1389 14.2221 15.1389 14.7779 15.375 15.25C15.4561 15.4123 15.5877 15.5439 15.75 15.625C16.2221 15.8611 16.7779 15.8611 17.25 15.625C17.4123 15.5439 17.5439 15.4123 17.625 15.25C17.8611 14.7779 17.8611 14.2221 17.625 13.75C17.5439 13.5877 17.4123 13.4561 17.25 13.375C16.7779 13.1389 16.2221 13.1389 15.75 13.375Z"
           fill="white" />
       </svg>
-      Date
+      <date id="date-display"></date>
     </div>
     <div id="hello-container">
       <div id="avatar">
@@ -65,15 +65,15 @@
                   <div class="task-icon-container">
                     <svg class="task-icon" width="32" height="32" viewBox="0 0 24 24" fill="none"
                       xmlns="http://www.w3.org/2000/svg">
-                      <path d="M15 12L9 12" stroke="black" stroke-width="2" stroke-linejoin="round" />
+                      <path d="M15 12L9 12" stroke="white" stroke-width="2" stroke-linejoin="round" />
                       <path
                         d="M15.8418 8.63261C15.9412 8.23533 16.2252 7.90991 16.6054 7.75782V7.75782C17.8216 7.27135 19.1784 7.27135 20.3946 7.75782V7.75782C20.7748 7.90991 21.0588 8.23533 21.1582 8.63261L21.2036 8.81441C21.7265 10.906 21.7265 13.094 21.2036 15.1856L21.1582 15.3674C21.0588 15.7647 20.7748 16.0901 20.3946 16.2422V16.2422C19.1784 16.7287 17.8216 16.7287 16.6054 16.2422V16.2422C16.2252 16.0901 15.9412 15.7647 15.8418 15.3674L15.7964 15.1856C15.2735 13.094 15.2735 10.906 15.7964 8.81441L15.8418 8.63261Z"
                         stroke="#FF8624" stroke-width="2" stroke-linejoin="round" />
                       <path
                         d="M2.84185 8.63261C2.94117 8.23533 3.22522 7.90991 3.60544 7.75782V7.75782C4.82164 7.27135 6.17836 7.27135 7.39456 7.75782V7.75782C7.77478 7.90991 8.05883 8.23533 8.15815 8.63261L8.2036 8.81441C8.72649 10.906 8.72649 13.094 8.2036 15.1856L8.15815 15.3674C8.05883 15.7647 7.77478 16.0901 7.39456 16.2422V16.2422C6.17836 16.7287 4.82164 16.7287 3.60544 16.2422V16.2422C3.22522 16.0901 2.94117 15.7647 2.84185 15.3674L2.7964 15.1856C2.27351 13.094 2.27351 10.906 2.7964 8.81441L2.84185 8.63261Z"
                         stroke="#FF8624" stroke-width="2" stroke-linejoin="round" />
-                      <path d="M22 12H23" stroke="black" stroke-width="2" stroke-linejoin="round" />
-                      <path d="M1 12H2" stroke="black" stroke-width="2" stroke-linejoin="round" />
+                      <path d="M22 12H23" stroke="white" stroke-width="2" stroke-linejoin="round" />
+                      <path d="M1 12H2" stroke="white" stroke-width="2" stroke-linejoin="round" />
                     </svg>
                   </div>
                   <%= task %>
@@ -107,7 +107,7 @@
                       <path
                         d="M6.47368 10.3158C6.80978 9.47555 7.47555 8.80978 8.31579 8.47369V8.47369C10.6808 7.52767 13.3192 7.52767 15.6842 8.47369V8.47369C16.5244 8.80978 17.1902 9.47555 17.5263 10.3158V10.3158C18.4723 12.6808 18.4723 15.3192 17.5263 17.6842V17.6842C17.1902 18.5244 16.5244 19.1902 15.6842 19.5263V19.5263C13.3192 20.4723 10.6808 20.4723 8.31579 19.5263V19.5263C7.47555 19.1902 6.80978 18.5244 6.47368 17.6842V17.6842C5.52767 15.3192 5.52767 12.6808 6.47368 10.3158V10.3158Z"
                         stroke="#FF8624" stroke-width="2" stroke-linejoin="round" />
-                      <path d="M12 8V7.82843C12 6.01742 12.7194 4.28058 14 3V3" stroke="black" stroke-width="2"
+                      <path d="M12 8V7.82843C12 6.01742 12.7194 4.28058 14 3V3" stroke="white" stroke-width="2"
                         stroke-linejoin="round" />
                     </svg>
                   </div>
@@ -141,9 +141,12 @@
     <p class="d-inline-flex gap-1">
       <button class="btn index-btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample"
         aria-expanded="false" aria-controls="collapseExample">
-        <svg class="get-started-icon" width="32" height="32"   viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9.40994 4.60259L9.56599 4.6416C13.0626 5.51575 16.1078 7.66179 18.1071 10.6607C18.6478 11.4718 18.6478 12.5285 18.1071 13.3396C16.1078 16.3384 13.0626 18.4845 9.56599 19.3586L9.40994 19.3976C8.07899 19.7304 6.7303 18.9212 6.39756 17.5902L6.20004 16.8001C5.41216 13.6486 5.41216 10.3516 6.20004 7.20011L6.39756 6.41001C6.7303 5.07906 8.07899 4.26985 9.40994 4.60259Z" fill="white"/>
-          </svg>          
+        <svg class="get-started-icon" width="32" height="32" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M9.40994 4.60259L9.56599 4.6416C13.0626 5.51575 16.1078 7.66179 18.1071 10.6607C18.6478 11.4718 18.6478 12.5285 18.1071 13.3396C16.1078 16.3384 13.0626 18.4845 9.56599 19.3586L9.40994 19.3976C8.07899 19.7304 6.7303 18.9212 6.39756 17.5902L6.20004 16.8001C5.41216 13.6486 5.41216 10.3516 6.20004 7.20011L6.39756 6.41001C6.7303 5.07906 8.07899 4.26985 9.40994 4.60259Z"
+            fill="white" />
+        </svg>
       </button>
     </p>
     <div class="collapse" id="collapseExample">
@@ -367,59 +370,65 @@
 
   <div id="training-plan">Training Plan & AI Recommendation</div>
   <div id="training-card-container" class="card-container carousel slide pointer-event" data-bs-ride="carousel">
-    <div id="ai-rec-initiate" class="training-card">
-      <!-- Card 1 content -->
-      <h2 class="training-plan-text">Get Started</h2>   
-      <div id="start-training-plan">
-        <svg class="start-training-icon" width="32" height="32"   viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9.40994 4.60259L9.56599 4.6416C13.0626 5.51575 16.1078 7.66179 18.1071 10.6607C18.6478 11.4718 18.6478 12.5285 18.1071 13.3396C16.1078 16.3384 13.0626 18.4845 9.56599 19.3586L9.40994 19.3976C8.07899 19.7304 6.7303 18.9212 6.39756 17.5902L6.20004 16.8001C5.41216 13.6486 5.41216 10.3516 6.20004 7.20011L6.39756 6.41001C6.7303 5.07906 8.07899 4.26985 9.40994 4.60259Z" fill="white"/>
-          </svg>          
-      </div>   
-    </div>
-    <div class="training-card individual-plan">
-      <!-- Card 2 content -->
-      <h2>Chest Exercise</h2>
-      <div id="chest" class="body-part">
+      <div id="ai-rec-initiate" class="training-card">
+        <!-- Card 1 content -->
+        <h2 class="training-plan-text">Get Started</h2>
+        <div id="start-training-plan">
+          <svg class="start-training-icon" width="32" height="32" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M9.40994 4.60259L9.56599 4.6416C13.0626 5.51575 16.1078 7.66179 18.1071 10.6607C18.6478 11.4718 18.6478 12.5285 18.1071 13.3396C16.1078 16.3384 13.0626 18.4845 9.56599 19.3586L9.40994 19.3976C8.07899 19.7304 6.7303 18.9212 6.39756 17.5902L6.20004 16.8001C5.41216 13.6486 5.41216 10.3516 6.20004 7.20011L6.39756 6.41001C6.7303 5.07906 8.07899 4.26985 9.40994 4.60259Z"
+              fill="white" />
+          </svg>
+        </div>
       </div>
-    </div>
-    <div class="training-card individual-plan">
-      <!-- Card 2 content -->
-      <h2>Back Exercise</h2>
-      <div id="back" class="body-part"></div>
-    </div>
-    <div class="training-card individual-plan">
-      <!-- Card 2 content -->
-      <h2>Light Cardio</h2>
-      <div id="light-cardio" class="body-part"></div>
-    </div>
+      <div class="training-card individual-plan">
+        <!-- Card 2 content -->
+        <h2>Chest Exercise</h2>
+        <div id="chest" class="body-part">
+        </div>
+      </div>
+      <div class="training-card individual-plan">
+        <!-- Card 2 content -->
+        <h2>Back Exercise</h2>
+        <div id="back" class="body-part"></div>
+      </div>
+      <div class="training-card individual-plan">
+        <!-- Card 2 content -->
+        <h2>Light Cardio</h2>
+        <div id="light-cardio" class="body-part"></div>
+      </div>
 
-    <div class="training-card individual-plan">
-      <!-- Card 2 content -->
-      <h2>Intensive Cardio</h2>
-      <div id="intensive-cardio" class="body-part"></div>
-    </div>
-    <div class="training-card individual-plan">
-      <!-- Card 2 content -->
-      <h2>Boxing - Basics</h2>
-      <div id="basic-boxing" class="body-part"></div>
-    </div>
-    <div class="training-card individual-plan">
-      <!-- Card 2 content -->
-      <h2>Agility Training</h2>
-      <div id="agility" class="body-part"></div>
-    </div>
+      <div class="training-card individual-plan">
+        <!-- Card 2 content -->
+        <h2>Intensive Cardio</h2>
+        <div id="intensive-cardio" class="body-part"></div>
+      </div>
+      <div class="training-card individual-plan">
+        <!-- Card 2 content -->
+        <h2>Boxing - Basics</h2>
+        <div id="basic-boxing" class="body-part"></div>
+      </div>
+      <div class="training-card individual-plan">
+        <!-- Card 2 content -->
+        <h2>Agility Training</h2>
+        <div id="agility" class="body-part"></div>
+      </div>
   </div>
 
   <div id="diet-nutrition">Diet & Nutrition</div>
   <div id="diet-card-container" class="card-container carousel slide pointer-event" data-bs-ride="carousel">
     <div id="diet-rec-initiate" class="training-card">
       <!-- Card 1 content -->
-      <h2 class="training-plan-text">Get Started</h2>   
+      <h2 class="training-plan-text">Get Started</h2>
       <div id="start-diet-plan">
-        <svg class="start-training-icon" width="32" height="32"   viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9.40994 4.60259L9.56599 4.6416C13.0626 5.51575 16.1078 7.66179 18.1071 10.6607C18.6478 11.4718 18.6478 12.5285 18.1071 13.3396C16.1078 16.3384 13.0626 18.4845 9.56599 19.3586L9.40994 19.3976C8.07899 19.7304 6.7303 18.9212 6.39756 17.5902L6.20004 16.8001C5.41216 13.6486 5.41216 10.3516 6.20004 7.20011L6.39756 6.41001C6.7303 5.07906 8.07899 4.26985 9.40994 4.60259Z" fill="white"/>
-          </svg>          
-      </div>   
+        <svg class="start-training-icon" width="32" height="32" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M9.40994 4.60259L9.56599 4.6416C13.0626 5.51575 16.1078 7.66179 18.1071 10.6607C18.6478 11.4718 18.6478 12.5285 18.1071 13.3396C16.1078 16.3384 13.0626 18.4845 9.56599 19.3586L9.40994 19.3976C8.07899 19.7304 6.7303 18.9212 6.39756 17.5902L6.20004 16.8001C5.41216 13.6486 5.41216 10.3516 6.20004 7.20011L6.39756 6.41001C6.7303 5.07906 8.07899 4.26985 9.40994 4.60259Z"
+            fill="white" />
+        </svg>
+      </div>
     </div>
     <div class="training-card individual-plan">
       <!-- Card 2 content -->

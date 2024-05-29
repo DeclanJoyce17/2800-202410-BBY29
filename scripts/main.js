@@ -26,3 +26,21 @@ document.addEventListener('DOMContentLoaded', () => {
   startAIChatBtn.addEventListener('click', () => {
     window.location.href = '/aichat-loading';
   })
+
+  const startTrainingPlanBtn = document.getElementById('start-training-plan');
+  startTrainingPlanBtn.addEventListener('click', () => {
+    window.location.href = '/ai-training-questions';
+  });
+
+  const startTaskBtnGroup = document.querySelectorAll('.view-task');
+  startTaskBtnGroup.forEach(button => {
+   button.addEventListener('click', () => {
+    window.location.href = '/body-motion-capture';
+  });
+});
+
+// Display date
+const now = new Date();
+const dayOfWeek = now.toLocaleString('en-US', {weekday: 'long'});
+const dateString = `${dayOfWeek}, ${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+document.getElementById('date-display').innerHTML = dateString;
