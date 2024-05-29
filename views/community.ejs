@@ -16,7 +16,7 @@
                     <button class="addPost">Add Post</button>
                 </a>
             </span>
-            
+
             <!-- Tag Filter -->
             <form method="GET" action="/community" class="filter">
                 <label for="tag">Filter:</label>
@@ -28,7 +28,7 @@
             </form>
         </div>
         <div class="posts">
-            <% posts.reverse().forEach(post=> { %>
+            <% posts.forEach(post=> { %>
                 <div class="post">
                     <div class="profile">
                         <img src="<%= post.profileImage %>" alt="Profile Image">
@@ -74,7 +74,7 @@
         <script
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap"
             async defer>
-            </script>
+        </script>
 
         <!-- bottom-to-top button -->
         <script>
@@ -126,20 +126,20 @@
 
                 modal.style.display = 'block';
                 setTimeout(() => {
-                    modal.classList.add('show'); 
+                    modal.classList.add('show');
                     modalContent.classList.add('show');
-                }, 10); 
+                }, 10);
 
                 document.getElementById('confirmBtn').onclick = function () {
                     modalContent.classList.remove('show');
                     setTimeout(() => {
                         event.target.closest('form').submit();
-                    }, 500); 
+                    }, 500);
                 };
 
                 document.getElementById('cancelBtn').onclick = function () {
-                    modalContent.classList.remove('show'); 
-                    modal.style.display = 'none'; 
+                    modalContent.classList.remove('show');
+                    modal.style.display = 'none';
                 };
             }
         </script>
@@ -153,5 +153,6 @@
                 <button id="cancelBtn">No</button>
             </div>
         </div>
+
 
         <%- include("templates/footer") %>

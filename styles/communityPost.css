@@ -55,9 +55,7 @@ button {
     margin-top: 10px;
     width: 100%;
     height: 400px;
-    /* Increase height */
     border-radius: 10px;
-    /* Add border radius */
 }
 
 .preview {
@@ -103,40 +101,30 @@ button {
 /* Ensure responsiveness */
 @media (max-width: 430px) {
 
-    /* iPhone 14 Pro Max width */
     h1 {
         font-size: 4rem;
-        /* Adjust font size */
     }
 
     textarea {
         font-size: 1.5rem;
-        /* Adjust font size */
         padding: 12px;
-        /* Adjust padding */
     }
 
     select, button {
         font-size: 2rem;
-        /* Adjust font size */
         padding: 12px;
-        /* Adjust padding */
     }
 
     .go-back {
         font-size: 1.5rem;
-        /* Adjust font size */
         padding: 8px;
-        /* Adjust padding */
     }
 
     #map {
         height: 300px;
-        /* Adjust height */
     }
 
     .preview img {
         max-width: 130px;
-        /* Adjust image size */
     }
 }

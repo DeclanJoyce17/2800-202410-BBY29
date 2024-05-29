@@ -1,4 +1,3 @@
-
 "use strict";
 // Load environment variables from .env file
 require('dotenv').config();
@@ -32,13 +31,18 @@ const app = express();
 const expireTime = 60 * 60 * 1000;
 app.set('view engine', 'ejs')
 
-// Load environment variables from .env file
-require('dotenv').config();
-
 const port = process.env.PORT || 3000;
 const speechClient = new SpeechClient();
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
+
+// For upload imgs in community page
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+	secure: true
+});
 
 app.use(express.json());
 
@@ -1297,7 +1301,7 @@ async function connectToMongo() {
 			// Get the page number from query parameter or default to 1
 			const page = parseInt(req.query.page) || 1;
 			// Define how many posts per page
-			const postsPerPage = 5;
+			const postsPerPage = 100;
 			// Get the tag filter from query parameter
 			const tag = req.query.tag || 'all';
 
@@ -1315,6 +1319,7 @@ async function connectToMongo() {
 				const totalPages = Math.ceil(totalPosts / postsPerPage);
 
 				const posts = await postsCollection.find(filter)
+				    .sort({ createdAt: -1 })
 					// Skip the posts of previous pages
 					.skip((page - 1) * postsPerPage)
 					// Limit the number of posts to display
@@ -1386,6 +1391,8 @@ async function connectToMongo() {
 				if (req.files && req.files.length > 0) {
 					imageUrls = await uploadImagesToCloudinary(req.files);
 				}
+
+				console.log("Image URLS: " + imageUrls)
 
 				const username = user.username;
 
