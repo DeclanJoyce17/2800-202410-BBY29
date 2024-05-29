@@ -1835,6 +1835,7 @@ async function connectToMongo() {
 
 	} catch (err) {
 		console.error("Connection error:", err);
+		res.render('404');
 		process.exit(1); // Exit with error if connection fails
 	}
 }
