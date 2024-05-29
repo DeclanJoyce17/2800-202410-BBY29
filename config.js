@@ -1,5 +1,4 @@
 "use strict";
-// Load environment variables from .env file
 require('dotenv').config();
 const fs = require("fs");
 const express = require('express');
@@ -1289,7 +1288,7 @@ async function connectToMongo() {
 			}
 		});
 
-		/****************** img community posts *************************/
+		/****************** community posts *************************/
 
 		// Define the route to render the postImgtest.ejs file
 		app.get('/community', async (req, res) => {
@@ -1300,33 +1299,37 @@ async function connectToMongo() {
 			const userId = req.session.userId;
 			// Get the page number from query parameter or default to 1
 			const page = parseInt(req.query.page) || 1;
-			// Define how many posts per page
-			const postsPerPage = 100;
+			const limit = parseInt(req.query.limit) || 5;
 			// Get the tag filter from query parameter
 			const tag = req.query.tag || 'all';
 
 			let filter = {};
 
 			if (tag !== 'all') {
+				console.log(tag);
 				filter.tags = tag;
+				console.log(filter);
 			}
 
 			try {
 				const postsCollection = db.collection('posts');
-				// Get the total number of posts
-				const totalPosts = await postsCollection.countDocuments(filter);
-				// Calculate total number of pages
-				const totalPages = Math.ceil(totalPosts / postsPerPage);
 
 				const posts = await postsCollection.find(filter)
 				    .sort({ createdAt: -1 })
 					// Skip the posts of previous pages
-					.skip((page - 1) * postsPerPage)
+					.skip((page - 1) * limit)
 					// Limit the number of posts to display
-					.limit(postsPerPage)
+					.limit(limit)
 					.toArray();
 
-				res.render('community', { posts, userId, page, totalPages, tag, cloudinary: cloudinary });
+				// Preprocess image URLs
+				const imageUrls = posts.map(post => post.imageUrls.map(url => cloudinary.url(url, { width: 1080, height: 1080, crop: 'fill' })));
+
+				if (req.query.json) {
+					res.json({ posts, imageUrls });
+				} else {
+					res.render('community', { posts, imageUrls, userId, tag });
+				}
 			} catch (error) {
 				console.error('Error retrieving posts:', error);
 				res.status(500).send('Failed to retrieve posts.');

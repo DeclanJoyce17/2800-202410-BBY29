@@ -27,8 +27,10 @@
                 </select>
             </form>
         </div>
-        <div class="posts">
-            <% posts.forEach(post=> { %>
+
+        <!-- initial posts - pages has content immediately -->
+        <div class="posts" id="posts">
+            <% posts.forEach((post, postIndex) => { %>
                 <div class="post">
                     <div class="profile">
                         <img src="<%= post.profileImage %>" alt="Profile Image">
@@ -37,36 +39,104 @@
                         </span>
                         <div class="actions">
                             <span class="tags">
-                                <% post.tags.forEach(tag=> { %>
+                                <% post.tags.forEach(tag => { %>
                                     <span class="tag">
                                         <%= tag %>
                                     </span>
-                                    <% }) %>
+                                <% }) %>
                             </span>
-                            <% if (String(post.userId)===String(userId)) { %>
+                            <% if (String(post.userId) === String(userId)) { %>
                                 <form action="/community/delete/<%= post._id %>" method="POST" class="delete">
                                     <button type="submit" onclick="confirmDelete(event)">Delete</button>
                                 </form>
-                                <% } %>
+                            <% } %>
                         </div>
                     </div>
                     <p class="text">
                         <%= post.text %>
                     </p>
                     <div class="image">
-                        <% post.imageUrls.forEach(url=> { %>
-                            <img src="<%= cloudinary.url(url, { width: 1080, height: 1080, crop: 'fill' }) %>"
-                                alt="Image">
-                            <% }) %>
+                        <% imageUrls[postIndex].forEach(url => { %>
+                            <img src="<%= url %>" alt="Image">
+                        <% }) %>
                     </div>
                     <% if (post.location) { %>
-                        <div class="map" data-latitude="<%= post.location.latitude %>"
-                            data-longitude="<%= post.location.longitude %>" style="height: 300px; width: 100%;"></div>
-
-                        <% } %>
+                        <div class="map" data-latitude="<%= post.location.latitude %>" data-longitude="<%= post.location.longitude %>" style="height: 300px; width: 100%;"></div>
+                    <% } %>
                 </div>
-                <% }) %>
+            <% }) %>
         </div>
+        
+        <!-- Dynamic Loading - additional posts -->
+        <script>
+            let currentPage = 1;
+            const limit = 5; // only load 5 posts at a time
+            let isLoading = false;
+            const userId = "<%= userId %>"; // Embedding userId from server-side
+            const tag = "<%= tag %>";
+        
+            async function loadMorePosts() {
+                if (isLoading) return;
+                isLoading = true;
+                currentPage++;
+                
+                try {
+                    const request = `/community?tag=${tag}&page=${currentPage}&limit=${limit}&json=true`
+                    const response = await fetch(request);
+                    console.log(request);
+                    const { posts, imageUrls } = await response.json();
+                    
+                    if (posts.length === 0) {
+                        window.removeEventListener('scroll', handleScroll);
+                        return;
+                    }
+                    
+                    const postsContainer = document.getElementById('posts');
+                    posts.forEach((post, postIndex) => {
+                        const postElement = document.createElement('div');
+                        postElement.classList.add('post');
+                        
+                        postElement.innerHTML = `
+                            <div class="profile">
+                                <img src="${post.profileImage}" alt="Profile Image">
+                                <span class="username">${post.username}</span>
+                                <div class="actions">
+                                    <span class="tags">
+                                        ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                    </span>
+                                    ${String(post.userId) === String(userId) ? `
+                                        <form action="/community/delete/${post._id}" method="POST" class="delete">
+                                            <button type="submit" onclick="confirmDelete(event)">Delete</button>
+                                        </form>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <p class="text">${post.text}</p>
+                            <div class="image">
+                                ${imageUrls[postIndex].map(url => `<img src="${url}" alt="Image">`).join('')}
+                            </div>
+                            ${post.location ? `
+                                <div class="map" data-latitude="${post.location.latitude}" data-longitude="${post.location.longitude}" style="height: 300px; width: 100%;"></div>
+                            ` : ''}
+                        `;
+                        postsContainer.appendChild(postElement);
+                    });
+                } catch (error) {
+                    console.error('Error loading more posts:', error);
+                } finally {
+                    isLoading = false;
+                }
+            }
+            
+            // lazy loading of post
+            function handleScroll() {
+                if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+                    loadMorePosts();
+                }
+            }
+        
+            window.addEventListener('scroll', handleScroll);
+        </script>
 
         <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
 
