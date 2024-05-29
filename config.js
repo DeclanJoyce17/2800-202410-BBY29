@@ -1262,11 +1262,18 @@ async function connectToMongo() {
 			const userCollection = db.collection('users');
 			const result = await userCollection.find({ email: req.session.email }).project({ username: 1, user_type: 1 }).toArray();
 			req.session.user_type = result[0].user_type;
-			console.log(req.session.userId);
 			const uploadSuccess = req.session.uploadSuccess;
+			const uploadError = req.session.uploadError;
 			req.session.uploadSuccess = false; // Reset the flag immediately
-			console.log("user type: " + req.session.user_type);
-			res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
+			req.session.uploadError = null; // Reset the error message immediately
+			res.render('profile', { 
+				userID: req.session.userId, 
+				type: req.session.user_type, 
+				username: req.session.username, 
+				email: req.session.email, 
+				uploadSuccess: uploadSuccess, 
+				uploadError: uploadError 
+			});
 		});
 
 		// Route to upload profile images
@@ -1274,6 +1281,13 @@ async function connectToMongo() {
 			if (!req.file) {
 				return res.status(400).send('No file uploaded.');
 			}
+
+			const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+			if (!allowedMimeTypes.includes(req.file.mimetype)) {
+				req.session.uploadError = 'Invalid file type. Only JPG, PNG, and GIF files are allowed.';
+				return res.redirect('/profile');
+			}
+			
 			try {
 				console.log("session user id: " + req.session.userId);
 				const userId = req.session.userId;
@@ -1578,7 +1592,6 @@ async function connectToMongo() {
 				const userId = req.session.userId;
 				const filename = req.file.originalname;
 				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
-				// Reset the flag after rendering
 				req.session.uploadSuccess = true;
 				res.redirect('/profile');
 			} catch (error) {
