@@ -10,33 +10,40 @@ body {
 .header {
     position: relative;
     background-color: #FF8624;
-    color: #fff;
-    padding: 20px;
+    padding: 0px;
+    margin: 0px;
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
     height : 100px;
+    width: 105%;
+    left: -10px;
     /* height: 130px; *--> AI page */
     box-shadow: 0 2px 4px rgba(225, 97, 18, 0.961);
 }
 
 .headerTitle {
+    padding-top: 25px;
     text-align: center;
     font-size: 24px;
     font-weight: bold;
+    margin-bottom: 0px;
+    color: white;
 }
 
 #go-back {
     position: absolute;
-    background-color:#f5f5f5;
-    color:#FF8624;
-    opacity: 0.4;
+    background-color:#FF8624;
+    color: white;
+    opacity: 0.9;
     border-radius: 20px;
     font-size: 20px;
-    border: none; 
+    border: none;
+    left: 20px;
 }
 
-.go-back:hover {
-    color: #ffcc00; 
+#go-back:hover {
+    color: white;
+    background-color: white;
     cursor: pointer;
 }
 
@@ -112,4 +119,9 @@ a {
     margin-top: 20px;
     font-size: 12px;
     color: #aaa;
+}
+
+.alert-info {
+    padding-top: 10px;
+    height: 60px;
 }

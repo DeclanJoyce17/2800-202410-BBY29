@@ -7,11 +7,18 @@
 
     <div class="login bg-light">
         <br>
-        <form action="/changeUsername" method="POST" class="index-form center">
-            <h1>New Username</h1>
-            <input type="text" name="username" placeholder="Username">
-            <button type="submit" class="index-btn">Confirm</button>
-        </form>
-        <br>
+        <% if (issue==true) { %>
+            <div class="alert alert-danger" role="alert">
+                <h1>Invalid Username</h1>
+            </div>
+            <% } %>
+                <form action="/changeUsername" method="POST" class="index-form center">
+                    <h1>New Username</h1>
+                    <h5>Must be between 8-20 characters</h5>
+                    <h5>No spaces or special characters</h5>
+                    <input type="text" name="username" placeholder="Username">
+                    <button type="submit" class="index-btn">Confirm</button>
+                </form>
+                <br>
     </div>
     <%- include("templates/end") %>

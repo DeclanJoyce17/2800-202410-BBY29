@@ -1282,7 +1282,7 @@ async function connectToMongo() {
 			const uploadSuccess = req.session.uploadSuccess;
 			req.session.uploadSuccess = false; // Reset the flag immediately
 			console.log("user type: " + req.session.user_type);
-			res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess });
+			res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: false });
 		});
 
 		// Route to upload profile images
@@ -1477,7 +1477,7 @@ async function connectToMongo() {
 
 		//ChangeEmail Page
 		app.get('/changeEmail', sessionValidation, async (req, res) => {
-			res.render('changeEmail');
+			res.render('changeEmail', { issue: false });
 		});
 
 		app.post('/changeEmail', sessionValidation, async (req, res) => {
@@ -1486,11 +1486,12 @@ async function connectToMongo() {
 
 			const schema = Joi.object(
 				{
-					email: Joi.string().max(35).required()
+					email: Joi.string().max(40).required()
 				}
 			);
 
-			if (schema.validate({ email }) != null) {
+			const { error } = schema.validate({ email });
+			if (!(error)) {
 				const updateDoc = {
 					$set: {
 						email: email
@@ -1500,18 +1501,19 @@ async function connectToMongo() {
 				const usersCollection = db.collection('users');
 				await usersCollection.updateOne(filter, updateDoc);
 				req.session.email = email;
-
-				res.redirect('profile');
+				const uploadSuccess = req.session.uploadSuccess;
+				req.session.uploadSuccess = false; // Reset the flag immediately
+				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true });
 			} else {
 
-				res.redirect('changeEmail');
+				res.render('changeEmail', { issue: true });
 			}
 
 		});
 
 		//ChangePassword Page
 		app.get('/changePassword', sessionValidation, async (req, res) => {
-			res.render('changePassword');
+			res.render('changePassword', { issue: false });
 		});
 
 		app.post('/changePassword', sessionValidation, async (req, res) => {
@@ -1523,8 +1525,8 @@ async function connectToMongo() {
 					password: Joi.string().min(8).max(20).required()
 				}
 			);
-
-			if (schema.validate({ password }) != null) {
+			const { error } = schema.validate({ password });
+			if (!error) {
 				const updateDoc = {
 					$set: {
 						password: await bcrypt.hash(password, saltRounds)
@@ -1533,17 +1535,17 @@ async function connectToMongo() {
 
 				const usersCollection = db.collection('users');
 				await usersCollection.updateOne(filter, updateDoc);
-
-				res.redirect('profile');
+				const uploadSuccess = req.session.uploadSuccess;
+				req.session.uploadSuccess = false; // Reset the flag immediately
+				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true });
 			} else {
-
-				res.redirect('changePassword');
+				res.render('changePassword', { issue: true });
 			}
 
 		});
 
 		app.get('/changeUsername', sessionValidation, async (req, res) => {
-			res.render('changeUsername');
+			res.render('changeUsername', { issue: false });
 		});
 
 		app.post('/changeUsername', sessionValidation, async (req, res) => {
@@ -1552,11 +1554,13 @@ async function connectToMongo() {
 
 			const schema = Joi.object(
 				{
-					username: Joi.string().alphanum.min(8).max(20).required()
+					username: Joi.string().alphanum().min(8).max(20).required()
 				}
 			);
 
-			if (schema.validate({ username }) != null) {
+			const { error } = schema.validate({ username });
+			console.log(error);
+			if (!(error)) {
 				const updateDoc = {
 					$set: {
 						username: username
@@ -1566,11 +1570,11 @@ async function connectToMongo() {
 				const usersCollection = db.collection('users');
 				await usersCollection.updateOne(filter, updateDoc);
 				req.session.username = username;
-
-				res.redirect('profile');
+				const uploadSuccess = req.session.uploadSuccess;
+				req.session.uploadSuccess = false; // Reset the flag immediately
+				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true });
 			} else {
-
-				res.redirect('changeUsername');
+				res.render('changeUsername', { issue: true });
 			}
 
 		});
