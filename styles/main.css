@@ -557,12 +557,13 @@ footer {
     border-radius: 20px;
     background-color: rgb(255, 255, 255);
     opacity: 0.4;
+    z-index: -0;
 }
 
 #notification-icon {
-    width:60px;
-    height:60px;
-        
+    position: absolute;
+    right: 35px;
+    top: 85px;
 }
 
 
