@@ -144,3 +144,38 @@ function drawBodyLines(keypoints) {
     }
   }
 }
+
+// Display the instruction for todo tasks on main page
+document.addEventListener('DOMContentLoaded', () => {
+  // Function to handle appending the instructionDiv
+  const handleMainAvailable = () => {
+    const main = document.querySelector('main');
+    const instructionDiv = document.querySelector('#instruction');
+    const todoInst = JSON.parse(localStorage.getItem('responseData'));
+    const mediaDisplay = document.querySelector('#media-display');
+
+    if (main && instructionDiv && todoInst) {
+      console.log('main', main);
+      console.log('ins', instructionDiv);
+      console.log('todo task', todoInst);
+
+      document.getElementById('instruction-text').innerHTML = todoInst.replace(/\n/g, '<br>');
+      main.appendChild(mediaDisplay);
+      main.appendChild(instructionDiv);
+
+      // Disconnect the observer once the main element is found and handled
+      observer.disconnect();
+    }
+  };
+
+  // This code is written by chatGPT to achieve the desired result above
+  // Create an observer to watch for changes in the DOM
+  const observer = new MutationObserver(() => {
+    if (document.querySelector('main')) {
+      handleMainAvailable();
+    }
+  });
+
+  // Start observing the document body for added nodes
+  observer.observe(document.body, { childList: true, subtree: true });
+});
