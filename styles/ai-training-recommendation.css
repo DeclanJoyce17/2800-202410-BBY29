@@ -135,24 +135,6 @@ footer {
     height: 50px;
 }
 
-
-
-
-#video-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
-
-#video-background video {
-    object-fit: cover;
-    width: 100%;
-    height: 150%;
-}
-
 #audio-container {
     display: none;
 }
@@ -220,14 +202,26 @@ footer {
     margin: 0 20px;
 }
 
-#weight-ai {
-    width: 70px;
-    height: 90px;
+.icon-container {
+    background-color: #212121;
+}
+
+.icon-container.active {
+    background-color: #FF8624;
+    opacity: 1;
+}
+
+.icon-container.active path {
+    stroke: white;
+    fill: white;
+}
+
+#weightlift {
+    width: 65px;
+    height: 80px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
     position: absolute;
     bottom: 40px;
-    opacity: 0.6;
 }
 
 #weight-ai-icon {
@@ -238,14 +232,12 @@ footer {
 }
 
 #walking {
-    width: 70px;
-    height: 90px;
+    width: 65px;
+    height: 80px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
     position: absolute;
     bottom: 40px;
     left: 80px;
-    opacity: 0.6;
 }
 
 #walking-icon {
@@ -256,10 +248,9 @@ footer {
 }
 
 #running {
-    width: 70px;
-    height: 90px;
+    width: 65px;
+    height: 80px;
     border-radius: 20px;
-    background-color: #FF8624;
     position: absolute;
     bottom: 40px;
     left: 160px;
@@ -279,14 +270,12 @@ footer {
   }
 
 #cycling {
-    width: 70px;
-    height: 90px;
+    width: 65px;
+    height: 80px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
     position: absolute;
     bottom: 40px;
     left: 240px;
-    opacity: 0.6;
 }
 
 #cycling-icon {
@@ -297,14 +286,12 @@ footer {
 }
 
 #hiking {
-    width: 70px;
-    height: 90px;
+    width: 65px;
+    height: 80px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
     position: absolute;
     bottom: 40px;
     left: 320px;
-    opacity: 0.6;
 }
 
 #hiking-icon {
@@ -315,14 +302,12 @@ footer {
 }
 
 #karate {
-    width: 70px;
-    height: 90px;
+    width: 65px;
+    height: 80px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
     position: absolute;
     bottom: 40px;
     left: 400px;
-    opacity: 0.6;
 }
 
 #karate-icon {
@@ -332,15 +317,29 @@ footer {
     top: 25%;
 }
 
-#skating {
-    width: 70px;
-    height: 90px;
+#cardio {
+    width: 65px;
+    height: 80px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
     position: absolute;
     bottom: 40px;
     left: 480px;
-    opacity: 0.6;
+}
+
+#cardio-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 25%;
+}
+
+#skating {
+    width: 65px;
+    height: 80px;
+    border-radius: 20px;
+    position: absolute;
+    bottom: 40px;
+    left: 560px;
 
 }
 
@@ -352,14 +351,12 @@ footer {
 }
 
 #other {
-    width: 70px;
-    height: 90px;
+    width: 65px;
+    height: 80px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
     position: absolute;
     bottom: 40px;
-    left: 560px;
-    opacity: 0.6;
+    left: 640px;
 
 }
 
@@ -470,19 +467,52 @@ h2 {
 #ai-assistant {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     margin: 30px 0;
-    width: 250px;
-    height: 250px;
+    width: 90%;
+    height: 160px;
     border-radius: 100px;
+    border: black solid 1px;
+    border-radius: 50px;
+    padding: 20px;
 }
 
 #ai-assistant video {
-    width: 180px; /* Set desired width */
-    height: 200px; /* Set desired height */
+    width: 120px; /* Set desired width */
+    height: 160px; /* Set desired height */
     border-radius: 120px;
 }
 
 #anything-else {
     margin-top: 10px;
+}
+
+#action {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    margin: 20px;
+}
+
+#save {
+    border: #FF8624 solid 2px;
+    width: 200px;
+    height: 50px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 20px;
+}
+
+#cancel {
+    border: #FF8624 solid 2px;
+    width: 200px;
+    height: 50px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 20px;
 }

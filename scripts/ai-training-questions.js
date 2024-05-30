@@ -138,19 +138,20 @@ topicGroup.forEach(topic => {
     topic.addEventListener('click', () => {
             topic.classList.toggle('active');
             updateTextContent();
+            saveToggledDivs();
     });
 });
 
 // Save the value for the topic to toggle the topic in AI recommendation page
-// Function to save toggled divs' inner HTML content into local storage
 function saveToggledDivs() {
     const activeDivs = document.querySelectorAll('.icon-container.active');
     const contentArray = [];
 
     activeDivs.forEach(div => {
-        contentArray.push(div.innerHTML);
+        contentArray.push(div.querySelector('.topic-text').innerHTML);
     });
 
+    console.log('saved content', activeDivs);
     // Save the content array into local storage
     localStorage.setItem('toggledDivsContent', JSON.stringify(contentArray));
 }
