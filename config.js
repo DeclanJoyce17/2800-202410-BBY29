@@ -1,6 +1,4 @@
-
 "use strict";
-// Load environment variables from .env file
 require('dotenv').config();
 const fs = require("fs");
 const express = require('express');
@@ -15,7 +13,6 @@ const { SpeechClient } = require('@google-cloud/speech');
 const { spawn } = require('child_process');
 const sharp = require('sharp');
 const axios = require('axios');
-const textToSpeech = require('@google-cloud/text-to-speech');
 const uuid = require('uuid');
 
 const util = require('util');
@@ -33,13 +30,18 @@ const app = express();
 const expireTime = 12 * 60 * 60 * 1000;
 app.set('view engine', 'ejs')
 
-// Load environment variables from .env file
-require('dotenv').config();
-
 const port = process.env.PORT || 3000;
 const speechClient = new SpeechClient();
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
+
+// For upload imgs in community page
+cloudinary.config({
+	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+	api_key: process.env.CLOUDINARY_API_KEY,
+	api_secret: process.env.CLOUDINARY_API_SECRET,
+	secure: true
+});
 
 app.use(express.json());
 
@@ -737,7 +739,6 @@ async function connectToMongo() {
 			const { token } = req.query;
 
 			try {
-				// Check if the session token exists in MongoDB
 				const resetToken = await db.collection('passwordResetTokens').findOne({ token });
 
 				if (!resetToken) {
@@ -872,11 +873,9 @@ async function connectToMongo() {
 
 			if (!req.session.authenticated) {
 				console.log("nope");
-				res.redirect('/login');  // Redirect to login if no user session
+				res.redirect('/login');
 				return;
 			}
-			var currentTime = new Date().getTime();
-			console.log(currentTime);
 			// greeting depends on the time user logged in
 			const currentHour = new Date().getHours();
 			let greeting;
@@ -936,8 +935,6 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			const result = await usersCollection.updateOne(filter, updateDoc);
 
-			//let doc = fs.readFileSync('./html/main.html', 'utf8'); // Ensure this path is correct
-
 			async function getAndSortUsersFromDB(limit = 5) {
 				try {
 					// Only return the data we need (excluding the password field)  // Sort by points in descending order
@@ -961,10 +958,11 @@ async function connectToMongo() {
 			let fitTasks = [];
 			let dietTasks = [];
 
+
+			// Get tasks
 			try {
 				const current_user = await usersCollection.findOne({ username: req.session.username });
 
-				// Get tasks
 				fitTasks = current_user.fitTasks.map(task => task);
 
 				dietTasks = current_user.dietTasks.map(task => task);
@@ -974,14 +972,8 @@ async function connectToMongo() {
 				res.status(500).send('Failed to fetch user data');
 			}
 
-			// console.log("username: " + username);
-			// console.log("points: " + points);
-			// console.log("rank: " + rank);
-			// console.log("USERS: " + users);
-			// console.log("tasks: " + tasks);
-
+			// Pass data to the template here
 			res.render('main', {
-				// Pass data to the template here
 				username,
 				rank,
 				points,
@@ -1040,8 +1032,6 @@ async function connectToMongo() {
 					break;
 				}
 			}
-
-			//console.log(taskBankFit[temp].task);
 
 			var updateDoc;
 
@@ -1122,9 +1112,6 @@ async function connectToMongo() {
 					break;
 				}
 			}
-
-
-			//console.log(taskBankFit[temp].task);
 
 			var updateDoc;
 
@@ -1358,7 +1345,7 @@ async function connectToMongo() {
 			}
 		});
 
-		/****************** img community posts *************************/
+		/****************** community posts *************************/
 
 		// Define the route to render the postImgtest.ejs file
 		app.get('/community', async (req, res) => {
@@ -1369,32 +1356,37 @@ async function connectToMongo() {
 			const userId = req.session.userId;
 			// Get the page number from query parameter or default to 1
 			const page = parseInt(req.query.page) || 1;
-			// Define how many posts per page
-			const postsPerPage = 5;
+			const limit = parseInt(req.query.limit) || 5;
 			// Get the tag filter from query parameter
 			const tag = req.query.tag || 'all';
 
 			let filter = {};
 
 			if (tag !== 'all') {
+				console.log(tag);
 				filter.tags = tag;
+				console.log(filter);
 			}
 
 			try {
 				const postsCollection = db.collection('posts');
-				// Get the total number of posts
-				const totalPosts = await postsCollection.countDocuments(filter);
-				// Calculate total number of pages
-				const totalPages = Math.ceil(totalPosts / postsPerPage);
 
 				const posts = await postsCollection.find(filter)
+					.sort({ createdAt: -1 })
 					// Skip the posts of previous pages
-					.skip((page - 1) * postsPerPage)
+					.skip((page - 1) * limit)
 					// Limit the number of posts to display
-					.limit(postsPerPage)
+					.limit(limit)
 					.toArray();
 
-				res.render('community', { posts, userId, page, totalPages, tag, cloudinary: cloudinary });
+				// Preprocess image URLs
+				const imageUrls = posts.map(post => post.imageUrls.map(url => cloudinary.url(url, { width: 1080, height: 1080, crop: 'fill' })));
+
+				if (req.query.json) {
+					res.json({ posts, imageUrls });
+				} else {
+					res.render('community', { posts, imageUrls, userId, tag });
+				}
 			} catch (error) {
 				console.error('Error retrieving posts:', error);
 				res.status(500).send('Failed to retrieve posts.');
@@ -1423,8 +1415,7 @@ async function connectToMongo() {
 			}
 		});
 
-		// max 4 images can be uploaded
-		// Updated POST route to handle post creation
+		// Updated POST route to handle post creation - max 4 images can be uploaded
 		app.post('/communityPost/post', upload.array('images', 4), async (req, res) => {
 			console.log('POST /communityPost/post');
 
@@ -1432,24 +1423,26 @@ async function connectToMongo() {
 				return res.status(401).send('Unauthorized');
 			}
 
-			// Generate a unique postId
 			const postId = new ObjectId();
-			// Default to empty string if no text is provided
 			const text = req.body.text || "";
 			const createdAt = new Date();
-			// to authorize them to delete the post
 			const userId = req.session.userId;
 			const tags = req.body.tags ? [req.body.tags.trim()] : [];
 			const latitude = req.body.latitude || null;
 			const longitude = req.body.longitude || null;
+
+			// Check if a valid tag is selected
+			if (!tags.length || tags[0] === 'Select') {
+				return res.status(400).send('Please select a valid tag (Fitness or Diet).');
+			}
 
 			// Check if at least one field is filled
 			if (!text && (!req.files || req.files.length === 0)) {
 				return res.status(400).send('Please provide either text or images.');
 			}
 
+			// Retrieve the user details
 			try {
-				// Retrieve the user details
 				const usersCollection = db.collection('users');
 				const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
 
@@ -1459,11 +1452,12 @@ async function connectToMongo() {
 					imageUrls = await uploadImagesToCloudinary(req.files);
 				}
 
+				console.log("Image URLS: " + imageUrls)
+
 				const username = user.username;
 
-				// Find the profile image in GridFS
+				// Find the profile image in GridFS or display default image
 				const files = await bucket.find({ 'metadata.userId': userId }).toArray();
-				// Default image
 				let profileImage = '/default-avatar.jpg';
 				if (files.length > 0) {
 					profileImage = `/images/${userId}`;
@@ -1846,11 +1840,10 @@ async function connectToMongo() {
 connectToMongo().catch(console.error);
 
 
-/************************ helper functions to upload profile images ***************************/
+/************************ helper functions that handles profile images ***************************/
 
-
+// This function specifically saves profile images and ensures only one exists per user
 async function saveProfileImageToMongoDB(fileBuffer, contentType, filename, userId) {
-	// This function specifically saves profile images and ensures only one exists per user.
 	try {
 		return await saveImageToMongoDB(fileBuffer, contentType, filename, userId, 320, 320, true);
 	} catch (error) {
@@ -1860,9 +1853,10 @@ async function saveProfileImageToMongoDB(fileBuffer, contentType, filename, user
 }
 
 // Save image to MongoDB using GridFS
+// Check if a file already exists for the given userId - it it exists, replace the existing one
 async function saveImageToMongoDB(fileBuffer, contentType, filename, userId, width, height, allowOneImageOnly) {
 	try {
-		// Resize the image before uploading for profile picture
+
 		const resizedBuffer = await resizeImage(fileBuffer, width, height);
 
 		const metadata = {
@@ -1871,10 +1865,8 @@ async function saveImageToMongoDB(fileBuffer, contentType, filename, userId, wid
 		};
 
 		if (allowOneImageOnly) {
-			// Check if a file already exists for the given userId
 			const existingFiles = await bucket.find({ "metadata.userId": userId }).toArray();
 			if (existingFiles.length > 0) {
-				// Assuming there is only one image per user, replace the existing one
 				await bucket.delete(existingFiles[0]._id);
 			}
 		}
@@ -1897,10 +1889,9 @@ async function saveImageToMongoDB(fileBuffer, contentType, filename, userId, wid
 	}
 }
 
-// resize Images
+// resize images
 async function resizeImage(fileBuffer, width, height) {
 	try {
-		// Resize the image
 		const resizedBuffer = await sharp(fileBuffer)
 			.resize(width, height)
 			.toBuffer();
@@ -1913,24 +1904,10 @@ async function resizeImage(fileBuffer, width, height) {
 
 /************************ helper functions to upload community post ***************************/
 
-// async function uploadImagesToCloudinary(files) {
-// 	return Promise.all(files.map(file => {
-// 		return new Promise((resolve, reject) => {
-// 			cloudinary.uploader.upload_stream({ resource_type: 'image' }, (error, result) => {
-// 				if (error) {
-// 					reject(error);
-// 				} else {
-// 					resolve(result.secure_url);
-// 				}
-// 			}).end(file.buffer);
-// 		});
-// 	}));
-// }
-
 async function uploadImagesToCloudinary(files) {
 	return Promise.all(files.map(file => {
 		return new Promise((resolve, reject) => {
-			resizeImage(file.buffer, 1080, 1080) // Resize the image to 1080x1080
+			resizeImage(file.buffer, 1080, 1080)
 				.then(resizedBuffer => {
 					cloudinary.uploader.upload_stream({
 						resource_type: 'image'
