@@ -1028,7 +1028,7 @@ async function connectToMongo() {
 
 			var results = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, points: 1 }).toArray();
 			
-			req.session.points = result[0].points;
+			req.session.points = results[0].points;
 			res.render('main', {
 				username,
 				rank,
