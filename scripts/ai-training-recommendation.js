@@ -1,7 +1,7 @@
 const responseData = JSON.parse(localStorage.getItem('responseData'));
 console.log("recommendation: ", responseData);
 const rec = document.getElementById('ai-recommendation');
-rec.textContent = responseData.message;
+rec.innerHTML = responseData.message.replace(/\n/g, '<br>');
 
 // Convert text response to speech by sending the text content to backend which handles Google Text to Speech API requests
 
