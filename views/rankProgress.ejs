@@ -1,6 +1,78 @@
 <%- include("templates/header") %>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+    
+    .container {
+        background-color: #ffffff;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 60px;
+        width: 95%;
+        max-width: 1000px;
+        text-align: center;
+        position: relative;
+    }
+    
+    h1, h2 {
+        margin: 40px 0;
+    }
+
+    h1 {
+        font-size: 3.5em;
+        color: #333333;
+    }
+
+    h2 {
+        font-size: 3em;
+        color: #555555;
+    }
+
+    .points {
+        display: flex;
+        font-size: 3.5em;
+        color: #FF8246;
+        font-weight: bold;
+        text-align: center;
+        margin-left: 70px;
+        margin-top: 20px;
+    }
+
+    .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: #FF8246;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        padding: 15px 30px;
+        font-size: 10pt;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .back-button:hover {
+        background-color: #e55a50;
+    }
+</style>
+
+<div class="container">
+    <a href="/profile" class="back-button">Back to Profile</a>
     <h1>Rank Progress</h1>
     <h2>Current Rank: <%= rank %></h2>
-    <h2>Current Points: <%= points %></h2>
+    <h2>Current Points: <span class="points"><%= points %></span></h2>
     <h1>Points until next rank: <%= nextRank %></h1>
+</div>
+
 <%- include("templates/footer") %>
