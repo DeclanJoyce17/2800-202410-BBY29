@@ -21,11 +21,11 @@
                 <button type="submit" class="btner"><img src="/img/chatBotImg.png"></button>
             </form>
         </div>
-        
-        <!--Contents in the body tag-->
-        <img class="title" src="/img/DietLogo.png" alt="logo">
 
-       
+        <!--Contents in the body tag-->
+        <img class="titles" src="/img/DietLogo.png" alt="logo">
+
+
         <div class="container taskCards">
             <% if (noRerolls) { %>
                 <h1 class="error">Lacking Rerolls</h1>
@@ -83,8 +83,8 @@
 
         </div>
         <div>
-            <% if(boostActive > 0) { %>
+            <% if(boostActive> 0) { %>
                 <div class="boostActive">You have <%= boostActive %> minutes of boost time left.</div>
-              <% } %>
-            </div>
+                <% } %>
+        </div>
         <%- include("templates/footer") %>

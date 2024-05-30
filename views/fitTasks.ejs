@@ -21,10 +21,10 @@
                 <button type="submit" class="btner"><img src="/img/chatBotImg.png"></button>
             </form>
         </div>
-        
+
         <!--Contents in the body tag-->
-        <img class="title" src="/img/FitnessLogo.png" alt="logo">
-        
+        <img class="titles" src="/img/FitnessLogo.png" alt="logo">
+
 
         <div class="container taskCards">
 
@@ -84,8 +84,8 @@
 
         </div>
         <div>
-            <% if(boostActive > 0) { %>
+            <% if(boostActive> 0) { %>
                 <div class="boostActive">You have <%= boostActive %> minutes of boost time left.</div>
-              <% } %>
-            </div>
+                <% } %>
+        </div>
         <%- include("templates/footer") %>

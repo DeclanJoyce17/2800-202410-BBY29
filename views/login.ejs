@@ -1,4 +1,5 @@
 <%- include("templates/header") %>
+	<link rel="stylesheet" type="text/css" href="/styles/change.css" text="">
 	</head>
 
 	<div class="title" class="center">
@@ -22,9 +23,16 @@
 				<form action="/login" method="POST" class="index-form center">
 					<h1>Login</h1>
 
-					<input type="email" name="email" placeholder="Email">
-					<input type="password" name="password" placeholder="Password">
-					<button type="submit" class="index-btn">Login</button>
+
+					<% if (input==1) { %>
+						<input type="email" name="email" placeholder="Email" class="border">
+						<input type="password" name="password" placeholder="Password" class="border">
+						<% } else { %>
+							<input type="email" name="email" placeholder="Email">
+							<input type="password" name="password" placeholder="Password">
+							<% } %>
+
+								<button type="submit" class="index-btn">Login</button>
 				</form>
 				<br>
 				<form class="index-form center">
