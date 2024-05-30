@@ -1121,7 +1121,6 @@ async function connectToMongo() {
 
 			res.redirect('fitTasks');
 		});
-
 		app.post('/rerollDiet', sessionValidation, async (req, res) => {
 			var currentTime = new Date().getTime();
 			var number = req.body.number;
