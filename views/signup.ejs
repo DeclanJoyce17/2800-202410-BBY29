@@ -1,48 +1,35 @@
 <%- include("templates/header") %>
-	<link rel="stylesheet" type="text/css" href="/styles/change.css" text="">
-	</head>
+<link rel="stylesheet" type="text/css" href="/styles/change.css" text="">
+</head>
 
-	<div class="title" class="center">
-		<img src="/img/Logo.png" alt="logo" width="250" height="250">
-	</div>
+<div class="title" class="center">
+	<img src="/img/Logo.png" alt="logo" width="250" height="250">
+</div>
 
-	<div class="login bg-light">
-		<br>
+<div class="login bg-light">
+	<br>
 
-		<!-- Existing user/email pop-up message -->
-		<% if (typeof errorMessage !=='undefined' && errorMessage) { %>
-			<div class="alert alert-danger" role="alert">
-				<h1>
-					<%= errorMessage %>
-				</h1>
-			</div>
-			<% } %>
+	<!-- Existing user/email pop-up message -->
+	<% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+		<div class="alert alert-danger" role="alert">
+			<h1><%= errorMessage %></h1>
+		</div>
+	<% } %>
 
-				<!-- Go Back button -->
-				<button type="button" class="index-btn top-left" style="margin-left: 10px;"
-					onclick="location.href='/';">
-					Go Back
-				</button>
+	<!-- Go Back button -->
+	<button type="button" class="index-btn top-left" style="margin-left: 10px;" onclick="location.href='/';">
+		Go Back
+	</button>
 
-      				<form action="/signup" method="POST" class="index-form center">
-      					<h1>Sign Up</h1>
+	<form action="/signup" method="POST" class="index-form center">
+		<h1>Sign Up</h1>
+		<input type="text" name="username" placeholder="Username" class="border" value="<%= typeof username !== 'undefined' ? username : '' %>"><br>
+		<input type="email" name="email" placeholder="Email" class="border" value="<%= typeof email !== 'undefined' ? email : '' %>"><br>
+		<input type="password" name="password" placeholder="Password" class="border"><br>
+		<button type="submit" class="index-btn">Sign Up</button>
+	</form>
+	<br>
+</div>
 
-					<% if (typeof errorMessage !=='undefined' && errorMessage) { %>
-						<input type="text" name="username" placeholder="Username" class="border"><br>
-						<input type="email" name="email" placeholder="Email" class="border"><br>
-						<input type="password" name="password" placeholder="Password" class="border"><br>
-						<% } else { %>
-      							<input type="text" name="username" placeholder="Username"
-            value="<%= typeof username !== 'undefined' ? username : '' %>"><br>
-      							<input type="email" name="email" placeholder="Email"
-            value="<%= typeof email !== 'undefined' ? email : '' %>"><br>
-      							<input type="password" name="password" placeholder="Password"><br>
-							<% } %>
-      								<button type="submit" class="index-btn">Sign Up</button>
-      				</form>
-      				<br>
-
-	</div>
-
-	<%- include("templates/easteregg") %>
-		<%- include("templates/end") %>
+<%- include("templates/easteregg") %>
+<%- include("templates/end") %>
