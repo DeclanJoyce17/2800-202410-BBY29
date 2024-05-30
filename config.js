@@ -1119,7 +1119,7 @@ async function connectToMongo() {
 
 			result = await usersCollection.updateOne(result[0], updateDoc);
 
-			res.render('fitTasks', { points: point, boostActive: Math.trunc((req.session.hourTime - currentTime) / 60000), task1: result[0].fitTasks[0], task2: result[0].fitTasks[1], task3: result[0].fitTasks[2], rerolls: result[0].rerolls, noRerolls: false });
+			res.redirect('fitTasks');
 		});
 
 		app.post('/rerollDiet', sessionValidation, async (req, res) => {
