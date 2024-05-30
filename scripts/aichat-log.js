@@ -14,12 +14,16 @@ async function getGroqChatCompletion(userInput) {
     });
 }
 
+const chatLog = document.getElementById('chat-log-here');
+const chatLogTemplate = document.getElementById('chat-log-template');
+
 document.addEventListener('DOMContentLoaded', async () => {
     const warning = document.getElementById('warning');
     const form = document.getElementById('chat-input-form');
     const questionInput = document.getElementById('chat-question');
     const responseDiv = document.getElementById('ai-response-test');
     const userInputDisplay = document.getElementById('user-input-test');
+    
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault(); // Prevent the form from submitting normally
@@ -27,9 +31,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Hide the warning when the users start a chat
         warning.style.display = 'none';
 
-        // Display the chat content
-        document.getElementById('user-input-test').style.display = 'block';
-        document.getElementById('ai-response-test').style.display = 'block';
         const userInput = questionInput.value.trim(); // Get the user's input from the form
 
         // Send the user's input to the server
@@ -45,22 +46,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Extract the response data
         const responseData = await response.json();
+        const aiResponse = responseData.message;
 
         // Update the HTML content with the response
-        userInputDisplay.textContent = questionInput.value;
-        questionInput.value = "";
-        responseDiv.textContent = responseData.message;
+        if (userInput.trim()) {
+            const userAvatarClassName = 'user-avatar-class';
+            appendChatMessage(true, userInput, '/img/fitup2.png', null, null, 'chat-avatar', userAvatarClassName);
+            appendChatMessage(false, aiResponse, '/img/ai-chat-bot.gif', 'response-message');
+        }
 
-        textToSpeech(responseDiv);
+        // Display the chat content
+        document.querySelector('.user-message').style.display = 'block';
+        document.querySelector('.ai-response').style.display = 'block';
+        questionInput.value = "";
+        textToSpeech(aiResponse);
     });
 });
 
+function appendChatMessage(isUserMessage, text, avatarUrl) {
+    const chatTemplate = chatLogTemplate.content.cloneNode(true);
+
+    if (isUserMessage) {
+        chatTemplate.querySelector('.chat-text').innerHTML = text;
+        chatTemplate.querySelector('.chat-text').setAttribute('class', 'user-chat-text');
+        chatTemplate.querySelector('.chat-message').setAttribute('class', 'user-message');
+        chatTemplate.querySelector('.avatar').src = avatarUrl;
+        chatTemplate.querySelector('.avatar').setAttribute('class', 'user-avatar');
+    } else {
+        chatTemplate.querySelector('.chat-text').innerHTML = text;
+        chatTemplate.querySelector('.chat-text').setAttribute('class', 'ai-response-text');
+        chatTemplate.querySelector('.chat-message').setAttribute('class', 'ai-response');
+        chatTemplate.querySelector('.avatar').src = avatarUrl;
+        chatTemplate.querySelector('.avatar').setAttribute('class', 'ai-avatar');
+    }
+
+    chatLog.appendChild(chatTemplate);
+}
 // Convert text response to speech by sending the text content to backend which handles 
 //Google Text to Speech API requests
 
 async function textToSpeech(text) {
-
-    const textInput = text.innerText.trim(); 
+    const textInput = text.trim(); 
     // console.log(textInput);
     if (!textInput) {
         console.log('Error: Text content is empty');

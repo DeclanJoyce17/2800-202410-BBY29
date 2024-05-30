@@ -539,7 +539,7 @@ async function connectToMongo() {
 			const result = await userCollection.find({}).project({ username: 1, user_type: 1 }).toArray();
 			req.session.user_type = result[0].user_type;
 			console.log(result[0].user_type)
-			res.render('admin', {users: result})
+			res.render('admin', { users: result })
 		});
 		// app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
 		// 	const userCollection = db.collection('users');
@@ -1028,7 +1028,7 @@ async function connectToMongo() {
 			// console.log("tasks: " + tasks);
 
 			var results = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, points: 1 }).toArray();
-			
+
 			req.session.points = results[0].points;
 			res.render('main', {
 				username,
@@ -1213,7 +1213,7 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, rerolls: 1, date: 1, pointBoost: 1, user_rank: 1 }).toArray();
 			var point = req.session.points;
-			
+
 			var currentPoint = req.session.currentPoints;
 			var lookingTask = req.body.task;
 			var addingPoints;
@@ -1267,7 +1267,7 @@ async function connectToMongo() {
 			}
 			var temp = '';
 			var tempTasks;
-			
+
 			req.session.user_rank = result[0].user_rank;
 			req.session.rerolls = result[0].rerolls;
 			var randomVal = Math.random() * 10;
@@ -1301,27 +1301,27 @@ async function connectToMongo() {
 
 			//console.log(taskBankFit[temp].task);
 
-		
+
 
 			if (number == 1) {
 				updateDoc = {
 					$set: {
 						fitTasks: [taskBankFit[temp].task, result[0].fitTasks[1], result[0].fitTasks[2]],
-						
+
 					},
 				};
 			} else if (number == 2) {
 				updateDoc = {
 					$set: {
 						fitTasks: [result[0].fitTasks[0], taskBankFit[temp].task, result[0].fitTasks[2]],
-						
+
 					},
 				};
 			} else if (number == 3) {
 				updateDoc = {
 					$set: {
 						fitTasks: [result[0].fitTasks[0], result[0].fitTasks[1], taskBankFit[temp].task],
-						
+
 					},
 				};
 			}
@@ -1341,7 +1341,7 @@ async function connectToMongo() {
 			const usersCollection = db.collection('users');
 			var result = await usersCollection.find({ email: req.session.email }).project({ dietTasks: 1, user_rank: 1, rerolls: 1, rerolls: 1, date: 1, pointBoost: 1, user_rank: 1 }).toArray();
 			var point = req.session.points;
-			
+
 			var currentPoint = req.session.currentPoints;
 			var lookingTask = req.body.task;
 			var addingPoints;
@@ -1395,7 +1395,7 @@ async function connectToMongo() {
 			}
 			var temp = '';
 			var tempTasks;
-			
+
 			req.session.user_rank = result[0].user_rank;
 			req.session.rerolls = result[0].rerolls;
 			var randomVal = Math.random() * 10;
@@ -1429,27 +1429,27 @@ async function connectToMongo() {
 
 			//console.log(taskBankFit[temp].task);
 
-		
+
 
 			if (number == 1) {
 				updateDoc = {
 					$set: {
 						dietTasks: [taskBankDiet[temp].task, result[0].dietTasks[1], result[0].dietTasks[2]],
-						
+
 					},
 				};
 			} else if (number == 2) {
 				updateDoc = {
 					$set: {
 						dietTasks: [result[0].dietTasks[0], taskBankDiet[temp].task, result[0].dietTasks[2]],
-						
+
 					},
 				};
 			} else if (number == 3) {
 				updateDoc = {
 					$set: {
 						dietTasks: [result[0].dietTasks[0], result[0].dietTasks[1], taskBankDiet[temp].task],
-						
+
 					},
 				};
 			}
@@ -1477,12 +1477,39 @@ async function connectToMongo() {
 		async function getGroqChatCompletion(userInput) {
 			return groq.chat.completions.create({
 				messages: [
+					// Set an optional system message. This sets the behavior of the
+					// assistant and can be used to provide specific instructions for
+					// how it should behave throughout the conversation.
+					{
+						role: "system",
+						content: "you are a helpful assistant. Your answer should be concise. Please remove all "
+							+ "asterisk (*) from your response. Please make appropriate sentences and paragraphs to ensure readibility for humans."
+					},
+					// Set a user message for the assistant to respond to.
 					{
 						role: "user",
 						content: userInput
 					}
 				],
-				model: "mixtral-8x7b-32768"
+				model: "mixtral-8x7b-32768",
+
+				// Set the rate of accuracy and precision for the answers
+				temperature: 0.3,
+
+				// The maximum number of tokens to generate.
+				max_tokens: 500,
+
+				// Controls diversity via nucleus sampling: 0.5 means half of all
+				// likelihood-weighted options are considered.
+				top_p: 1,
+
+				// Set a stop sequence that signals an AI to stop generating content, ensuring its responses
+				// remain focused and concise. .
+				// stop: [end],
+
+				// // If set, partial message deltas will be sent, instead of waiting for the whole response
+				// // to be completely processed and sent as a big chunk
+				// stream: true
 			});
 		}
 

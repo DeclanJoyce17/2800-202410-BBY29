@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scanning Effect</title>
+  <!-- <link rel="stylesheet" href="styles.css"> -->
+  <style>
+ body {
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  background-color: black;
+}
+
+.scanner-container {
+  height: 100%;
+  width: 100%;
+  background: radial-gradient(circle, transparent 36%, #fff 36%);
+  background-size: 4px 4px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stripe {
+  content: "";
+  position: absolute;
+  left: -50%;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to right, transparent 50%, rgba(255, 255, 255, 0.1) 51%, rgba(255, 255, 255, 0.7) 52%, transparent 53%);
+  background-size: 4px 4px;
+  opacity: 0;
+  animation: scanner 1s linear infinite;
+  transform-origin: bottom;
+}
+
+@keyframes scanner {
+  50% {
+    opacity: 1;
+    transform: translateY(200%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0%);
+  }
+}
+
+.scanner-container::before,
+.scanner-container::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  background: linear-gradient(to bottom, transparent 50%, #fff 50%);
+}
+
+.scanner-container::before {
+  animation: fadeIn 1s linear infinite;
+  animation-iteration-count: 2;
+}
+
+.scanner-container::after {
+  animation: fadeOut 1s linear infinite;
+  animation-iteration-count: 2;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+
+@keyframes fadeOut {
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="scanner-container"></div>
+</body>
+</html>

@@ -1,7 +1,18 @@
 const responseData = JSON.parse(localStorage.getItem('responseData'));
+const toggledDivContent = JSON.parse(localStorage.getItem('toggledDivsContent'));
 console.log("recommendation: ", responseData);
+console.log('div content', toggledDivContent);
 const rec = document.getElementById('ai-recommendation');
-rec.textContent = responseData.message;
+rec.innerHTML = responseData.message.replace(/\n/g, '<br>');
+
+// Iterate over the array and toggle corresponding divs
+toggledDivContent.forEach(topic => {
+    console.log('topic', topic);
+    const divToToggle = document.querySelector(`#${topic.toLowerCase()}`);
+    if (divToToggle) {
+        divToToggle.classList.toggle('active');
+    }
+});
 
 // Convert text response to speech by sending the text content to backend which handles Google Text to Speech API requests
 
@@ -42,4 +53,9 @@ async function textToSpeech() {
     }
 }
 
-textToSpeech();
+// textToSpeech();  
+
+const homeBtn = document.getElementById('home');
+homeBtn.addEventListener('click', () => {
+  window.location.href = '/main';
+});

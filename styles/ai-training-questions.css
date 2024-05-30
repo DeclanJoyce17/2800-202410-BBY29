@@ -69,7 +69,6 @@ body {
     padding: 16px;
     border-radius: 20px;
     height: 650px;
-    width: 410px;
     border: none;
 }
 
@@ -203,6 +202,51 @@ footer {
     top: 80px;
     left: 50%;
     transform: translateX(-50%);
+    --bs-progress-bar-bg: #FF8624;
+}
+
+.form-check-input:checked {
+    background-color: #FF8624;
+}
+
+.form-check .form-check-input {
+    --bs-form-check-bg: var(--bs-body-bg);
+    border: solid #FF8624;
+}
+
+.list-group-item.active {
+    z-index: 2;
+    color: var(--bs-list-group-active-color);
+    background-color: #FF8624;
+    border-color: #FF8624;
+}
+
+.list-group-item {
+    background-color: #f0f0f0;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: white;
+    background-color: #FF8624;
+}
+
+.nav-link {
+    color: #FF8624;
+}
+
+.icon-container {
+    background-color: #f0f0f0;
+    opacity: 0.8;
+}
+.icon-container.active {
+    background-color: #FF8624;
+    opacity: 1;
+    color: white;
+}
+
+.icon-container.active .topic-icon path {
+    stroke: white;
+    fill: none;
 }
 
 .logo-card {
@@ -213,7 +257,7 @@ footer {
 
 h2 {
     font-size: 30pt;
-    text-align: center;
+    text-align: left;
     margin-bottom: 50px;
 }
 
@@ -274,11 +318,11 @@ h2 {
     width: 115px;
     height: 130px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
+    
     position: absolute;
     left: 15px;
     top: 180px;
-    opacity: 0.6;
+    
 }
 
 .topic-icon {
@@ -300,11 +344,11 @@ h2 {
     width: 115px;
     height: 130px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
+    
     position: absolute;
     left: 143px;
     top: 180px;
-    opacity: 0.6;
+    
 }
 
 /* #walking-icon {
@@ -317,11 +361,11 @@ h2 {
     width: 115px;
     height: 130px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
+    
     position: absolute;
     right: 15px;
     top: 180px;
-    opacity: 0.6;
+    
 }
 
 #running-icon {
@@ -334,28 +378,23 @@ h2 {
     width: 115px;
     height: 130px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
+    
     position: absolute;
     left: 15px;
     top: 325px;
-    opacity: 0.6;
+    
 }
 
-/* #cycling-icon {
-    position: absolute;
-    left: 12px;
-    bottom: 14px;
-} */
 
 #hiking {
     width: 115px;
     height: 130px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
+    
     position: absolute;
     left: 143px;
     top: 325px;
-    opacity: 0.6;
+    
 }
 
 #hiking-icon {
@@ -368,11 +407,11 @@ h2 {
     width: 115px;
     height: 130px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
+    
     position: absolute;
     right: 15px;
     top: 325px;
-    opacity: 0.6;
+    
 }
 
 #karate-icon {
@@ -385,11 +424,11 @@ h2 {
     width: 115px;
     height: 130px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
+    
     position: absolute;
     left: 15px;
     top: 470px;
-    opacity: 0.6;
+    
 
 }
 
@@ -403,20 +442,20 @@ h2 {
     width: 115px;
     height: 130px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
+    
     position: absolute;
     left: 143px;
     top: 470px;
-    opacity: 0.6;
+    
 }
 
 #other {
     width: 115px;
     height: 130px;
     border-radius: 20px;
-    background-color: rgb(228, 226, 226);
+    
     position: absolute;
     right: 15px;
     top: 470px;
-    opacity: 0.6;
+    
 }

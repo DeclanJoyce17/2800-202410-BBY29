@@ -1,5 +1,5 @@
 
-
+/*
 .button {
     border-radius: 25px;
     margin-top: 20px;
@@ -12,7 +12,7 @@
     margin-right: 810px;
     color: black;
     font-size: 40px;
-    background-color: #d4d5d6;
+    background-color: #d4d5d6; 
     border: none;
     cursor: pointer;
     transition-duration: 0.4s;
@@ -31,7 +31,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 250px; /* Ensure the height is set to match the image height */
+  height: 250px; /* Ensure the height is set to match the image height *
 }
 
 .title img {
@@ -84,8 +84,8 @@
     padding-right: 10%;
     height: 100%;
     width: 80%;
-    display: flex; /* Use flexbox */
-    justify-content: space-between; /* Space items evenly */
+    display: flex; /* Use flexbox *
+    justify-content: space-between; /* Space items evenly *
 }
 
 .resize {
@@ -94,3 +94,4 @@
 }
 
 
+*/
