@@ -17,6 +17,38 @@
     border-radius: 5px;
 }
 
+.card-container {
+    position: relative;
+    perspective: 1000px;
+}
+
+.card-container {
+    position: relative;
+    perspective: 1000px;
+}
+
+
+
+    .card {
+        perspective: 1000px;
+    }
+    .card-body {
+        transition: opacity 1s ease-in-out;
+    }
+    .flip {
+        transform: rotateY(180deg);
+        transition: transform 1s;
+    }
+    .fade-out {
+        opacity: 0;
+    }
+
+
+
+
+
+
+
 /* footer */
 footer {
     position: fixed;
