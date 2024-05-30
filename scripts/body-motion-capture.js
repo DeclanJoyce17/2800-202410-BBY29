@@ -147,7 +147,10 @@ function drawBodyLines(keypoints) {
 
 // Display the instruction for todo tasks on main page
 document.addEventListener('DOMContentLoaded', () => {
+
+  document.body.appendChild(document.getElementById('footer'));
   // Function to handle appending the instructionDiv
+
   const handleMainAvailable = () => {
     const main = document.querySelector('main');
     const instructionDiv = document.querySelector('#instruction');
@@ -162,8 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('instruction-text').innerHTML = todoInst.replace(/\n/g, '<br>');
       main.appendChild(mediaDisplay);
       main.appendChild(instructionDiv);
-      main.removeChild(document.querySelector('footer'));
-
+      mediaDisplay.classList.remove('hidden');
+      
       // Disconnect the observer once the main element is found and handled
       observer.disconnect();
     }
