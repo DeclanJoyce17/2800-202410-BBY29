@@ -405,22 +405,20 @@ async function connectToMongo() {
 
 		//Signup POST
 		app.post('/signup', async (req, res) => {
-
-
 			const usersCollection = db.collection('users');
 			const { username, email, password } = req.body;
 
 			// Validate input
 			if (!username) {
-				res.render('signup', { errorMessage: 'Name is required.' });
+				res.render('signup', { errorMessage: 'Name is required.', username, email });
 				return;
 			}
 			if (!email) {
-				res.render('signup', { errorMessage: 'Email is required.' });
+				res.render('signup', { errorMessage: 'Email is required.', username, email });
 				return;
 			}
 			if (!password) {
-				res.render('signup', { errorMessage: 'Password is required.' });
+				res.render('signup', { errorMessage: 'Password is required.', username, email });
 				return;
 			}
 
@@ -433,12 +431,11 @@ async function connectToMongo() {
 
 			const { error } = schema.validate({ username, email, password });
 			if (error) {
-				res.render('signup', { errorMessage: `Validation error: ${error.details[0].message}` });
+				res.render('signup', { errorMessage: `Validation error: ${error.details[0].message}`, username, email });
 				return;
 			}
 
 			try {
-
 				// Check if username or email already exists
 				const existingUser = await usersCollection.findOne({
 					$or: [{ username: username }, { email: email }]
@@ -453,7 +450,7 @@ async function connectToMongo() {
 					} else if (existingUser.email === email) {
 						errorMessage = 'Email already exists.';
 					}
-					res.render('signup', { errorMessage: errorMessage });
+					res.render('signup', { errorMessage, username, email });
 					return;
 				}
 
@@ -464,7 +461,6 @@ async function connectToMongo() {
 
 				var taskBankFit = await db.collection('fitnessTasks').find({}).project({ task: 1 }).toArray();
 				var userFitTasks = new Array(3);
-
 
 				for (var i = 0; i < 3; i++) {
 					while (true) {
@@ -478,7 +474,6 @@ async function connectToMongo() {
 
 				var taskBankDiet = await db.collection('dietTasks').find({}).project({ task: 1 }).toArray();
 				var userDietTasks = new Array(3);
-
 
 				for (var i = 0; i < 3; i++) {
 					while (true) {
@@ -523,9 +518,10 @@ async function connectToMongo() {
 				res.redirect('/main');
 			} catch (err) {
 				console.error("Error registering user:", err);
-				res.render('signup', { errorMessage: 'Failed to register user.' });
+				res.render('signup', { errorMessage: 'Failed to register user.', username, email });
 			}
 		});
+
 
 		app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
 			console.log(req.session.user_type);
