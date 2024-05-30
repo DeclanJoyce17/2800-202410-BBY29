@@ -36,3 +36,8 @@ const nextPage = () => {
 
 
 document.getElementById('continue').addEventListener('click', nextPage);
+
+const backBtn = document.getElementById('go-back');
+backBtn.addEventListener('click', () => {
+  window.history.back();
+})

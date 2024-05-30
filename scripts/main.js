@@ -121,3 +121,4 @@ const communityBtn = document.getElementById('home');
 communityBtn.addEventListener('click', () => {
   window.location.href = '/community';
 })
+

@@ -116,9 +116,9 @@ h1 {
 }
 
 #leaderboard {
-    width: 100%;
+    width: 95%;
     position: relative;
-    margin: 0;
+    margin: 0 0 0 10px;
 }
   
   @keyframes sparkle {
@@ -232,7 +232,7 @@ td {
     top: -0.5rem;
     background-color: #353741;
     position: absolute;
-    left: -1rem;
+    left: 0px;
     -webkit-box-shadow: 0px 15px 11px -6px #7a7a7d;
     box-shadow: 0px 15px 11px -6px #7a7a7d;
 }

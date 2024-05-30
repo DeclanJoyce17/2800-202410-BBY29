@@ -155,3 +155,8 @@ function saveToggledDivs() {
     // Save the content array into local storage
     localStorage.setItem('toggledDivsContent', JSON.stringify(contentArray));
 }
+
+const backBtn = document.getElementById('go-back');
+backBtn.addEventListener('click', () => {
+  window.history.back();
+})

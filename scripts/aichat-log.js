@@ -120,3 +120,9 @@ async function textToSpeech(text) {
         console.log('Error: ', response.statusText);
     }
 }
+
+
+const backBtn = document.getElementById('go-back');
+backBtn.addEventListener('click', () => {
+  window.history.back();
+})
