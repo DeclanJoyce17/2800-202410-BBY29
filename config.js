@@ -30,7 +30,7 @@ require('dotenv').config();
 require("./utils.js");
 
 const app = express();
-const expireTime = 60 * 60 * 1000;
+const expireTime = 12 * 60 * 60 * 1000;
 app.set('view engine', 'ejs')
 
 // Load environment variables from .env file
@@ -190,7 +190,10 @@ async function connectToMongo() {
 			auth: {
 				user: process.env.APP_EMAIL,
 				pass: process.env.APP_PASSWORD
-			}
+			},
+			defaults: {
+				from: 'FitUp <' + process.env.APP_EMAIL + '>',
+			},
 		});
 
 		//Index Page
@@ -649,38 +652,87 @@ async function connectToMongo() {
 		});
 
 		app.get('/reset-email', (req, res) => {
-			res.render('reset-email');
+			res.render('reset-email', { errorMessage: null, successMessage: null });
 		});
 
 		app.post('/reset-email', async (req, res) => {
-			// Email url made with help of chatgpt
 			const { email } = req.body;
-			const sessionToken = crypto.randomBytes(32).toString('hex');
-			try {
-				await db.collection('passwordResetTokens').insertOne({ email, token: sessionToken });
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-				const resetUrl = `https://two800-202410-bby29-63o6.onrender.com/reset-password?token=${sessionToken}`;
+			if (!emailRegex.test(email)) {
+				return res.render('reset-email', { errorMessage: 'Invalid email format.', successMessage: null });
+			}
+
+			const sessionToken = crypto.randomBytes(32).toString('hex');
+
+			try {
+				// Check if email exists in the database
+				const user = await db.collection('users').findOne({ email });
+
+				if (!user) {
+					return res.render('reset-email', { errorMessage: 'Email does not exist.', successMessage: null });
+				}
+
+				const userName = user.username; // Assuming 'firstName' is the field in your database
+
+				// Create session token
+				await db.collection('passwordResetTokens').insertOne({ email, token: sessionToken, createdAt: new Date() });
+
+				const resetUrl = `http://localhost:2800/reset-password?token=${sessionToken}`;
+
+				const imgPath1 = path.join(__dirname, 'img', 'Logo.png');
+				const imgPath2 = path.join(__dirname, 'img', 'fitup.png');
+
+				// Function to escape special characters in HTML
+				function escapeHtml(text) {
+					return text
+						.replace(/&/g, "&amp;")
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;")
+						.replace(/"/g, "&quot;")
+						.replace(/'/g, "&#039;");
+				}
+
+				const escapedUserName = escapeHtml(userName);
+				const escapedResetUrl = escapeHtml(resetUrl);
+
 				const mailOptions = {
-					from: process.env.APP_EMAIL,
+					from: 'FitUp <' + process.env.APP_EMAIL + '>',
 					to: email,
 					subject: 'Password Reset',
 					html: `
-                <p>Hello,</p>
-                <p>You have requested to reset your password. Please click the link below to reset your password:</p>
-                <a href="${resetUrl}">${resetUrl}</a>
-                <p>This link will expire in 30 minutes.</p>
-            `
+        <div style="text-align: center;">
+            <img src="cid:headerLogo" alt="FitUp Logo" width="250" height="250" style="display: block; margin: 0 auto;">
+            <p>Hello ${escapedUserName},</p>
+            <p>You have requested to reset your password. Please click the link below to reset:</p>
+            <a href="${escapedResetUrl}">${escapedResetUrl}</a>
+            <p>This link will expire in 30 minutes.</p>
+            <img src="cid:footerLogo" alt="FitUp Footer Logo" width="150" height="150" style="display: block; margin: 20px auto 0;">
+        </div>
+    `,
+					attachments: [
+						{
+							filename: 'Logo.png',
+							path: imgPath1,
+							cid: 'headerLogo' // Content-ID for the header logo image
+						},
+						{
+							filename: 'fitup.png',
+							path: imgPath2,
+							cid: 'footerLogo' // Content-ID for the footer logo image
+						}
+					]
 				};
 
 				await transporter.sendMail(mailOptions);
-				res.send('Password reset email sent successfully. <br><a href="/">Back to home page</a>');
-			}
-			catch (error) {
+				return res.render('reset-email', { errorMessage: null, successMessage: 'Password reset email sent successfully.' });
+			} catch (error) {
 				console.error('Error sending password reset email:', error);
 				res.status(500).send('Failed to send password reset email.');
 			}
 		});
 
+		// Route to display the password reset form
 		app.get('/reset-password', async (req, res) => {
 			const { token } = req.query;
 
@@ -693,9 +745,51 @@ async function connectToMongo() {
 				}
 
 				// Display the password reset form
-				res.render('reset-password', { token });
+				res.render('reset-password', { token, errorMessage: null, successMessage: null });
 			} catch (error) {
 				console.error('Error fetching reset token:', error);
+				res.status(500).send('Error resetting password.');
+			}
+		});
+
+		// Route to handle password reset form submission
+		app.post('/reset-password', async (req, res) => {
+			const { token, newPassword, confirmNewPassword } = req.body;
+
+			// Define Joi schema for password validation
+			const schema = Joi.object({
+				newPassword: Joi.string().min(8).max(20).required(),
+				confirmNewPassword: Joi.string().valid(Joi.ref('newPassword')).required()
+			});
+
+			try {
+				// Validate the incoming data
+				const validationResult = schema.validate({ newPassword, confirmNewPassword });
+
+				if (validationResult.error) {
+					// Handle validation error
+					return res.render('reset-password', { token, errorMessage: 'Passwords do not match.', successMessage: null });
+				}
+
+				// Verify that the session token exists in MongoDB
+				const resetToken = await db.collection('passwordResetTokens').findOne({ token });
+
+				if (!resetToken) {
+					return res.status(400).send('Invalid or expired token.');
+				}
+
+				// Hash the new password
+				const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+				// Update the user's password in MongoDB
+				await db.collection('users').updateOne({ email: resetToken.email }, { $set: { password: hashedPassword } });
+
+				// Delete the reset token from MongoDB
+				await db.collection('passwordResetTokens').deleteOne({ token });
+
+				return res.render('reset-password', { token: null, errorMessage: null, successMessage: 'Password reset successful.' });
+			} catch (error) {
+				console.error('Error resetting password:', error);
 				res.status(500).send('Error resetting password.');
 			}
 		});
@@ -731,47 +825,7 @@ async function connectToMongo() {
 			res.render('rankProgress', { points: result[0].points, rank: result[0].user_rank, nextRank: newRanking });
 		});
 
-		// Route to handle password reset form submission
-		app.post('/reset-password', async (req, res) => {
-			const { token, newPassword, confirmNewPassword } = req.body;
 
-			// Define Joi schema for password validation
-			const schema = Joi.object({
-				newPassword: Joi.string().min(8).max(20).required(),
-				confirmNewPassword: Joi.string().valid(Joi.ref('newPassword')).required()
-			});
-
-			try {
-				// Validate the incoming data
-				const validationResult = schema.validate({ newPassword, confirmNewPassword });
-
-				if (validationResult.error) {
-					// Handle validation error
-					return res.status(400).send('Invalid password or password confirmation.');
-				}
-
-				// Verify that the session token exists in MongoDB
-				const resetToken = await db.collection('passwordResetTokens').findOne({ token });
-
-				if (!resetToken) {
-					return res.status(400).send('Invalid or expired token.');
-				}
-
-				// Hash the new password
-				const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-				// Update the user's password in MongoDB
-				await db.collection('users').updateOne({ email: resetToken.email }, { $set: { password: hashedPassword } });
-
-				// Delete the reset token from MongoDB
-				await db.collection('passwordResetTokens').deleteOne({ token });
-
-				res.send('Password reset successful. <br><a href="/login">Back to login</a>');
-			} catch (error) {
-				console.error('Error resetting password:', error);
-				res.status(500).send('Error resetting password.');
-			}
-		});
 
 		app.get('/map', (req, res) => {
 			// Resolve the path to map.html using path module
@@ -1775,7 +1829,7 @@ async function connectToMongo() {
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
-			res.status(404).send('Page not found - 404');
+			res.render('404');
 		});
 
 		app.listen(port, () => {
@@ -1785,6 +1839,7 @@ async function connectToMongo() {
 
 	} catch (err) {
 		console.error("Connection error:", err);
+		res.render('404');
 		process.exit(1); // Exit with error if connection fails
 	}
 }
