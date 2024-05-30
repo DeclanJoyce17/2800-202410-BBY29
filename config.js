@@ -539,6 +539,7 @@ async function connectToMongo() {
 			const result = await userCollection.find({}).project({ username: 1, user_type: 1 }).toArray();
 			req.session.user_type = result[0].user_type;
 			console.log(result[0].user_type)
+			res.render('admin', {users: result})
 		});
 		// app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
 		// 	const userCollection = db.collection('users');
