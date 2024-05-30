@@ -409,6 +409,7 @@ footer {
 }
 
 #plus {
+    
     position: absolute;
     left: 180px;
     bottom: 90px;
@@ -547,21 +548,24 @@ footer {
 }
 
 #notification {
+    display: block;
     position: absolute;
     top: 70px;
     right: 20px;
     width: 60px;
     height: 60px;
     border-radius: 20px;
-    background-color: rgb(225, 225, 225);
+    background-color: rgb(255, 255, 255);
     opacity: 0.4;
 }
 
 #notification-icon {
-    position: absolute;
-    top: 85px;
-    right: 35px;
+    width:60px;
+    height:60px;
+        
 }
+
+
 
 #notification-metric {
     width: 12px;
