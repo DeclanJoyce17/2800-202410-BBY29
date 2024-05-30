@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('instruction-text').innerHTML = todoInst.replace(/\n/g, '<br>');
       main.appendChild(mediaDisplay);
       main.appendChild(instructionDiv);
+      main.removeChild(document.querySelector('footer'));
 
       // Disconnect the observer once the main element is found and handled
       observer.disconnect();

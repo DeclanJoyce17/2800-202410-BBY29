@@ -10,7 +10,7 @@ body {
     left: 20px;
     top: 50px;
     background-color: rgb(221, 218, 218);
-    opacity: 0.6;
+    /* opacity: 0.6; */
     border-radius: 20px;
     width: 60px;
     height: 60px;
@@ -28,7 +28,7 @@ body {
     right: 20px;
     top: 50px;
     background-color: rgb(221, 218, 218);
-    opacity: 0.6;
+    opacity: 0.;
     border-radius: 20px;
     width: 60px;
     height: 60px;
@@ -44,14 +44,14 @@ body {
 #top-nav {
     position: fixed;
     top: 0;
-    /* background-image: url('/img/wallpaper-header2.png'); */
-    /* background-size: cover; */
+    background-image: url('/img/wallpaper-header2.png');
+    background-size: cover;
     color: white;
     font-weight: bold;
     width: 100%;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
-    height: 300px;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+    height: 250px;
     z-index: 1000;
 }
 
@@ -70,7 +70,7 @@ body {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: 50px;
+    bottom: 15px;
 }
 
 #warning {
@@ -172,14 +172,14 @@ footer {
 
 #chat-log-here {
     position: relative;
-    margin: 150px 20px 200px;
+    margin: 270px 20px 200px;
     height: auto;
 }
 
 .user-message {
     position: relative;
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     padding: 20px;
     border-top-left-radius: 40px;
     border-top-right-radius: 40px;
@@ -188,14 +188,23 @@ footer {
     text-align: right;
 }
 
+.user-chat-text {
+    padding-right: 60px;
+}
+
 .ai-response {
     position: relative;
-    background-color: white;
+    background-color: black;
     padding: 20px;
     border-top-left-radius: 40px;
     border-top-right-radius: 40px;
     border-bottom-right-radius: 40px;
     margin-bottom: 50px;
+    color: white;
+}
+
+.ai-response-text {
+    padding-left: 60px;
 }
 
 .user-avatar, .ai-avatar {
@@ -207,13 +216,13 @@ footer {
 }
 
 .user-avatar {
-    right: -10px;
-    bottom: -70px;
+    right: 10px;
+    bottom: -18px;
 }
 
 .ai-avatar {
-    left: -10px;
-    bottom: -70px;
+    left: 10px;
+    bottom: -18px;
 }
 
 

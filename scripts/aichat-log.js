@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector('.user-message').style.display = 'block';
         document.querySelector('.ai-response').style.display = 'block';
         questionInput.value = "";
-        textToSpeech(aiResponse);
+        // textToSpeech(aiResponse);
     });
 });
 
