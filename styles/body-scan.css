@@ -209,11 +209,18 @@ video {
 
   #scan-result {
     position: absolute;
-    top: 80px;
-    left: 10%;
+    top: 50px;
+    left: 20px;
     font-size: 24pt;
     font-weight: bold;
-    color: #FF8624
+    color: #FF8624;
+    width: 90%;
+    height: 80px;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
   }
 
   #scan-metrics {
