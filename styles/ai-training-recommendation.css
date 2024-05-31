@@ -74,12 +74,6 @@ footer {
     border-radius: 25px;
 }
 
-#plus-icon {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 20px;
-}
 
 #diet-user {
     height: 130px;

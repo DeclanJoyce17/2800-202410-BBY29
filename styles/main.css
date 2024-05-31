@@ -419,6 +419,14 @@ footer {
     border-radius: 20px;
 }
 
+#plus-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15%;
+    width: 50px;
+    height: auto;
+}
 
 #diet-user {
     height: 130px;

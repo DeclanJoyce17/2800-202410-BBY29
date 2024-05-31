@@ -75,3 +75,13 @@ const skipBtn = document.getElementById('skip');
 skipBtn.addEventListener('click', () => {
   window.location.href = '/ai-training-recommendation';
 })
+
+const backBtn = document.getElementById('go-back');
+backBtn.addEventListener('click', () => {
+  window.location.href = "ai-training-scan-request"
+})
+
+const backdBtn = document.getElementById('go-back-con');
+bacdkBtn.addEventListener('click', () => {
+  window.location.href = "ai-training-scan-request"
+})

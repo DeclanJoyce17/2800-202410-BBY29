@@ -1,4 +1,4 @@
-<%- include("templates/header") %>
+<%- include("templates/headerOld") %>
     <link rel="stylesheet" href="/styles/change.css">
     <link rel="stylesheet" href="/styles/style.css">
     </head>
@@ -18,14 +18,23 @@
                 <input type="email" name="email" placeholder="Email" class="border" required>
                 <button type="submit" class="index-btn" onclick="confirmChange(event)">Confirm</button>
             </form>
-            <% } else { %>
+            <% } else if (issue2==true) { %>
+                <div class="alert alert-danger" role="alert">
+                    <h5>Account With Email Already Exists</h5>
+                </div>
                 <form action="/changeEmail" method="POST" class="change-form center">
                     <h1>New Email</h1>
-                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="email" name="email" placeholder="Email" class="border" required>
                     <button type="submit" class="index-btn" onclick="confirmChange(event)">Confirm</button>
                 </form>
-                <% } %>
-                    <br>
+                <% } else { %>
+                    <form action="/changeEmail" method="POST" class="change-form center">
+                        <h1>New Email</h1>
+                        <input type="email" name="email" placeholder="Email" required>
+                        <button type="submit" class="index-btn" onclick="confirmChange(event)">Confirm</button>
+                    </form>
+                    <% } %>
+                        <br>
     </div>
 
     <script>
@@ -42,6 +51,7 @@
 
             document.getElementById('confirmBtn').onclick = function () {
                 modalContent.classList.remove('show');
+
                 setTimeout(() => {
                     event.target.closest('form').submit();
                 }, 500);

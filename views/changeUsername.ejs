@@ -1,4 +1,4 @@
-<%- include("templates/header") %>
+<%- include("templates/headerOld") %>
     <link rel="stylesheet" href="/styles/change.css">
     <link rel="stylesheet" href="/styles/style.css">
     </head>
@@ -20,16 +20,28 @@
                 <input type="text" name="username" placeholder="Username" class="border" required>
                 <button type="submit" class="index-btn" onclick="confirmChange(event)">Confirm</button>
             </form>
-            <% } else { %>
+            <% } else if (issue2==true) { %>
+                <div class="alert alert-danger" role="alert">
+                    <h5>Username Already Taken</h5>
+                </div>
                 <form action="/changeUsername" method="POST" class="change-form center">
                     <h1>New Username</h1>
                     <h5>Must be between 8-20 characters</h5>
                     <h5>No spaces or special characters</h5>
-                    <input type="text" name="username" placeholder="Username">
+                    <input type="text" name="username" placeholder="Username" class="border" required>
                     <button type="submit" class="index-btn" onclick="confirmChange(event)">Confirm</button>
                 </form>
-                <% } %>
-                    <br>
+                <% } else { %>
+                    <form action="/changeUsername" method="POST" class="change-form center">
+                        <h1>New Username</h1>
+                        <h5>Must be between 8-20 characters</h5>
+                        <h5>No spaces or special characters</h5>
+                        <input type="text" name="username" placeholder="Username" required>
+                        <button type="submit" class="index-btn" onclick="confirmChange(event)">Confirm</button>
+                    </form>
+                    <% } %>
+
+                        <br>
     </div>
 
     <script>
@@ -48,7 +60,9 @@
                 modalContent.classList.remove('show');
                 setTimeout(() => {
                     event.target.closest('form').submit();
+                    //window.location.href = '/profile';
                 }, 500);
+
             };
 
             document.getElementById('cancelBtn').onclick = function () {
