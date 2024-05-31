@@ -3,7 +3,8 @@
 ## 1.
 # Project Title
 # Comp 2800 - BBY29 
-# FitUp app
+# FitUp Mobile App
+# App Link - https://fitupapp.onrender.com
 
 ## 2. Project Description
 Empower your fitness journey with FitUp, a smart AI-driven app, offering personalized tasks, real-time progress updates, and nutrition recommendations to achieve your goals alongside friends, so join FitUp today!
@@ -259,7 +260,7 @@ In the landing, login, and signup page if you input the konami code Arrow keys [
 
 ## 8. AI Use
 
-We user chatGPT, Groq's Mistral AI, Tensorflow
+We used chatGPT, Groq's Mistral AI, Tensorflow
 
 Groq is used for the integrated ai chatbot
 Tensorflow for body tracking
