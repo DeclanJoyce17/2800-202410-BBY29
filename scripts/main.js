@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Display date
 const now = new Date();
 const dayOfWeek = now.toLocaleString('en-US', {weekday: 'long'});
-const dateString = `${dayOfWeek}, ${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+const dateString = `${dayOfWeek}, ${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
 document.getElementById('date-display').innerHTML = dateString;
 
 // Firework animation for the leader board
