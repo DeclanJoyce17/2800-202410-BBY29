@@ -26,6 +26,15 @@ body {
     perspective: 1000px;
 }
 
+.container2 {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Distribute items evenly */
+    align-items: center; /* Align items vertically */
+}
+
+.container2 > * {
+    margin-right: 10px; /* Add some spacing between elements */
+}
 
 .card {
     display:block;
@@ -76,8 +85,8 @@ footer {
 
 .Chatter {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 10px;
+    right: 170px;
 }
 
 .titles {
@@ -139,22 +148,22 @@ footer {
 }
 
 .rerolls {
-    float: left;
     background-color: #FF8624;
     padding-right: 10px;
     border-radius: 20px;
-    margin-top: 85px;
-    margin-left: 13px;
+    margin-top: 20px;
+    margin-left: 340px;
     border: none;
 }
 
 .reroll{
     vertical-align: middle;
-    font-size: 35px;
+    font-size: 25px;
 }
 
 .rerollImg {
     vertical-align: middle;
+    height: 30px;
 }
 
 .rerollbtn {
