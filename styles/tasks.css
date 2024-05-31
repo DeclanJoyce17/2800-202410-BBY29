@@ -26,29 +26,31 @@ body {
     perspective: 1000px;
 }
 
-.card-container {
-    position: relative;
-    perspective: 1000px;
+
+.card {
+    display:block;
+    width:85%;
+    left: 33px;
 }
 
+#back {
+    display: block;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #FF8624;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    cursor: pointer;
+    text-decoration: none;
+}
 
-
-    .card {
-        perspective: 1000px;
-    }
-    .card-body {
-        transition: opacity 1s ease-in-out;
-    }
-    .flip {
-        transform: rotateY(180deg);
-        transition: transform 1s;
-    }
-    .fade-out {
-        opacity: 0;
-    }
-
-
-
+#back:hover {
+    background-color: #db6c11;
+}
 
 
 
@@ -141,8 +143,8 @@ footer {
     background-color: #FF8624;
     padding-right: 10px;
     border-radius: 20px;
-    margin-top: 5px;
-    margin-left: 5px;
+    margin-top: 85px;
+    margin-left: 13px;
     border: none;
 }
 
