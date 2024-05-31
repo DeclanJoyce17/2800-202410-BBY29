@@ -7,10 +7,6 @@ video:not(.fade) {
     opacity: 1;
 }
 
-#female {
-    margin-left: 1px;
-}
-
 body {
     background-color: #606060;
     overflow: hidden;
