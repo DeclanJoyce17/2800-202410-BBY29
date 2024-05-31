@@ -729,12 +729,15 @@ async function connectToMongo() {
 		 */
 		app.post('/reset-email', async (req, res) => {
 			const { email } = req.body;
+
+			// Ai created this email formatting checker
 			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 			if (!emailRegex.test(email)) {
 				return res.render('reset-email', { errorMessage: 'Invalid email format.', successMessage: null });
 			}
 
+			// Creates a token
 			const sessionToken = crypto.randomBytes(32).toString('hex');
 
 			try {
@@ -745,9 +748,9 @@ async function connectToMongo() {
 					return res.render('reset-email', { errorMessage: 'Email does not exist.', successMessage: null });
 				}
 
-				const userName = user.username; // Assuming 'firstName' is the field in your database
+				const userName = user.username; 
 
-				// Create session token
+				// Create session token with help of AI
 				await db.collection('passwordResetTokens').insertOne({ email, token: sessionToken, createdAt: new Date() });
 
 				const resetUrl = `http://localhost:2800/reset-password?token=${sessionToken}`;
@@ -755,7 +758,7 @@ async function connectToMongo() {
 				const imgPath1 = path.join(__dirname, 'img', 'Logo.png');
 				const imgPath2 = path.join(__dirname, 'img', 'fitup.png');
 
-				// Function to escape special characters in HTML
+				// Function to escape special characters in HTML made with AI
 				function escapeHtml(text) {
 					return text
 						.replace(/&/g, "&amp;")
@@ -768,6 +771,7 @@ async function connectToMongo() {
 				const escapedUserName = escapeHtml(userName);
 				const escapedResetUrl = escapeHtml(resetUrl);
 
+				// AI created the html in the email
 				const mailOptions = {
 					from: 'FitUp <' + process.env.APP_EMAIL + '>',
 					to: email,
