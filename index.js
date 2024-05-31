@@ -822,22 +822,38 @@ async function connectToMongo() {
 			}
 			else if (currentPoints > 49 && currentPoints < 100) {
 				newRanking = 100 - currentPoints;
-				console.log('silver');
+				console.log('Silver');
 			}
 			else if (currentPoints > 99 && currentPoints < 150) {
 				newRanking = 150 - currentPoints;
-				console.log('gold');
+				console.log('Gold');
 			}
 			else if (currentPoints > 149 && currentPoints < 200) {
 				newRanking = 200 - currentPoints;
-				console.log('platinum');
+				console.log('Platinum');
 			}
 			else if (currentPoints > 199 && currentPoints < 250) {
 				newRanking = 250 - currentPoints;
-				console.log('diamond');
+				console.log('Diamond');
+			}
+			
+			else if (currentPoints > 249 && currentPoints < 400) {
+				newRanking = 400 - currentPoints;
+				console.log('master');
+
+			}
+			else if (currentPoints > 400 && currentPoints < 700) {
+				newRanking = 700 - currentPoints;
+				console.log('grandmaster');
+			}
+			else if (currentPoints > 700 && currentPoints < 1000) {
+				newRanking = 1000 - currentPoints;
+				console.log('champion');
+
 			}
 			else {
 				newRanking = 0;
+				req.session.rank = 'god';
 			}
 			res.render('rankProgress', { points: result[0].points, rank: result[0].user_rank, nextRank: newRanking });
 		});
@@ -967,18 +983,18 @@ async function connectToMongo() {
 				console.log('diamond');
 			}
 			else if (currentPoints > 249 && currentPoints < 400) {
-				req.session.rank = 'master';
+				req.session.rank = 'Master';
 
 			}
 			else if (currentPoints > 400 && currentPoints < 700) {
-				req.session.rank = 'grandmaster';
+				req.session.rank = 'Grandmaster';
 			}
 			else if (currentPoints > 700 && currentPoints < 1000) {
-				req.session.rank = 'champion';
+				req.session.rank = 'Champion';
 
 			}
 			else {
-				req.session.rank = 'god';
+				req.session.rank = 'God';
 			}
 			const filter = { username: req.session.username };
 

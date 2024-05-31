@@ -1,4 +1,4 @@
-<%- include("templates/header") %>
+<%- include("templates/headerOld") %>
 
     <style>
         body {
@@ -40,30 +40,31 @@
         }
 
         .points {
-            display: block;
+            display: flex;
             font-size: 3.5em;
-            color: #ff6f61;
+            color: #FF8246;
             font-weight: bold;
             text-align: center;
             margin-top: 20px;
+            margin-left:100px;
         }
 
         .back-button {
             position: absolute;
             top: 20px;
             left: 20px;
-            background-color: #ff6f61;
+            background-color: #FF8246;
             color: #ffffff;
             border: none;
             border-radius: 5px;
-            padding: 15px 30px;
-            font-size: 1.5em;
+            padding: 10px 15px;
+            font-size: 10pt;
             cursor: pointer;
             text-decoration: none;
         }
 
         .back-button:hover {
-            background-color: #e55a50;
+            background-color: #ee6525;
         }
     </style>
 
@@ -79,4 +80,4 @@
         </h1>
     </div>
 
-    <%- include("templates/footer") %>
+    <%- include("templates/end") %>
