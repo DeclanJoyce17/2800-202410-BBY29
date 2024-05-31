@@ -1037,7 +1037,8 @@ async function connectToMongo() {
 				users,
 				fitTasks,
 				dietTasks,
-				greeting
+				greeting,
+				userID: req.session.userId,
 			});
 		});
 
@@ -1830,7 +1831,7 @@ async function connectToMongo() {
 				req.session.email = email;
 				const uploadSuccess = req.session.uploadSuccess;
 				req.session.uploadSuccess = false; // Reset the flag immediately
-				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true });
+				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true, uploadError: false });
 			} else {
 
 				res.render('changeEmail', { issue: true });
@@ -1864,7 +1865,7 @@ async function connectToMongo() {
 				await usersCollection.updateOne(filter, updateDoc);
 				const uploadSuccess = req.session.uploadSuccess;
 				req.session.uploadSuccess = false; // Reset the flag immediately
-				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true });
+				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true, uploadError: false });
 			} else {
 				res.render('changePassword', { issue: true });
 			}
@@ -1899,7 +1900,7 @@ async function connectToMongo() {
 				req.session.username = username;
 				const uploadSuccess = req.session.uploadSuccess;
 				req.session.uploadSuccess = false; // Reset the flag immediately
-				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true });
+				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true, uploadError: false });
 			} else {
 				res.render('changeUsername', { issue: true });
 			}
