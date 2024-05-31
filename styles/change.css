@@ -16,6 +16,12 @@
     display: block;
 }
 
+.change-form {
+    padding: 12px 0px;
+    font-size: 16px;
+    
+}
+
 .modal-content {
     background-color: #fefefe;
     margin: 5% auto;
