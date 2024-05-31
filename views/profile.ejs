@@ -11,6 +11,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
+    <!-- favicon -->
+    <link rel="icon" href="/img/fitup.png">
+
     <link rel="stylesheet" href="/styles/profile.css">
 </head>
 
@@ -45,81 +48,82 @@
             </div>
             <% } %>
 
-        <!-- Error Message -->
-        <% if (uploadError) { %>
-            <div id="error-message" class="alert-error">
-                <%= uploadError %>
-            </div>
-            <% } %>
+                <!-- Error Message -->
+                <% if (uploadError) { %>
+                    <div id="error-message" class="alert-error">
+                        <%= uploadError %>
+                    </div>
+                    <% } %>
 
-        <!-- Profile Options-->
-        <div class="section">
-            <div class="section-title">General</div>
-            <div class="item">
-                <a href="/changeUsername" style="text-decoration : none;">
-                    <span class="icon">👤</span>
-                    <span>Change Username</span>
-                </a>
-            </div>
-            <div class="item">
-                <a href="/" id="profileImageLink" style="text-decoration: none;">
-                    <span class="icon">👤</span>
-                    <span>Change Profile Image</span>
-                </a>
-                <form id="profileUploadForm" action="/profile-upload" method="post"
-                    enctype="multipart/form-data" class="d-none">
-                    <input type="file" name="image" id="profileImageInput" required
-                        style="display: none;">
-                </form>
-            </div>
-            <div class="item">
-                <a href="/changeEmail" style="text-decoration : none;">
-                    <span class="icon">✉️</span>
-                    <span>Change Email</span>
-                </a>
-            </div>
-            <div class="item">
-                <a href="/changePassword" style="text-decoration : none;">
-                    <span class="icon">📝</span>
-                    <span>Change Password</span>
-                </a>
-            </div>
-            <div class="item">
-                <a href="/rankProgress" style="text-decoration : none;">
-                    <span class="icon">🏆</span>
-                    <span>Ranking Progress</span>
-                </a>
-            </div>
-            <% if(type=='admin' ) { %>
-                <div class="item">
-                    <a href="/admin" style="text-decoration : none;">
-                        <span class="icon"></span>
-                        <span>Admin</span>
-                    </a>
-                </div>
-                <% } %>
-        </div>
+                        <!-- Profile Options-->
+                        <div class="section">
+                            <div class="section-title">General</div>
+                            <div class="item">
+                                <a href="/changeUsername" style="text-decoration : none;">
+                                    <span class="icon">👤</span>
+                                    <span>Change Username</span>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="/" id="profileImageLink" style="text-decoration: none;">
+                                    <span class="icon">👤</span>
+                                    <span>Change Profile Image</span>
+                                </a>
+                                <form id="profileUploadForm" action="/profile-upload" method="post"
+                                    enctype="multipart/form-data" class="d-none">
+                                    <input type="file" name="image" id="profileImageInput" required
+                                        style="display: none;">
+                                </form>
+                            </div>
+                            <div class="item">
+                                <a href="/changeEmail" style="text-decoration : none;">
+                                    <span class="icon">✉️</span>
+                                    <span>Change Email</span>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="/changePassword" style="text-decoration : none;">
+                                    <span class="icon">📝</span>
+                                    <span>Change Password</span>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="/rankProgress" style="text-decoration : none;">
+                                    <span class="icon">🏆</span>
+                                    <span>Ranking Progress</span>
+                                </a>
+                            </div>
+                            <% if(type=='admin' ) { %>
+                                <div class="item">
+                                    <a href="/admin" style="text-decoration : none;">
+                                        <span class="icon"></span>
+                                        <span>Admin</span>
+                                    </a>
+                                </div>
+                                <% } %>
+                        </div>
 
-        <!-- Danger Zone/Logout -->
-        <div class="section danger-zone">
-            <div class="section-title"></div><hr>
-            <div class="item" action="/logout" method="get">
-                <a href="/logout" type="submit" id="logoutLink" style="text-decoration : none;">
-                    <span class="icon">❌</span>
-                    <span>Log Out</span>
-                </a>
-                </form>
-            </div>
-        </div>
+                        <!-- Danger Zone/Logout -->
+                        <div class="section danger-zone">
+                            <div class="section-title"></div>
+                            <hr>
+                            <div class="item" action="/logout" method="get">
+                                <a href="/logout" type="submit" id="logoutLink" style="text-decoration : none;">
+                                    <span class="icon">❌</span>
+                                    <span>Log Out</span>
+                                </a>
+                                </form>
+                            </div>
+                        </div>
 
-        <!-- Sends to /logout -->
-        <form id="logoutForm" action="/logout" method="GET" style="display: none;">
-            <input type="hidden">
-        </form>
+                        <!-- Sends to /logout -->
+                        <form id="logoutForm" action="/logout" method="GET" style="display: none;">
+                            <input type="hidden">
+                        </form>
 
-        <div class="footer">
-            fitup. v1.2800 ©All Rights Reserved, 2024
-        </div>
+                        <div class="footer">
+                            fitup. v1.2800 ©All Rights Reserved, 2024
+                        </div>
     </div>
 
     <!-- going back function -->
