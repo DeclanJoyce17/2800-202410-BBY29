@@ -11,6 +11,14 @@ nav {
     top: 20px;
 }
 
+.py-5 {
+    padding: 0 !important;
+}
+
+.my-5 {
+    margin: 0 0 180px !important
+}
+
 .navButton {
     margin-left: 19px;
     margin-right: 18px;
@@ -69,13 +77,12 @@ main {
     border-radius: 0.5rem;
     align-items: center;
     justify-content: center;
+    margin: 0;
+    width: 100%;
 }
 
 #header {
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 2.5rem 2rem;
 }
 
@@ -105,13 +112,54 @@ h1 {
     color: #141a39;
     text-transform: uppercase;
     cursor: default;
+    font-weight: bold;
 }
 
 #leaderboard {
-    width: 100%;
+    width: 95%;
     position: relative;
+    margin: 0 0 0 10px;
 }
+  
+  @keyframes sparkle {
+    0% {
+      opacity: 0;
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-50px) rotate(180deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(0) rotate(360deg);
+    }
+  }
 
+  /* Adjust the size and position of the fireworks */
+  .firework {
+    position: absolute;
+    width: 10px; /* Increase particle size */
+    height: 10px; /* Increase particle size */
+    border-radius: 50%;
+    animation: firework 1s ease-in-out infinite;
+  }
+
+  @keyframes firework {
+    0% {
+      opacity: 0;
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-100px) rotate(180deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(0) rotate(360deg);
+    }
+  }
+  
 table {
     width: 100%;
     border-collapse: collapse;
@@ -158,6 +206,7 @@ td {
 .name {
     text-align: left;
     font-size: 1.2rem;
+    padding-left: 0;
 }
 
 .points {
@@ -183,7 +232,7 @@ td {
     top: -0.5rem;
     background-color: #353741;
     position: absolute;
-    left: -1rem;
+    left: 0px;
     -webkit-box-shadow: 0px 15px 11px -6px #7a7a7d;
     box-shadow: 0px 15px 11px -6px #7a7a7d;
 }
@@ -360,6 +409,7 @@ footer {
 }
 
 #plus {
+    
     position: absolute;
     left: 180px;
     bottom: 90px;
@@ -498,21 +548,25 @@ footer {
 }
 
 #notification {
+    display: block;
     position: absolute;
     top: 70px;
     right: 20px;
     width: 60px;
     height: 60px;
     border-radius: 20px;
-    background-color: rgb(225, 225, 225);
+    background-color: rgb(255, 255, 255);
     opacity: 0.4;
+    z-index: -0;
 }
 
 #notification-icon {
     position: absolute;
-    top: 85px;
     right: 35px;
+    top: 85px;
 }
+
+
 
 #notification-metric {
     width: 12px;

@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector('.user-message').style.display = 'block';
         document.querySelector('.ai-response').style.display = 'block';
         questionInput.value = "";
-        textToSpeech(aiResponse);
+        // textToSpeech(aiResponse);
     });
 });
 
@@ -120,3 +120,9 @@ async function textToSpeech(text) {
         console.log('Error: ', response.statusText);
     }
 }
+
+
+const backBtn = document.getElementById('go-back');
+backBtn.addEventListener('click', () => {
+  window.history.back();
+})

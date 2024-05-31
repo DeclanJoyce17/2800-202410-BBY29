@@ -2092,7 +2092,9 @@ async function connectToMongo() {
 		app.post("/text-to-speech", async (req, res) => {
 			const text = req.body.text;
 
-			const client = new textToSpeech.TextToSpeechClient();
+			const client = new textToSpeech.TextToSpeechClient({
+				key: process.env.GOOGLE_API_KEY
+			});
 
 			try {
 				// Construct the request

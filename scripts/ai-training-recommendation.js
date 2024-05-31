@@ -59,3 +59,8 @@ const homeBtn = document.getElementById('home');
 homeBtn.addEventListener('click', () => {
   window.location.href = '/main';
 });
+
+const backBtn = document.getElementById('go-back');
+backBtn.addEventListener('click', () => {
+  window.history.back();
+})

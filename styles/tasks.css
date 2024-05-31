@@ -1,5 +1,9 @@
 
 /* task container */
+body {
+    padding-bottom: 200px;
+}
+
 .task-list-container {
     display: flex;
     flex-direction: column;
@@ -82,9 +86,10 @@ footer {
 
 .taskCards {
     width: 100%;
-    padding-left: 45px;
-    padding-right: 45px;
-    margin-bottom: 30px;
+    height: 10%;
+    padding-left: 4px;
+    padding-right: 4px;
+    margin-bottom: 3px;
 }
 
 .card{
