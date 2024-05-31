@@ -1569,8 +1569,9 @@ async function connectToMongo() {
 				username: req.session.username,
 				email: req.session.email,
 				uploadSuccess: uploadSuccess,
-				uploadError: uploadError
-			});
+				uploadError: uploadError,
+				change: false
+			});	
 		});
 
 		// Route to upload profile images
