@@ -5,6 +5,7 @@ body {
   }
 
   main {
+    padding-top: 100px;
     padding-bottom: 200px;
   }
 
@@ -25,8 +26,8 @@ body {
 }
 
 #camera-feed {
-  position: absolute;
-  top: 400px;
+  width: 0;
+  height: 0;
 }
 #home-weight {
     height: 180px;
