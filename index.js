@@ -57,11 +57,14 @@ const upload = multer({ storage: storage });
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+
 /************ uploading profile images ***********/
 
-// Initialize MongoDB and GridFS
-// ensuring that the MongoDB connection 
-// and GridFS initialization are completed before proceeding further.
+/**
+* Initialize MongoDB and GridFS
+*
+* ensuring that the MongoDB connection  and GridFS initialization are completed before proceeding further.
+*/
 let db, bucket;
 async function initMongoDB() {
 	const client = new MongoClient(mongoUri);
@@ -77,16 +80,18 @@ async function initMongoDB() {
 }
 initMongoDB();
 
-// Route to upload images
+// Route to upload images.
 app.post('/upload', upload.single('image'), async (req, res) => {
 	if (!req.file) {
 		return res.status(400).send('No file uploaded.');
 	}
 	try {
+		// Get the original filename of the uploaded file
 		const filename = req.file.originalname;
+		// Save the image to MongoDB using a helper function
 		const fileId = await saveImageToMongoDB(req.file.buffer, req.file.mimetype, filename);
+		// Send a success message with the file ID
 		res.send(`Image uploaded successfully with ID: ${fileId}`);
-
 	} catch (error) {
 		console.error('Upload error:', error);
 		res.status(500).send(`Failed to upload image: ${error.message}`);
@@ -1542,7 +1547,7 @@ async function connectToMongo() {
 		// };
 
 		/****************** profile Image *************************/
-
+		
 		// Express route to get a profile image by user id
 		app.get('/images/:userId', async (req, res) => {
 			try {
@@ -1579,14 +1584,19 @@ async function connectToMongo() {
 			}
 		});
 
+		// Define the route for the '/profile' endpoint, applying the sessionValidation middleware
 		app.get('/profile', sessionValidation, async (req, res) => {
 			const userCollection = db.collection('users');
+			// Find the user document matching the email stored in the session, projecting only the username and user_type fields
 			const result = await userCollection.find({ email: req.session.email }).project({ username: 1, user_type: 1 }).toArray();
 			req.session.user_type = result[0].user_type;
+			// Retrieve the upload success flag and error message from the session
 			const uploadSuccess = req.session.uploadSuccess;
 			const uploadError = req.session.uploadError;
-			req.session.uploadSuccess = false; // Reset the flag immediately
-			req.session.uploadError = null; // Reset the error message immediately
+			// Reset the flag immediately
+			req.session.uploadSuccess = false;
+			// Reset the error message immediately
+			req.session.uploadError = null;
 			res.render('profile', {
 				userID: req.session.userId,
 				type: req.session.user_type,
@@ -1625,9 +1635,7 @@ async function connectToMongo() {
 		});
 
 		/****************** community posts *************************/
-		/****************** img community posts *************************/
 
-		// Define the route to render the postImgtest.ejs file
 		// Define the route to render the postImgtest.ejs file
 		app.get('/community', async (req, res) => {
 			if (!req.session.userId) {
@@ -1664,7 +1672,9 @@ async function connectToMongo() {
 				const imageUrls = posts.map(post => post.imageUrls.map(url => cloudinary.url(url, { width: 1080, height: 1080, crop: 'fill' })));
 
 				const postSuccess = req.session.postSuccess;
-				req.session.postSuccess = false; // Reset the flag
+				
+				// Reset the flag
+				req.session.postSuccess = false;
 
 				if (req.query.json) {
 					res.json({ posts, imageUrls });
@@ -1677,16 +1687,18 @@ async function connectToMongo() {
 			}
 		});
 
+		// Define the route for the '/communityPost' endpoint
 		app.get('/communityPost', async (req, res) => {
 			if (!req.session.userId) {
 				return res.status(401).send('Unauthorized');
 			}
 
+			// Retrieve the error message from the session
 			const errorMessage = req.session.errorMessage;
-			req.session.errorMessage = null; // Reset the error message
+			// Reset the error message
+			req.session.errorMessage = null;
 			res.render('communityPost', { errorMessage });
 		});
-
 
 		// Route to get posts by tag
 		app.get('/posts/:tag', async (req, res) => {
@@ -1777,6 +1789,7 @@ async function connectToMongo() {
 					location: latitude && longitude ? { latitude, longitude } : null
 				});
 
+				// Set a session flag indicating post success and redirect to the community page
 				req.session.postSuccess = true;
 				res.redirect('/community');
 			} catch (error) {
@@ -1791,11 +1804,14 @@ async function connectToMongo() {
 				return res.status(401).send('Unauthorized');
 			}
 
+			// Extract the postId from the request parameters
 			const postId = req.params.id;
 			const userId = req.session.userId;
 
 			try {
+				// Get the 'posts' collection from the database
 				const postsCollection = db.collection('posts');
+				// Find the post document by postId
 				const post = await postsCollection.findOne({ _id: new ObjectId(postId) });
 
 				if (!post) {
@@ -1815,7 +1831,7 @@ async function connectToMongo() {
 				// Delete post from MongoDB
 				await postsCollection.deleteOne({ _id: new ObjectId(postId) });
 
-				res.redirect('/community');  // Redirect to the postImgtest route
+				res.redirect('/community'); 
 			} catch (error) {
 				console.error('Error deleting post:', error);
 				res.status(500).send(`Failed to delete post: ${error.message}`);
@@ -1969,10 +1985,13 @@ async function connectToMongo() {
 				return res.status(400).send('No file uploaded.');
 			}
 			try {
-				console.log("session user id: " + req.session.userId);
+				// Retrieve the user ID from the session
 				const userId = req.session.userId;
+				// Retrieve the user ID from the session
 				const filename = req.file.originalname;
+				 // Save the profile image to MongoDB using a helper function
 				await saveProfileImageToMongoDB(req.file.buffer, req.file.mimetype, filename, userId);
+				 // Set a session flag indicating upload success message
 				req.session.uploadSuccess = true;
 				res.redirect('/profile');
 			} catch (error) {
@@ -2179,7 +2198,11 @@ connectToMongo().catch(console.error);
 
 /************************ helper functions that handles profile images ***************************/
 
-// This function specifically saves profile images and ensures only one exists per user
+/*
+* This function specifically saves profile images
+*
+* ensures only one exists per user
+*/
 async function saveProfileImageToMongoDB(fileBuffer, contentType, filename, userId) {
 	try {
 		return await saveImageToMongoDB(fileBuffer, contentType, filename, userId, 320, 320, true);
@@ -2189,29 +2212,42 @@ async function saveProfileImageToMongoDB(fileBuffer, contentType, filename, user
 	}
 }
 
-// Save image to MongoDB using GridFS
-// Check if a file already exists for the given userId - it it exists, replace the existing one
+/**
+* Save image to MongoDB using GridFS
+* Check if a file already exists for the given userId - if it exists, replace the existing one
+*
+* Generated by ChatGPT 3.5
+* @author https://chat.openai.com/
+*/
 async function saveImageToMongoDB(fileBuffer, contentType, filename, userId, width, height, allowOneImageOnly) {
 	try {
-
+		// Resize the image buffer to the specified width and height
 		const resizedBuffer = await resizeImage(fileBuffer, width, height);
 
+		// Create metadata for the image including content type and user ID
 		const metadata = {
 			contentType: contentType,
 			userId: userId
 		};
 
+		// If only one image is allowed per user, check for existing images
 		if (allowOneImageOnly) {
+			// Find existing files for the user
 			const existingFiles = await bucket.find({ "metadata.userId": userId }).toArray();
+			// If an existing file is found, delete it
 			if (existingFiles.length > 0) {
 				await bucket.delete(existingFiles[0]._id);
 			}
 		}
 
+		// Open an upload stream to GridFS with the specified filename and metadata
 		const uploadStream = bucket.openUploadStream(filename, { metadata: metadata });
+		// Write the resized image buffer to the upload stream
 		uploadStream.write(resizedBuffer);
+		// End the upload stream
 		uploadStream.end();
 
+		// Return a promise that resolves with the upload stream ID on successful finish
 		return new Promise((resolve, reject) => {
 			uploadStream.on('finish', () => resolve(uploadStream.id));
 			uploadStream.on('error', (error) => {
@@ -2229,9 +2265,12 @@ async function saveImageToMongoDB(fileBuffer, contentType, filename, userId, wid
 // resize images
 async function resizeImage(fileBuffer, width, height) {
 	try {
+		// Use the 'sharp' library to resize the image buffer to the specified width and height
 		const resizedBuffer = await sharp(fileBuffer)
 			.resize(width, height)
 			.toBuffer();
+
+		// Return the resized image buffer
 		return resizedBuffer;
 	} catch (error) {
 		console.error('Error resizing image:', error);
@@ -2239,21 +2278,31 @@ async function resizeImage(fileBuffer, width, height) {
 	}
 }
 
-/************************ helper functions to upload community post ***************************/
+/************************ helper functions that handles post images *****************************/
 
+/** Function to upload images to Cloudinary
+* 
+* Generated by ChatGPT 3.5
+* @author https://chat.openai.com/
+*/
 async function uploadImagesToCloudinary(files) {
+	// Use Promise.all to handle multiple file uploads concurrently
 	return Promise.all(files.map(file => {
+		 // Return a new promise for each file upload
 		return new Promise((resolve, reject) => {
 			resizeImage(file.buffer, 1080, 1080)
 				.then(resizedBuffer => {
+					// Upload the resized image to Cloudinary using the upload_stream method
 					cloudinary.uploader.upload_stream({
 						resource_type: 'image'
 					}, (error, result) => {
 						if (error) {
 							reject(error);
 						} else {
+							// Resolve the promise with the secure URL of the uploaded image
 							resolve(result.secure_url);
 						}
+					// End the upload stream with the resized image buffer
 					}).end(resizedBuffer);
 				})
 				.catch(error => reject(error));
