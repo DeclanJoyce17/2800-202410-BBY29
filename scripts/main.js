@@ -59,6 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
   localStorage.setItem('responseData', JSON.stringify(responseData.message));
 
   console.log(responseData.message);
+
+  window.location.href = 'body-motion-capture';
   });
 });
 
