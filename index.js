@@ -1,5 +1,7 @@
 
 "use strict";
+
+/**All node modules we used and implemented */
 require('dotenv').config();
 const fs = require("fs");
 const express = require('express');
@@ -16,25 +18,21 @@ const sharp = require('sharp');
 const axios = require('axios');
 const textToSpeech = require('@google-cloud/text-to-speech');
 const uuid = require('uuid');
-
 const util = require('util');
-
 var nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const Joi = require('joi');
 const cloudinary = require('cloudinary').v2;
-
-// Load environment variables from .env file
-
-
 const app = express();
 const expireTime = 12 * 60 * 60 * 1000;
-app.set('view engine', 'ejs')
 
+
+// Load environment variables from .env file
 const port = process.env.PORT || 3000;
 const speechClient = new SpeechClient();
 const mongoUri = process.env.MONGO_URI;
 const nodeSessionSecret = process.env.NODE_SESSION_SECRET;
+
 
 // For upload imgs in community page
 cloudinary.config({
@@ -44,16 +42,12 @@ cloudinary.config({
 	secure: true
 });
 
-app.use(express.json());
 
+app.use(express.json());
 app.use(express.static('public'));
-// Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));
-// Store files in memory as Buffer objects by using multer
 const storage = multer.memoryStorage()
-// Telling multer to use the previously defined memory storage for storing the files
 const upload = multer({ storage: storage });
-// to use EJS to render our ejs files as HTML
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -80,7 +74,9 @@ async function initMongoDB() {
 }
 initMongoDB();
 
-// Route to upload images.
+/**
+ * Route to upload images
+ */
 app.post('/upload', upload.single('image'), async (req, res) => {
 	if (!req.file) {
 		return res.status(400).send('No file uploaded.');
@@ -100,11 +96,6 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 
 
 /*********** connecting mongo ***************/
-
-
-
-//if ur wondering why everything is inside this async connect-mongo call, blame davin, but at the same time it works?
-
 async function connectToMongo() {
 	const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -138,7 +129,7 @@ async function connectToMongo() {
 		}));
 
 
-
+		//Parsing the static folders
 		app.use("/scripts", express.static("./scripts"));
 		app.use('/img', express.static('./img'));
 		app.use('/styles', express.static('./styles'));
@@ -164,6 +155,7 @@ async function connectToMongo() {
 			return false;
 		}
 
+
 		//Session Validation Middleware
 		function sessionValidation(req, res, next) {
 			if (isValidSession(req)) {
@@ -174,6 +166,8 @@ async function connectToMongo() {
 			}
 		}
 
+
+		//Admin Checking Function
 		function isAdmin(req) {
 			if (req.session.user_type == 'admin') {
 				return true;
@@ -181,6 +175,8 @@ async function connectToMongo() {
 			return false;
 		}
 
+
+		//Admin Validation Middleware
 		function adminValidation(req, res, next) {
 			console.log(req);
 			if (isAdmin(req)) {
@@ -192,7 +188,8 @@ async function connectToMongo() {
 			}
 		}
 
-		//Used chatgpt to help figure out the password
+
+		//Used Chatgpt to help figure out the password
 		const transporter = nodemailer.createTransport({
 			service: 'gmail', // e.g., 'gmail', 'yahoo', etc.
 			auth: {
@@ -204,7 +201,12 @@ async function connectToMongo() {
 			},
 		});
 
-		//Index Page
+
+		/**
+		 * Main page
+		 * 
+		 * If logged in redirect to main, otherwise redirect to index.
+		 */
 		app.get('/', (req, res) => {
 			if (req.session.authenticated) {
 				res.redirect('/main');
@@ -214,7 +216,12 @@ async function connectToMongo() {
 			}
 		});
 
-		//Sign up page
+
+		/**
+		 * Signup page
+		 * 
+		 * If logged in redirect to main, otherwise redirect to signup.
+		 */
 		app.get('/signup', (req, res) => {
 			if (req.session.authenticated) {
 				res.redirect('/main');
@@ -224,7 +231,12 @@ async function connectToMongo() {
 			}
 		});
 
-		//Shop Page
+
+		/**
+		 * Shop page
+		 * 
+		 * Renders shop page with shop data from the database.
+		 */
 		app.get('/shop', sessionValidation, async (req, res) => {
 			const usersCollection = db.collection('shopItems');
 			const result = await usersCollection.find().project({}).toArray();
@@ -235,11 +247,10 @@ async function connectToMongo() {
 			res.render('shop', { items: result, currentPoints: results[0].currentPoints });
 		});
 
-		app.post('/moreinfo/:name', sessionValidation, async (req, res) => {
-			var itemName = req.params.name;
-			res.send(itemName)
-		});
 
+		/**
+		 * Buying items from shop post
+		 */
 		app.post('/buy/:name', sessionValidation, async (req, res) => {
 			var itemName = req.params.name;
 			var points = req.session.currentPoints;
@@ -303,7 +314,14 @@ async function connectToMongo() {
 
 		});
 
-		//FitTasks Page
+
+		/**
+		 * FitTasks page
+		 * 
+		 * Displays tasks from database
+		 * Display time left on boost
+		 * Displays points
+		 */
 		app.get('/fitTasks', sessionValidation, async (req, res) => {
 			var currentTime = new Date().getTime();
 			var point = req.session.points;
@@ -357,7 +375,14 @@ async function connectToMongo() {
 
 		});
 
-		//DietTasks Page
+
+		/**
+		 * dietTask page
+		 * 
+		 * Displays tasks from database
+		 * Display time left on boost
+		 * Displays points
+		 */
 		app.get('/dietTasks', sessionValidation, async (req, res) => {
 			var point = req.session.points;
 			var currentTime = new Date().getTime();
@@ -411,7 +436,10 @@ async function connectToMongo() {
 
 		});
 
-		//Signup POST
+
+		/**
+		 * Signup page
+		 */
 		app.post('/signup', async (req, res) => {
 			const usersCollection = db.collection('users');
 			const { username, email, password } = req.body;
@@ -436,8 +464,6 @@ async function connectToMongo() {
 			}
 
 			// Continue with your signup logic if no errors
-			// ...
-
 
 			// Validate input format with Joi
 			const schema = Joi.object({
@@ -541,7 +567,11 @@ async function connectToMongo() {
 		});
 
 
-
+		/**
+		 * Admin page
+		 * 
+		 * Shows all users and you can update roles,remove roles, or delete users.
+		 */
 		app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
 			console.log(req.session.user_type);
 			if (req.session.user_type != 'admin') {
@@ -553,13 +583,9 @@ async function connectToMongo() {
 			console.log(result[0].user_type)
 			res.render('admin', { users: result })
 		});
-		// app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
-		// 	const userCollection = db.collection('users');
-		// 	const result = await userCollection.find().project({ username: 1, user_type: 1 }).toArray();
+		
 
-		// 	res.render('admin', { users: result });
-		// });
-
+		//Demote admin to users.
 		app.post('/demoteAdmin/:username2', async (req, res) => {
 			const userCollection = db.collection('users');
 			var username2 = req.params.username2;
@@ -579,6 +605,8 @@ async function connectToMongo() {
 			res.redirect('/admin');
 		});
 
+
+		//Delete users from database as admin.
 		app.post('/deleteUser/:username', async (req, res) => {
 			var username = req.params.username;
 			const userCollection = db.collection('users');
@@ -589,6 +617,8 @@ async function connectToMongo() {
 			res.redirect('/admin');
 		});
 
+
+		//promote users to admin.
 		app.post('/promoteUser/:username2', async (req, res) => {
 			const userCollection = db.collection('users');
 			var username2 = req.params.username2;
@@ -606,7 +636,12 @@ async function connectToMongo() {
 			res.redirect('/admin');
 		});
 
-		//Login Page
+
+		/**
+		 * Login page
+		 * 
+		 * redirects to main if logged in.
+		 */
 		app.get('/login', (req, res) => {
 			if (req.session.authenticated) {
 				res.redirect('/main');
@@ -616,7 +651,12 @@ async function connectToMongo() {
 			}
 		});
 
-		//Login POST
+
+		/**
+		 * Login post
+		 * 
+		 * saves user variables from database into a session variable.
+		 */
 		app.post('/login', async (req, res) => {
 
 			const usersCollection = db.collection('users');
@@ -661,7 +701,10 @@ async function connectToMongo() {
 			}
 		});
 
-		//Log Out Page
+
+		/**
+		 * Logout page
+		 */
 		app.get('/logout', (req, res) => {
 			//destroy session
 			req.session.destroy(err => {
@@ -672,10 +715,18 @@ async function connectToMongo() {
 			});
 		});
 
+
+		/**
+		 * Reset email page
+		 */
 		app.get('/reset-email', (req, res) => {
 			res.render('reset-email', { errorMessage: null, successMessage: null });
 		});
 
+
+		/**
+		 * Reset email allows for you to change your email.
+		 */
 		app.post('/reset-email', async (req, res) => {
 			const { email } = req.body;
 			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -753,7 +804,10 @@ async function connectToMongo() {
 			}
 		});
 
-		// Route to display the password reset form
+
+		/**
+		 * Reset password page.
+		 */
 		app.get('/reset-password', async (req, res) => {
 			const { token } = req.query;
 
@@ -772,7 +826,10 @@ async function connectToMongo() {
 			}
 		});
 
-		// Route to handle password reset form submission
+
+		/**
+		 * Reset password allows you to change your password.
+		 */
 		app.post('/reset-password', async (req, res) => {
 			const { token, newPassword, confirmNewPassword } = req.body;
 
@@ -815,7 +872,11 @@ async function connectToMongo() {
 		});
 
 
-
+		/**
+		 * Rank progress
+		 * 
+		 * page shows current rank progess taking information from database.
+		 */
 		app.get('/rankProgress', sessionValidation, async (req, res) => {
 
 			const usersCollection = db.collection('users');
@@ -863,6 +924,7 @@ async function connectToMongo() {
 			res.render('rankProgress', { points: result[0].points, rank: result[0].user_rank, nextRank: newRanking });
 		});
 
+
 		// Route to handle password reset form submission
 		app.post('/reset-password', async (req, res) => {
 			const { token, newPassword, confirmNewPassword } = req.body;
@@ -905,6 +967,12 @@ async function connectToMongo() {
 			}
 		});
 
+
+		/**
+		 * Map page 
+		 * 
+		 * shows map and allows you to see your location and nearby gyms.
+		 */
 		app.get('/map', (req, res) => {
 			// Resolve the path to map.html using path module
 			const mapFilePath = path.join(__dirname, 'html', 'map.html');
@@ -913,39 +981,47 @@ async function connectToMongo() {
 			res.sendFile(mapFilePath);
 		});
 
+
+		/**
+		 * Aichat home page
+		 * 
+		 * shows the AI chat
+		 */
 		app.get('/aichat-home', (req, res) => {
-			// Resolve the path to map.html using path module
 			const mapFilePath = path.join(__dirname, 'html', 'aichat-home.html');
 
-			// Send map.html as the response
 			res.sendFile(mapFilePath);
 		});
 
-		app.get('/aichat-config', (req, res) => {
-			// Resolve the path to map.html using path module
-			const mapFilePath = path.join(__dirname, 'html', 'aichat-config.html');
 
-			// Send map.html as the response
-			res.sendFile(mapFilePath);
-		});
-
+		/**
+		 * loading page for AI
+		 */
 		app.get('/aichat-loading', (req, res) => {
-			// Resolve the path to map.html using path module
 			const mapFilePath = path.join(__dirname, 'html', 'aichat-loading.html');
 
-			// Send map.html as the response
 			res.sendFile(mapFilePath);
 		});
 
+
+		/**
+		 * AI chat log
+		 * 
+		 * This is where teh AI actually is
+		 */
 		app.get('/aichat-log', (req, res) => {
-			// Resolve the path to map.html using path module
 			const mapFilePath = path.join(__dirname, 'html', 'aichat-log.html');
 
-			// Send map.html as the response
 			res.sendFile(mapFilePath);
 		});
 
-		//main page - check the user, display the remained tasks, display the user name in the current session;
+
+		/**
+		 * Main page
+		 * 
+		 * Updated all database values and updates session values
+		 * Renders main page with all EJS variables needed.
+		 */
 		app.get('/main', async (req, res) => {
 
 			if (!req.session.authenticated) {
@@ -1049,12 +1125,6 @@ async function connectToMongo() {
 				res.status(500).send('Failed to fetch user data');
 			}
 
-			// console.log("username: " + username);
-			// console.log("points: " + points);
-			// console.log("rank: " + rank);
-			// console.log("USERS: " + users);
-			// console.log("tasks: " + tasks);
-
 			var results = await usersCollection.find({ email: req.session.email }).project({ fitTasks: 1, user_rank: 1, rerolls: 1, points: 1 }).toArray();
 
 			req.session.points = results[0].points;
@@ -1070,6 +1140,12 @@ async function connectToMongo() {
 			});
 		});
 
+
+		/**
+		 * Reroll fit post
+		 * 
+		 * Rerolls current task from databse if you have enough rerolls.
+		 */
 		app.post('/rerollFit', sessionValidation, async (req, res) => {
 
 			var number = req.body.number;
@@ -1144,12 +1220,17 @@ async function connectToMongo() {
 				};
 			}
 
-
-
 			result = await usersCollection.updateOne(result[0], updateDoc);
 
 			res.redirect('fitTasks');
 		});
+
+
+		/**
+		 * reroll diet task
+		 * 
+		 * Rerolls a diet task from the database given you have rerolls.
+		 */
 		app.post('/rerollDiet', sessionValidation, async (req, res) => {
 			var currentTime = new Date().getTime();
 			var number = req.body.number;
@@ -1233,7 +1314,13 @@ async function connectToMongo() {
 		});
 
 
-		//Adding points to Fitness Page
+		/**
+		 * Adding points
+		 * 
+		 * When clicking done on a task add points to user and update database
+		 * Check to see if user has a boost on or not
+		 * Changes task after clicking done.
+		 */
 		app.post('/addPointFit', sessionValidation, async (req, res) => {
 			var currentTime = new Date().getTime();
 			const tasks1 = db.collection('fitnessTasks');
@@ -1327,10 +1414,6 @@ async function connectToMongo() {
 				}
 			}
 
-			//console.log(taskBankFit[temp].task);
-
-
-
 			if (number == 1) {
 				updateDoc = {
 					$set: {
@@ -1361,7 +1444,14 @@ async function connectToMongo() {
 			res.redirect('/fitTasks');
 		});
 
-		//Adding points to Diet Page
+
+		/**
+		 * Adding points
+		 * 
+		 * When clicking done on a task add points to user and update database
+		 * Check to see if user has a boost on or not
+		 * Changes task after clicking done.
+		 */
 		app.post('/addPointDiet', sessionValidation, async (req, res) => {
 			var currentTime = new Date().getTime();
 			const tasks1 = db.collection('dietTasks');
@@ -1455,10 +1545,6 @@ async function connectToMongo() {
 				}
 			}
 
-			//console.log(taskBankFit[temp].task);
-
-
-
 			if (number == 1) {
 				updateDoc = {
 					$set: {
@@ -1489,6 +1575,7 @@ async function connectToMongo() {
 			res.redirect('/dietTasks');
 		});
 
+		
 		app.post('/GroqChatCompletion', async (req, res) => {
 
 			const userInput = req.body.question;
@@ -1502,6 +1589,12 @@ async function connectToMongo() {
 			}
 		});
 
+		/**
+		 * AI chat completion.
+		 * 
+		 * @param {*} userInput 
+		 * @returns AI chat messages
+		 */
 		async function getGroqChatCompletion(userInput) {
 			return groq.chat.completions.create({
 				messages: [
@@ -1531,20 +1624,8 @@ async function connectToMongo() {
 				// likelihood-weighted options are considered.
 				top_p: 1,
 
-				// Set a stop sequence that signals an AI to stop generating content, ensuring its responses
-				// remain focused and concise. .
-				// stop: [end],
-
-				// // If set, partial message deltas will be sent, instead of waiting for the whole response
-				// // to be completely processed and sent as a big chunk
-				// stream: true
 			});
 		}
-
-		// module.exports = {
-		//     main,
-		//     getGroqChatCompletion
-		// };
 
 		/****************** profile Image *************************/
 		
