@@ -1,4 +1,5 @@
 <%- include("templates/header") %>
+	<link rel="stylesheet" type="text/css" href="/styles/change.css" text="">
 	<link rel="stylesheet" type="text/css" href="/styles/style.css" text="">
 	</head>
 
@@ -12,9 +13,9 @@
 		<!-- Existing user/email pop-up message -->
 		<% if (typeof errorMessage !=='undefined' && errorMessage) { %>
 			<div class="alert alert-danger" role="alert">
-				<h1>
+				<h5>
 					<%= errorMessage %>
-				</h1>
+				</h5>
 			</div>
 			<% } %>
 

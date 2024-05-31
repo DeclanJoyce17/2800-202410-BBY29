@@ -408,24 +408,31 @@ async function connectToMongo() {
 
 		//Signup POST
 		app.post('/signup', async (req, res) => {
-
-
 			const usersCollection = db.collection('users');
 			const { username, email, password } = req.body;
 
+
 			// Validate input
+			let errorMessage = '';
+
 			if (!username) {
-				res.render('signup', { errorMessage: 'Name is required.', username, email });
-				return;
+				errorMessage += 'Name is required.\n';
 			}
 			if (!email) {
-				res.render('signup', { errorMessage: 'Email is required.', username, email });
-				return;
+				errorMessage += 'Email is required.\n';
 			}
 			if (!password) {
-				res.render('signup', { errorMessage: 'Password is required.', username, email });
+				errorMessage += 'Password is required.\n';
+			}
+
+			if (errorMessage) {
+				res.render('signup', { errorMessage: errorMessage.trim(), username, email });
 				return;
 			}
+
+			// Continue with your signup logic if no errors
+			// ...
+
 
 			// Validate input format with Joi
 			const schema = Joi.object({
@@ -1572,7 +1579,7 @@ async function connectToMongo() {
 				uploadSuccess: uploadSuccess,
 				uploadError: uploadError,
 				change: false
-			});	
+			});
 		});
 
 		// Route to upload profile images
@@ -1799,7 +1806,7 @@ async function connectToMongo() {
 			}
 		});
 
-		
+
 
 		/****************** Changing User Info *************************/
 
