@@ -1603,6 +1603,7 @@ async function connectToMongo() {
 		/****************** img community posts *************************/
 
 		// Define the route to render the postImgtest.ejs file
+		// Define the route to render the postImgtest.ejs file
 		app.get('/community', async (req, res) => {
 			if (!req.session.userId) {
 				return res.status(401).send('Unauthorized');
@@ -1618,7 +1619,9 @@ async function connectToMongo() {
 			let filter = {};
 
 			if (tag !== 'all') {
+				console.log(tag);
 				filter.tags = tag;
+				console.log(filter);
 			}
 
 			try {
@@ -1793,6 +1796,8 @@ async function connectToMongo() {
 				res.status(500).send(`Failed to delete post: ${error.message}`);
 			}
 		});
+
+		
 
 		/****************** Changing User Info *************************/
 
