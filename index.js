@@ -836,7 +836,7 @@ async function connectToMongo() {
 				newRanking = 250 - currentPoints;
 				console.log('Diamond');
 			}
-			
+
 			else if (currentPoints > 249 && currentPoints < 400) {
 				newRanking = 400 - currentPoints;
 				console.log('master');
@@ -1828,36 +1828,48 @@ async function connectToMongo() {
 
 		//ChangeEmail Page
 		app.get('/changeEmail', sessionValidation, async (req, res) => {
-			res.render('changeEmail', { issue: false });
+			res.render('changeEmail', { issue: false, issue2: false });
 		});
 
 		app.post('/changeEmail', sessionValidation, async (req, res) => {
 			const filter = { username: req.session.username };
 			const email = req.body.email;
+			const usersCollection = db.collection('users');
 
 			const schema = Joi.object(
 				{
-					email: Joi.string().max(40).required()
+					email: Joi.string().email().max(40).required()
 				}
 			);
 
 			const { error } = schema.validate({ email });
 			if (!(error)) {
+
+				const existingUser = await usersCollection.findOne({ email: email });
+
+
+				if (existingUser) {
+
+					if (!(existingUser.username == req.session.username)) {
+						res.render('changeEmail', { issue: false, issue2: true });
+						return;
+					}
+				}
+
 				const updateDoc = {
 					$set: {
 						email: email
 					}
 				};
 
-				const usersCollection = db.collection('users');
+
 				await usersCollection.updateOne(filter, updateDoc);
 				req.session.email = email;
 				const uploadSuccess = req.session.uploadSuccess;
 				req.session.uploadSuccess = false; // Reset the flag immediately
 				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true, uploadError: false });
 			} else {
-
-				res.render('changeEmail', { issue: true });
+				res.render('changeEmail', { issue: true, issue2: false });
 			}
 
 		});
@@ -1878,6 +1890,9 @@ async function connectToMongo() {
 			);
 			const { error } = schema.validate({ password });
 			if (!error) {
+
+
+
 				const updateDoc = {
 					$set: {
 						password: await bcrypt.hash(password, saltRounds)
@@ -1896,12 +1911,13 @@ async function connectToMongo() {
 		});
 
 		app.get('/changeUsername', sessionValidation, async (req, res) => {
-			res.render('changeUsername', { issue: false });
+			res.render('changeUsername', { issue: false, issue2: false });
 		});
 
 		app.post('/changeUsername', sessionValidation, async (req, res) => {
 			const filter = { email: req.session.email };
 			const username = req.body.username;
+			const usersCollection = db.collection('users');
 
 			const schema = Joi.object(
 				{
@@ -1912,56 +1928,34 @@ async function connectToMongo() {
 			const { error } = schema.validate({ username });
 			console.log(error);
 			if (!(error)) {
+
+				const existingUser = await usersCollection.findOne({ username: username });
+
+				if (existingUser) {
+					if (existingUser.email != req.session.email) {
+						res.render('changeUsername', { issue: false, issue2: true });
+						return;
+					}
+				}
+
 				const updateDoc = {
 					$set: {
 						username: username
 					}
 				};
 
-				const usersCollection = db.collection('users');
+
 				await usersCollection.updateOne(filter, updateDoc);
 				req.session.username = username;
 				const uploadSuccess = req.session.uploadSuccess;
 				req.session.uploadSuccess = false; // Reset the flag immediately
 				res.render('profile', { userID: req.session.userId, type: req.session.user_type, username: req.session.username, email: req.session.email, uploadSuccess: uploadSuccess, change: true, uploadError: false });
 			} else {
-				res.render('changeUsername', { issue: true });
+				res.render('changeUsername', { issue: true, issue2: false });
 			}
 
 		});
 
-		app.get('/changeUsername', sessionValidation, async (req, res) => {
-			res.render('changeUsername');
-		});
-
-		app.post('/changeUsername', sessionValidation, async (req, res) => {
-			const filter = { email: req.session.email };
-			const username = req.body.username;
-
-			const schema = Joi.object(
-				{
-					username: Joi.string().min(8).max(20).required()
-				}
-			);
-
-			if (schema.validate({ username }) != null) {
-				const updateDoc = {
-					$set: {
-						username: username
-					}
-				};
-
-				const usersCollection = db.collection('users');
-				await usersCollection.updateOne(filter, updateDoc);
-				req.session.username = username;
-
-				res.redirect('profile');
-			} else {
-
-				res.redirect('changeUsername');
-			}
-
-		});
 
 		// Route to upload profile images
 		app.post('/profile-upload', upload.single('image'), async (req, res) => {
