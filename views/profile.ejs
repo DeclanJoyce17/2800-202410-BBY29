@@ -52,6 +52,7 @@
             </div>
             <% } %>
 
+        <!-- Profile Options-->
         <div class="section">
             <div class="section-title">General</div>
             <div class="item">
@@ -99,6 +100,7 @@
                 <% } %>
         </div>
 
+        <!-- Danger Zone/Logout -->
         <div class="section danger-zone">
             <div class="section-title">Danger Zone</div>
             <div class="item" action="/logout" method="get">
@@ -109,6 +111,11 @@
                 </form>
             </div>
         </div>
+
+        <!-- Sends to /logout -->
+        <form id="logoutForm" action="/logout" method="GET" style="display: none;">
+            <input type="hidden">
+        </form>
 
         <div class="footer">
             fitup. v1.2800 ©All Rights Reserved, 2024
