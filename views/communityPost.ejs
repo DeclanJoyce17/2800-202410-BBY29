@@ -1,206 +1,240 @@
-<%- include("templates/header") %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>FitUp</title>
+    <meta name="Comp2800 template" content="FitUp">
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap Library CSS CDN go here -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <!-- Boostrap Library JS CDN  go here -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+        </script>
+
+    <!-- favicon -->
+    <link rel="icon" href="/img/fitup.png">
+
+    <!-- Other libraries CSS CDN go here -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- Other Libraries JS CDN go here -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Google Fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <title>Community</title>
     <link rel="stylesheet" type="text/css" href="../../styles/communityPost.css" text="">
-    </head>
+    <link rel="stylesheet" type="text/css" href="../../styles/mainOld.css" text="">
+</head>
 
-    <body>
+<body>
 
-        <a class="go-back" onclick="goBack()">Back</a>
+    <a class="go-back" onclick="goBack()">Back</a>
 
-        <h1>Community Posts</h1>
+    <h1>Community Posts</h1>
 
-        <!-- Error Message -->
-        <% if (errorMessage) { %>
-            <div id="error-message" class="alert-error">
-                <%= errorMessage %>
-            </div>
+    <!-- Error Message -->
+    <% if (errorMessage) { %>
+        <div id="error-message" class="alert-error">
+            <%= errorMessage %>
+        </div>
         <% } %>
-        
-        <!-- Form for creating a new post -->
-        <form action="/communityPost/post" method="post" enctype="multipart/form-data" id="communityPostForm">
-            <textarea name="text" rows="4" cols="50" placeholder="Write something...(optional)"
-                id="postText"></textarea><br>
-            <input type="file" name="images" id="imageInput" multiple accept="image/*"><br>
-            <div class="preview" id="imagePreview"></div><br>
-            <button type="button" id="clearImagesButton">Clear All Images</button><br>
-            <select name="tags" id="tags">
-                <option value="" selected>Select</option>
-                <option value="fitness">Fitness</option>
-                <option value="diet">Diet</option>
-            </select><br>
 
-            <!-- Map for selecting location -->
-            <div id="map" style="height: 300px; width: 100%;"></div><br>
-            <button type="button" id="clearPinButton">Clear Pin</button><br>
-            <input type="hidden" id="latitude" name="latitude">
-            <input type="hidden" id="longitude" name="longitude">
+            <!-- Form for creating a new post -->
+            <form action="/communityPost/post" method="post" enctype="multipart/form-data" id="communityPostForm">
+                <textarea name="text" rows="4" cols="50" placeholder="Write something...(optional)"
+                    id="postText"></textarea><br>
+                <input type="file" name="images" id="imageInput" multiple accept="image/*"><br>
+                <div class="preview" id="imagePreview"></div><br>
+                <button type="button" id="clearImagesButton">Clear All Images</button><br>
+                <select name="tags" id="tags">
+                    <option value="" selected>Select</option>
+                    <option value="fitness">Fitness</option>
+                    <option value="diet">Diet</option>
+                </select><br>
 
-            <button type="submit">Post</button>
-        </form>
+                <!-- Map for selecting location -->
+                <div id="map" style="height: 300px; width: 100%;"></div><br>
+                <button type="button" id="clearPinButton">Clear Pin</button><br>
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
 
-        <!-- going back function -->
-        <script>
-            function goBack() {
-                window.history.back();
-            }
-        </script>
+                <button type="submit">Post</button>
+            </form>
 
-        <!-- error message -->
-        <script>
-            document.getElementById('communityPostForm').addEventListener('submit', function (event) {
-                const text = document.getElementById('postText').value.trim();
-                const imageInput = document.getElementById('imageInput');
-                const images = imageInput.files;
-                const tags = document.getElementById('tags').value;
-
-                if (!text && images.length === 0) {
-                    event.preventDefault();
-                    showError('Please provide either text or images.');
-                    return;
+            <!-- going back function -->
+            <script>
+                function goBack() {
+                    window.history.back();
                 }
+            </script>
 
-                if (!tags || tags === 'Select') {
-                    event.preventDefault();
-                    showError('Please select a valid tag (Fitness or Diet).');
-                    return;
+            <!-- error message -->
+            <script>
+                document.getElementById('communityPostForm').addEventListener('submit', function (event) {
+                    const text = document.getElementById('postText').value.trim();
+                    const imageInput = document.getElementById('imageInput');
+                    const images = imageInput.files;
+                    const tags = document.getElementById('tags').value;
+
+                    if (!text && images.length === 0) {
+                        event.preventDefault();
+                        showError('Please provide either text or images.');
+                        return;
+                    }
+
+                    if (!tags || tags === 'Select') {
+                        event.preventDefault();
+                        showError('Please select a valid tag (Fitness or Diet).');
+                        return;
+                    }
+
+                    if (images.length > 4) {
+                        event.preventDefault();
+                        showError('You can only upload a maximum of 4 images.');
+                        return;
+                    }
+                });
+
+                document.getElementById('clearImagesButton').addEventListener('click', function () {
+                    document.getElementById('imageInput').value = '';
+                    document.getElementById('imagePreview').innerHTML = '';
+                });
+
+                document.getElementById('clearPinButton').addEventListener('click', function () {
+                    document.getElementById('latitude').value = '';
+                    document.getElementById('longitude').value = '';
+                });
+
+                function showError(message) {
+                    const errorMessage = document.getElementById('errorMessage');
+                    const errorText = document.getElementById('errorText');
+                    errorText.textContent = message;
+                    errorMessage.style.display = 'block';
+                    setTimeout(() => {
+                        errorMessage.style.display = 'none';
+                    }, 2000);
                 }
+            </script>
 
-                if (images.length > 4) {
-                    event.preventDefault();
-                    showError('You can only upload a maximum of 4 images.');
-                    return;
-                }
-            });
+            <!-- preview images -->
+            <script>
+                document.getElementById('imageInput').addEventListener('change', function () {
+                    const preview = document.getElementById('imagePreview');
+                    const errorMessageDiv = document.getElementById('errorMessage');
+                    preview.innerHTML = '';
+                    const files = this.files;
+                    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
 
-            document.getElementById('clearImagesButton').addEventListener('click', function () {
-                document.getElementById('imageInput').value = '';
-                document.getElementById('imagePreview').innerHTML = '';
-            });
+                    // Remove previous error message if exists
+                    if (errorMessageDiv) {
+                        errorMessageDiv.remove();
+                    }
 
-            document.getElementById('clearPinButton').addEventListener('click', function () {
-                document.getElementById('latitude').value = '';
-                document.getElementById('longitude').value = '';
-            });
-
-            function showError(message) {
-                const errorMessage = document.getElementById('errorMessage');
-                const errorText = document.getElementById('errorText');
-                errorText.textContent = message;
-                errorMessage.style.display = 'block';
-                setTimeout(() => {
-                    errorMessage.style.display = 'none';
-                }, 2000);
-            }
-        </script>
-
-        <!-- preview images -->
-        <script>
-            document.getElementById('imageInput').addEventListener('change', function () {
-                const preview = document.getElementById('imagePreview');
-                const errorMessageDiv = document.getElementById('errorMessage');
-                preview.innerHTML = '';
-                const files = this.files;
-                const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-
-                // Remove previous error message if exists
-                if (errorMessageDiv) {
-                    errorMessageDiv.remove();
-                }
-
-                if (files.length > 4) {
-                    showError('You can only upload a maximum of 4 images.');
-                    this.value = '';
-                    return;
-                }
-
-                for (let file of files) {
-                    if (!allowedMimeTypes.includes(file.type)) {
-                        showError('Invalid file type. Only JPG, PNG, and GIF files are allowed.');
+                    if (files.length > 4) {
+                        showError('You can only upload a maximum of 4 images.');
                         this.value = '';
                         return;
                     }
-                }
 
-                if (files) {
-                    Array.from(files).forEach(file => {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            const img = document.createElement('img');
-                            img.src = e.target.result;
-                            img.style.maxWidth = '150px';
-                            img.style.margin = '10px';
-                            img.style.borderRadius = '10px';
-                            preview.appendChild(img);
+                    for (let file of files) {
+                        if (!allowedMimeTypes.includes(file.type)) {
+                            showError('Invalid file type. Only JPG, PNG, and GIF files are allowed.');
+                            this.value = '';
+                            return;
                         }
-                        reader.readAsDataURL(file);
-                    });
-                }
-            });
+                    }
 
-            function showError(message) {
-                const errorMessageDiv = document.createElement('div');
-                errorMessageDiv.id = 'error-message';
-                errorMessageDiv.className = 'alert-error';
-                errorMessageDiv.innerText = message;
-                document.body.insertBefore(errorMessageDiv, document.body.firstChild);
-
-                setTimeout(() => {
-                    errorMessageDiv.remove();
-                }, 2000);
-            }
-        </script>
-
-
-        <!-- Google Maps API -->
-        <script
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap"
-            async defer></script>
-        <script>
-            let map, marker;
-
-            function initMap() {
-                map = new google.maps.Map(document.getElementById('map'), {
-                    center: { lat: -34.397, lng: 150.644 },
-                    zoom: 8
+                    if (files) {
+                        Array.from(files).forEach(file => {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+                                img.style.maxWidth = '150px';
+                                img.style.margin = '10px';
+                                img.style.borderRadius = '10px';
+                                preview.appendChild(img);
+                            }
+                            reader.readAsDataURL(file);
+                        });
+                    }
                 });
 
-                map.addListener('click', (event) => {
-                    placeMarker(event.latLng);
-                });
+                function showError(message) {
+                    const errorMessageDiv = document.createElement('div');
+                    errorMessageDiv.id = 'error-message';
+                    errorMessageDiv.className = 'alert-error';
+                    errorMessageDiv.innerText = message;
+                    document.body.insertBefore(errorMessageDiv, document.body.firstChild);
 
-                document.getElementById('clearPinButton').addEventListener('click', clearMarker);
-            }
+                    setTimeout(() => {
+                        errorMessageDiv.remove();
+                    }, 2000);
+                }
+            </script>
 
-            function placeMarker(location) {
-                if (marker) {
-                    marker.setPosition(location);
-                } else {
-                    marker = new google.maps.Marker({
-                        position: location,
-                        map: map
+
+            <!-- Google Maps API -->
+            <script
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap"
+                async defer></script>
+            <script>
+                let map, marker;
+
+                function initMap() {
+                    map = new google.maps.Map(document.getElementById('map'), {
+                        center: { lat: -34.397, lng: 150.644 },
+                        zoom: 8
                     });
+
+                    map.addListener('click', (event) => {
+                        placeMarker(event.latLng);
+                    });
+
+                    document.getElementById('clearPinButton').addEventListener('click', clearMarker);
                 }
 
-                document.getElementById('latitude').value = location.lat();
-                document.getElementById('longitude').value = location.lng();
-            }
+                function placeMarker(location) {
+                    if (marker) {
+                        marker.setPosition(location);
+                    } else {
+                        marker = new google.maps.Marker({
+                            position: location,
+                            map: map
+                        });
+                    }
 
-            function clearMarker() {
-                if (marker) {
-                    marker.setMap(null);
-                    marker = null;
+                    document.getElementById('latitude').value = location.lat();
+                    document.getElementById('longitude').value = location.lng();
                 }
-                document.getElementById('latitude').value = '';
-                document.getElementById('longitude').value = '';
-            }
-        </script>
 
-        <!-- Trim trailing whitespace before form submission -->
-        <script>
-            document.getElementById('communityPostForm').addEventListener('submit', function (event) {
-                const postText = document.getElementById('postText');
-                postText.value = postText.value.trim();
-            });
-        </script>
+                function clearMarker() {
+                    if (marker) {
+                        marker.setMap(null);
+                        marker = null;
+                    }
+                    document.getElementById('latitude').value = '';
+                    document.getElementById('longitude').value = '';
+                }
+            </script>
 
-        <%- include("templates/end") %>
+            <!-- Trim trailing whitespace before form submission -->
+            <script>
+                document.getElementById('communityPostForm').addEventListener('submit', function (event) {
+                    const postText = document.getElementById('postText');
+                    postText.value = postText.value.trim();
+                });
+            </script>
+
+</body>
+
+</html>
