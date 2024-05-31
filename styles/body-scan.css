@@ -2,28 +2,28 @@ body {
     margin: 0;
     font-family: "Montserrat", sans-serif;
     background-color: #646464;
-  }
-  
-  header {
+}
+
+header {
     margin-top: 3em;
     text-align: center;
     color: white;
-  }
-  
-  header h1 {
+}
+
+header h1 {
     font-size: 2em;
     font-weight: 900;
-  }
-  
-  #container3D canvas {
+}
+
+#container3D canvas {
     width: 100vw !important;
     height: 100vh !important;
     position: absolute;
     top: 0;
     left: 0;
-  }
+}
 
-  footer {
+footer {
     position: fixed;
     bottom: 0;
     display: flex;
@@ -74,24 +74,62 @@ body {
     text-align: center;
     position: absolute;
     left: 30px;
-    top: 15px;
+    top: 20px;
 }
 
 #continue-btn {
     position: absolute;
     right: 10px;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 30px;
-    /* background-color: rgb(221, 218, 218); */
-    /* top: 5px; */
+    background-color: rgb(221, 218, 218);
+    opacity: 0.8;
+    top: 10px;
 }
 
 #continue-icon {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: 25%;
+    top: 10%;
+}
+
+#cancel-ctn {
+    position: absolute;
+    left: 210px;
+    bottom: 30px;
+    background-color: #FF8624;
+    width: 200px;
+    height: 60px;
+    border-radius: 20px;
+}
+
+#cancel {
+    color: white;
+    font-size: 16pt;
+    text-align: center;
+    position: absolute;
+    left: 30px;
+    top: 20px;
+}
+
+#cancel-btn {
+    position: absolute;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 30px;
+    background-color: rgb(221, 218, 218);
+    opacity: 0.8;
+    top: 10px;
+}
+
+#cancel-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 10%;
 }
 
 #dash-board-icon {
@@ -124,3 +162,81 @@ body {
     width: 90px;
     height: 50px;
 }
+
+body {
+    overflow: hidden;
+}
+
+video {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+#scanning {
+    position: absolute;
+    bottom: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgb(185, 254, 253);
+    font-size: 20pt;   
+    font-weight: bold; 
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+    width: 30px;
+    aspect-ratio: 4;
+    background: radial-gradient(circle closest-side,rgb(185, 254, 253) 90%,#0000) 0/calc(100%/3) 100% space;
+    clip-path: inset(0 100% 0 0);
+    animation: l1 1s steps(4) infinite;
+    margin: 10px 10px 0;
+  }
+  @keyframes l1 {to{clip-path: inset(0 -34% 0 0)}}
+
+  #wait-msg {
+    position: absolute;
+    top: 80px;
+    left: 20%;
+    color: rgb(185, 254, 253);
+    text-align: center;
+    font-size: 20pt;
+    font-weight: bold;
+  }
+
+  #scan-result {
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    font-size: 24pt;
+    font-weight: bold;
+    color: #FF8624;
+    width: 90%;
+    height: 80px;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+  }
+
+  #scan-metrics {
+    position: absolute;
+    left: 20px;
+    bottom: 150px;
+    color: rgb(185, 254, 253);
+    border: solid 1px #FF8624;
+    width: 80%;
+    height: 150px;
+    font-size: 16pt;
+    padding: 20px;
+    border-radius: 20px;
+    display: none;
+  }
+
+  .metrics {
+    padding: 0 0 15px;
+  }

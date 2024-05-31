@@ -1,42 +1,55 @@
-<%- include("templates/header") %>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>FitUp</title>
+    <meta name="Comp2800 template" content="FitUp">
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap Library CSS CDN go here -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <!-- Boostrap Library JS CDN  go here -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+        </script>
+
+    <!-- favicon -->
+    <link rel="icon" href="/img/fitup.png">
+
+    <!-- Other libraries CSS CDN go here -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- Other Libraries JS CDN go here -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Google Fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <title>Community</title>
     <link rel="stylesheet" type="text/css" href="../../styles/community.css" text="">
-    </head>
+    <link rel="stylesheet" type="text/css" href="../../styles/mainOld.css" text="">
+</head>
 
-    <script>
-        function initMap() {
-            document.querySelectorAll('.map').forEach(mapElement => {
-                const latitude = parseFloat(mapElement.dataset.latitude);
-                const longitude = parseFloat(mapElement.dataset.longitude);
-
-                console.log('Latitude:', latitude, 'Longitude:', longitude);
-
-                if (!isNaN(latitude) && !isNaN(longitude)) {
-                    const map = new google.maps.Map(mapElement, {
-                        center: { lat: latitude, lng: longitude },
-                        zoom: 8
-                    });
-
-                    new google.maps.Marker({
-                        position: { lat: latitude, lng: longitude },
-                        map: map
-                    });
-                } 
-            });
-        }
-    </script>
-
+<body>
     <div class="header">
         <p class="headerTitle">Community posts</p>
+        <a id="go-back" onclick="goBack()">Back</a>
     </div>
 
     <div class="header2">
+
         <!-- add post -->
         <span class="add-post-container">
             <a href="/communityPost">
                 <button class="addPost">Add Post</button>
             </a>
         </span>
+
         <!-- Tag Filter -->
         <form method="GET" action="/community" class="filter">
             <label for="tag">Filter:</label>
@@ -47,84 +60,231 @@
             </select>
         </form>
     </div>
-    <div class="posts">
-        <% posts.forEach(post=> { %>
-            <div class="post">
-                <div class="profile">
-                    <img src="<%= post.profileImage %>" alt="Profile Image">
-                    <span class="username">
-                        <%= post.username %>
-                    </span>
-                    <div class="actions">
-                        <span class="tags">
-                            <% post.tags.forEach(tag=> { %>
-                                <span class="tag">
-                                    <%= tag %>
+
+    <!-- Success Message -->
+    <% if (postSuccess) { %>
+        <div id="success-message" class="alert-success">
+            Post created successfully!
+        </div>
+        <% } %>
+
+            <!-- initial posts - pages has content immediately -->
+            <div class="posts" id="posts">
+                <% posts.forEach((post, postIndex)=> { %>
+                    <div class="post">
+                        <div class="profile">
+                            <img src="/images/<%= post.userId %>" alt="Profile Image">
+                            <span class="username">
+                                <%= post.username %>
+                            </span>
+                            <div class="actions">
+                                <span class="tags">
+                                    <% post.tags.forEach(tag=> { %>
+                                        <span class="tag">
+                                            <%= tag %>
+                                        </span>
+                                        <% }) %>
                                 </span>
+                                <% if (String(post.userId)===String(userId)) { %>
+                                    <form action="/community/delete/<%= post._id %>" method="POST" class="delete">
+                                        <button type="submit" onclick="confirmDelete(event)">Delete</button>
+                                    </form>
+                                    <% } %>
+                            </div>
+                        </div>
+                        <p class="text">
+                            <%= post.text %>
+                        </p>
+                        <div class="image">
+                            <% imageUrls[postIndex].forEach(url=> { %>
+                                <img src="<%= url %>" alt="Image">
                                 <% }) %>
-                        </span>
-                        <% if (String(post.userId)===String(userId)) { %>
-                            <form action="/community/delete/<%= post._id %>" method="POST" class="delete">
-                                <button type="submit">Delete</button>
-                            </form>
+                        </div>
+                        <% if (post.location) { %>
+                            <div class="map" data-latitude="<%= post.location.latitude %>"
+                                data-longitude="<%= post.location.longitude %>" style="height: 300px; width: 100%;">
+                            </div>
                             <% } %>
                     </div>
-                </div>
-                <p class="text">
-                    <%= post.text %>
-                </p>
-                <div class="image">
-                    <% post.imageUrls.forEach(url=> { %>
-                        <img src="<%= cloudinary.url(url, { width: 1080, height: 1080, crop: 'fill' }) %>" alt="Image">
-                        <% }) %>
-                </div>
-                <% if (post.location) { %>
-                    <div class="map" data-latitude="<%= post.location.latitude %>"
-                        data-longitude="<%= post.location.longitude %>" style="height: 300px; width: 100%;"></div>
-
-                    <% } %>
+                    <% }) %>
             </div>
-            <% }) %>
-    </div>
 
-    <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+            <!-- Dynamic Loading - additional posts -->
+            <script>
+                let currentPage = 1;
+                const limit = 5; // only load 5 posts at a time
+                let isLoading = false;
+                const userId = "<%= userId %>"; // Embedding userId from server-side
+                const tag = "<%= tag %>";
 
-    <!-- Pagination Links -->
-    <!-- <div class="pagination">
-        <% if (page > 1) { %>
-            <a href="/community?page=<%= page - 1 %>&tag=<%= tag %>">Previous</a>
-        <% } %>
+                async function loadMorePosts() {
+                    if (isLoading) return;
+                    isLoading = true;
+                    currentPage++;
 
-        <% for (let i = 1; i <= totalPages; i++) { %>
-            <a href="/community?page=<%= i %>&tag=<%= tag %>" class="<%= i === page ? 'active' : '' %>"><%= i %></a>
-        <% } %>
+                    try {
+                        const request = `/community?tag=${tag}&page=${currentPage}&limit=${limit}&json=true`
+                        const response = await fetch(request);
+                        console.log(request);
+                        const { posts, imageUrls } = await response.json();
 
-        <% if (page < totalPages) { %>
-            <a href="/community?page=<%= page + 1 %>&tag=<%= tag %>">Next</a>
-        <% } %>
-    </div> -->
+                        if (posts.length === 0) {
+                            window.removeEventListener('scroll', handleScroll);
+                            return;
+                        }
 
-    <!-- Google Maps API -->
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap"
-        async defer></script>
+                        const postsContainer = document.getElementById('posts');
+                        posts.forEach((post, postIndex) => {
+                            const postElement = document.createElement('div');
+                            postElement.classList.add('post');
+
+                            postElement.innerHTML = `
+                            <div class="profile">
+                                <img src="${post.profileImage}" alt="Profile Image">
+                                <span class="username">${post.username}</span>
+                                <div class="actions">
+                                    <span class="tags">
+                                        ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                    </span>
+                                    ${String(post.userId) === String(userId) ? `
+                                        <form action="/community/delete/${post._id}" method="POST" class="delete">
+                                            <button type="submit" onclick="confirmDelete(event)">Delete</button>
+                                        </form>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <p class="text">${post.text}</p>
+                            <div class="image">
+                                ${imageUrls[postIndex].map(url => `<img src="${url}" alt="Image">`).join('')}
+                            </div>
+                            ${post.location ? `
+                                <div class="map" data-latitude="${post.location.latitude}" data-longitude="${post.location.longitude}" style="height: 300px; width: 100%;"></div>
+                            ` : ''}
+                        `;
+                            postsContainer.appendChild(postElement);
+                        });
+                    } catch (error) {
+                        console.error('Error loading more posts:', error);
+                    } finally {
+                        isLoading = false;
+                    }
+                }
+
+                // lazy loading of post
+                function handleScroll() {
+                    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+                        loadMorePosts();
+                    }
+                }
+
+                window.addEventListener('scroll', handleScroll);
+            </script>
+
+            <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+
+            <!-- going back function -->
+            <script>
+                function goBack() {
+                    window.location.href = 'main';
+                }
+            </script>
+
+            <!-- Google Maps API -->
+            <script
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSsNPGiel4VXi9zgbCfhYRgfdZrBZ3SD4&loading=async&callback=initMap"
+                async defer>
+                </script>
+
+            <!-- bottom-to-top button -->
+            <script>
+                let mybutton = document.getElementById("myBtn");
+                window.onscroll = function () { scrollFunction() };
+                function scrollFunction() {
+                    // When the user scrolls down 30px from the top of the document, show the button
+                    if (document.body.scrollTop > 30 || document.documentElement.scrollTop > 30) {
+                        mybutton.style.display = "block";
+                    } else {
+                        mybutton.style.display = "none";
+                    }
+                }
+                function topFunction() {
+                    document.documentElement.scrollTop = 0;
+                }
+            </script>
+
+            <!-- map -->
+            <script>
+                function initMap() {
+                    document.querySelectorAll('.map').forEach(mapElement => {
+                        const latitude = parseFloat(mapElement.dataset.latitude);
+                        const longitude = parseFloat(mapElement.dataset.longitude);
+
+                        console.log('Latitude:', latitude, 'Longitude:', longitude);
+
+                        if (!isNaN(latitude) && !isNaN(longitude)) {
+                            const map = new google.maps.Map(mapElement, {
+                                center: { lat: latitude, lng: longitude },
+                                zoom: 8
+                            });
+
+                            new google.maps.Marker({
+                                position: { lat: latitude, lng: longitude },
+                                map: map
+                            });
+                        }
+                    });
+                }
+            </script>
+
+            <!-- confirmation message for deleting -->
+            <script>
+                function confirmDelete(event) {
+                    event.preventDefault();
+                    const modal = document.getElementById('confirmModal');
+                    const modalContent = document.querySelector('.modal-content');
+
+                    modal.style.display = 'block';
+                    setTimeout(() => {
+                        modal.classList.add('show');
+                        modalContent.classList.add('show');
+                    }, 10);
+
+                    document.getElementById('confirmBtn').onclick = function () {
+                        modalContent.classList.remove('show');
+                        setTimeout(() => {
+                            event.target.closest('form').submit();
+                        }, 500);
+                    };
+
+                    document.getElementById('cancelBtn').onclick = function () {
+                        modalContent.classList.remove('show');
+                        modal.style.display = 'none';
+                    };
+                }
+            </script>
 
 
-    <script>
-        // Get the button:
-        let mybutton = document.getElementById("myBtn");
-        window.onscroll = function () { scrollFunction() };
-        function scrollFunction() {
-            // When the user scrolls down 30px from the top of the document, show the button
-            if (document.body.scrollTop > 30 || document.documentElement.scrollTop > 30) {
-                mybutton.style.display = "block";
-            } else {
-                mybutton.style.display = "none";
-            }
-        }
-        function topFunction() {
-            document.documentElement.scrollTop = 0;
-        }
-    </script>
+            <!-- Confirmation Modal -->
+            <div id="confirmModal" class="modal">
+                <div class="modal-content">
+                    <p>Are you sure you want to delete this post?</p>
+                    <button id="confirmBtn">Yes</button>
+                    <button id="cancelBtn">No</button>
+                </div>
+            </div>
 
-    <%- include("templates/footer") %>
+            <!-- success message -->
+            <script>
+                window.addEventListener('DOMContentLoaded', (event) => {
+                    const successMessage = document.getElementById('success-message');
+                    if (successMessage) {
+                        setTimeout(() => {
+                            successMessage.remove();
+                        }, 2000);
+                    }
+                });
+            </script>
+
+</body>
+
+</html>

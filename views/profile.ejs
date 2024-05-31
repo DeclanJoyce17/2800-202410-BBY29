@@ -7,17 +7,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Account Settings</title>
+    <!-- Bootstrap Library CSS CDN go here -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <!-- favicon -->
+    <link rel="icon" href="/img/fitup.png">
+
     <link rel="stylesheet" href="/styles/profile.css">
 </head>
 
-<!-- can't use header.ejs because there is style.css. that ruins the page-->
+<!-- can't use header.ejs because there is style.css. that ruins the page -->
 
 <body>
     <div class="container">
 
         <div class="header">
             <p class="headerTitle">Account Settings</p>
-            <a class="go-back" onclick="goBack()">Back</a>
+            <a id="go-back" onclick="goBack()">Back</a>
         </div>
 
         <div class="profile-image">
@@ -35,132 +42,98 @@
             </h1>
         </div>
 
-        <!-- Success Message -->
-        <% if (uploadSuccess) { %>
-            <div id="success-message" class="alert-success">
-                Image uploaded successfully!
+        <% if (change==true) { %>
+            <div class="alert alert-info" role="alert">
+                <h2>User Info Change Successful</h2>
             </div>
             <% } %>
 
-
-                <div class="section">
-                    <div class="section-title">General</div>
-
-                    <!-- possibly use -->
-                    <!-- <div class="item">
-                <span>Notifications</span>
-                <span class="icon">🔔</span>
-            </div> -->
-
-                    <!-- <div class="item">
-                <span>Language</span>
-                <span class="icon">🌐</span>
-                <span class="badge">EN</span>
-            </div> -->
-                    <!-- <div class="item">
-                <span>Dark Mode</span>
-                <input type="checkbox" class="toggle" checked>
-            </div> -->
-                    <div class="item">
-                        <a href="/changeUsername" style="text-decoration : none;">
-                            <span class="icon">👤</span>
-                            <span>Change Username</span>
-                        </a>
+                <!-- Error Message -->
+                <% if (uploadError) { %>
+                    <div id="error-message" class="alert-error">
+                        <%= uploadError %>
                     </div>
+                    <% } %>
 
-                    <div class="item">
-                        <a href="/" id="profileImageLink" style="text-decoration: none;">
-                            <span class="icon">👤</span>
-                            <span>Change Profile Image</span>
-                        </a>
-                        <form id="profileUploadForm" action="/profile-upload" method="post"
-                            enctype="multipart/form-data" class="d-none">
-                            <input type="file" name="image" id="profileImageInput" required style="display: none;">
-                        </form>
-                    </div>
-
-                    <div class="item">
-                        <a href="/changeEmail" style="text-decoration : none;">
-                            <span class="icon">✉️</span>
-                            <span>Change Email</span>
-                        </a>
-                    </div>
-
-                    <div class="item">
-                        <a href="/changePassword" style="text-decoration : none;">
-                            <span class="icon">📝</span>
-                            <span>Change Password</span>
-                        </a>
-                    </div>
-
-                    <div class="item">
-                        <a href="/rankProgress" style="text-decoration : none;">
-                            <span class="icon">🏆</span>
-                            <span>Ranking Progress</span>
-                        </a>
-                    </div>
-                    <% if(type =='admin') { %>
-                        <div class="item">
-                            <a href="/admin" style="text-decoration : none;">
-                                <span class="icon"></span>
-                                <span>Admin</span>
-                            </a>
+                        <!-- Profile Options-->
+                        <div class="section">
+                            <div class="section-title">General</div>
+                            <div class="item">
+                                <a href="/changeUsername" style="text-decoration : none;">
+                                    <span class="icon">👤</span>
+                                    <span>Change Username</span>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="/" id="profileImageLink" style="text-decoration: none;">
+                                    <span class="icon">👤</span>
+                                    <span>Change Profile Image</span>
+                                </a>
+                                <form id="profileUploadForm" action="/profile-upload" method="post"
+                                    enctype="multipart/form-data" class="d-none">
+                                    <input type="file" name="image" id="profileImageInput" required
+                                        style="display: none;">
+                                </form>
+                            </div>
+                            <div class="item">
+                                <a href="/changeEmail" style="text-decoration : none;">
+                                    <span class="icon">✉️</span>
+                                    <span>Change Email</span>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="/changePassword" style="text-decoration : none;">
+                                    <span class="icon">📝</span>
+                                    <span>Change Password</span>
+                                </a>
+                            </div>
+                            <div class="item">
+                                <a href="/rankProgress" style="text-decoration : none;">
+                                    <span class="icon">🏆</span>
+                                    <span>Ranking Progress</span>
+                                </a>
+                            </div>
+                            <% if(type=='admin' ) { %>
+                                <div class="item">
+                                    <a href="/admin" style="text-decoration : none;">
+                                        <span class="icon"></span>
+                                        <span>Admin</span>
+                                    </a>
+                                </div>
+                                <% } %>
                         </div>
-                        <% } %>
-                </div>
 
-                <!-- <div class="section">
-            <div class="section-title">Security & Privacy</div>
-            <div class="item">
-                <a href="/" style="text-decoration : none;">
-                    <span class="icon">🔏</span>
-                    <span>Privacy Policy</span>
-                </a>
-            </div>
-        </div>
+                        <!-- Danger Zone/Logout -->
+                        <div class="section danger-zone">
+                            <div class="section-title"></div>
+                            <hr>
+                            <div class="item" action="/logout" method="get">
+                                <a href="/logout" type="submit" id="logoutLink" style="text-decoration : none;">
+                                    <span class="icon">❌</span>
+                                    <span>Log Out</span>
+                                </a>
+                                </form>
+                            </div>
+                        </div>
 
-        <div class="section">
-            <div class="section-title">Help & Support</div>
-            <div class="item">
-                <a href="/" style="text-decoration : none;">
-                    <span class="icon">🗨️</span>
-                    <span>About Us</span>
-                </a>
-            </div>
-
-            <div class="item">
-                <a href="/" style="text-decoration : none;">
-                    <span class="icon">🆘</span>
-                    <span>Help Center</span>
-                </a>
-            </div>
-        </div> -->
-
-
-                <div class="section danger-zone">
-                    <div class="section-title">Danger Zone</div>
-                    <div class="item" action="/logout" method="get">
-                        <a href="/logout" type="submit" style="text-decoration : none;">
-                            <span class="icon">❌</span>
-                            <span>Log Out</span>
-                        </a>
+                        <!-- Sends to /logout -->
+                        <form id="logoutForm" action="/logout" method="GET" style="display: none;">
+                            <input type="hidden">
                         </form>
-                    </div>
-                </div>
 
-                <div class="footer">
-                    fitup.ai v1.2800 ©All Rights Reserved, 2024
-                </div>
+                        <div class="footer">
+                            fitup. v1.2800 ©All Rights Reserved, 2024
+                        </div>
     </div>
 
     <!-- going back function -->
     <script>
         function goBack() {
-            window.history.back();
+            window.location.href = 'main';
         }
     </script>
 
-    <!-- one click event for uploading image / mitigating the steps -->
+    <!-- one click event for uploading image / mitigating the steps / success message-->
     <script>
         document.getElementById('profileImageLink').addEventListener('click', function (e) {
             e.preventDefault();
@@ -174,12 +147,50 @@
         document.addEventListener('DOMContentLoaded', () => {
             const successMessageDiv = document.getElementById('success-message');
             if (successMessageDiv) {
-                // Hide the success message after 3 seconds
                 setTimeout(() => {
                     successMessageDiv.style.display = 'none';
                 }, 3000);
             }
         });
     </script>
+
+    <!-- confirmation message for logout -->
+    <script>
+        document.getElementById('logoutLink').addEventListener('click', function (event) {
+            event.preventDefault();
+
+            const modal = document.getElementById('confirmModal');
+            const modalContent = document.querySelector('.modal-content');
+
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.classList.add('show');
+                modalContent.classList.add('show');
+            }, 10);
+
+            document.getElementById('confirmBtn').onclick = function () {
+                modalContent.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    document.getElementById('logoutForm').submit();
+                }, 500);
+            };
+
+            document.getElementById('cancelBtn').onclick = function () {
+                modalContent.classList.remove('show');
+                modal.style.display = 'none';
+            };
+        });
+    </script>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to log out?</p>
+            <button id="confirmBtn">Yes</button>
+            <button id="cancelBtn">No</button>
+        </div>
+    </div>
+
 
     <%- include("templates/end") %>

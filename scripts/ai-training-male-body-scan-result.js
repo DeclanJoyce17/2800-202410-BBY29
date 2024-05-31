@@ -108,3 +108,45 @@ const continueButton = document.getElementById('continue-ctn');
 continueButton.addEventListener('click', () => {
   window.location.href = '/ai-training-recommendation';
 });
+
+// Display the metrics section
+const metricsContainer = document.getElementById("scan-metrics");
+const height = document.getElementById("height");
+const weight = document.getElementById("weight");
+const bmi = document.getElementById("bmi");
+const musMass = document.getElementById("muscle-mass");
+
+// Set initial opacity and display properties for each child div
+height.style.transition = "opacity 0.5s ease";
+height.style.opacity = 0;
+height.style.display = "block";
+
+weight.style.transition = "opacity 0.5s ease";
+weight.style.opacity = 0;
+weight.style.display = "block";
+
+bmi.style.transition = "opacity 0.5s ease";
+bmi.style.opacity = 0;
+bmi.style.display = "block";
+
+musMass.style.transition = "opacity 0.5s ease";
+musMass.style.opacity = 0;
+musMass.style.display = "block";
+
+const metrics = [height, weight, bmi, musMass];
+
+function fadeIn(element) {
+  element.style.opacity = 1;
+}
+
+setTimeout(() => {
+  metricsContainer.style.display = "block";
+  fadeIn(metricsContainer);
+  let delay = 0;
+  metrics.forEach((metric, index) => {
+    setTimeout(() => {
+      fadeIn(metric);
+    }, delay + (index + 1) * 500);
+  });
+}, 500);
+

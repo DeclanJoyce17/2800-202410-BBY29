@@ -1,6 +1,18 @@
 body {
     margin: 0;
     padding: 0;
+    overflow: hidden;
+    font-size: 40pt;
+    font-weight: bold;
+}
+
+.text {
+    position: absolute;
+    top: 50%;
+    margin: 0 20px;
+    color: #FF8624;
+    opacity: 0;
+    transition: opacity 1s ease;
 }
 
 #camera-feed {
@@ -56,7 +68,7 @@ footer {
     top: 20px;
 }
 
-#bookmark {
+#skip {
     width: 60px;
     height: 60px;
     position: absolute;
@@ -66,7 +78,7 @@ footer {
     border-radius: 20px;
 }
 
-#bookmark-icon {
+#skip-icon {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -85,3 +97,51 @@ footer {
 #content {
     margin-bottom: 200px;
 }
+
+#go-back {
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    background-color: rgb(221, 218, 218);
+    opacity: 0.6;
+    border-radius: 20px;
+    width: 60px;
+    height: 60px;
+}
+
+#go-back-icon {
+    position: absolute;
+    left: 32px;
+    top: 65px;
+}
+
+#setting {
+    position: absolute;
+    right: 20px;
+    top: 50px;
+    background-color: rgb(221, 218, 218);
+    opacity: 0.6;
+    border-radius: 20px;
+    width: 60px;
+    height: 60px;
+}
+
+#setting-icon {
+    position: absolute;
+    right: 18px;
+    transform: translateX(-50%);
+    top: 65px;
+}
+
+#top-nav {
+    position: fixed;
+    top: 0;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    height: 300px;
+    z-index: 1000;
+}
+

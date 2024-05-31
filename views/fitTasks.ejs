@@ -1,46 +1,59 @@
-<%- include("templates/header") %>
+<%- include("templates/headerOld") %>
+
     <link rel="stylesheet" type="text/css" href="/styles/tasks.css" text="">
 
     </head>
 
     <body>
 
-        <div>
-            <form action="/shop" method="get">
-                <button type="submit" class="rerolls">
-                    <img class="rerollImg" src="/img/reroll.png">
-                    <span class="reroll">: <%=rerolls%>
-                    </span>
-                </button>
-            </form>
+        <div class="container2 inline">
+            <a href="/" id="back" type="button">Back</a>
+
+
+            <div class="Chatter">
+                <form action="/aichat-loading" method="get">
+                    <button type="submit" class="btner"><img src="/img/chatBotImg.png"></button>
+                </form>
+            </div>
+
+            <div>
+                <form action="/shop" method="get">
+                    <button type="submit" class="rerolls">
+                        <img class="rerollImg" src="/img/reroll.png">
+                        <span class="reroll">: <%=rerolls%></span>
+                    </button>
+                </form>
+            </div>
+
+            
         </div>
 
-        <!-- Chatbot -->
-        <div class="Chatter">
-            <form action="/aichat-home" method="get">
-                <button type="submit" class="btner"><img src="/img/chatBotImg.png"></button>
-            </form>
-        </div>
-        
-        <!--Contents in the body tag-->
-        <img class="title" src="/img/FitnessLogo.png" alt="logo">
-        
+        <h1 class="text-center">
+            <svg id="weight-icon" width="100" height="100" viewBox="0 0 24 24" fill="none" style="margin-top: 50px;"
+                xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M6.51706 10.6554C6.19086 10.8729 5.78252 10.9275 5.41058 10.8036C3.89312 10.2977 2.70237 9.10699 2.19655 7.58953C2.07257 7.2176 2.12726 6.80926 2.34473 6.48305L2.46829 6.29772C2.78795 5.81823 3.13662 5.36025 3.51194 4.92615L2.29295 3.70717L3.70717 2.29295L4.92615 3.51194C5.36025 3.13662 5.81823 2.78795 6.29772 2.46829L6.48305 2.34473C6.80926 2.12726 7.2176 2.07257 7.58953 2.19655C9.10699 2.70237 10.2977 3.89312 10.8036 5.41058C10.9275 5.78252 10.8729 6.19085 10.6554 6.51706L10.5318 6.7024C10.2122 7.18189 9.86349 7.63987 9.48818 8.07396L14.9488 13.5346C15.47 13.0761 16.0223 12.6519 16.6023 12.2652L16.7134 12.1912C16.8943 12.0706 17.1207 12.0403 17.3269 12.109C19.0097 12.6699 20.3302 13.9904 20.8911 15.6732C20.9599 15.8794 20.9295 16.1059 20.8089 16.2867L20.7349 16.3978C20.3482 16.9779 19.924 17.5301 19.4656 18.0513L20.7072 19.2929L19.293 20.7072L18.0513 19.4655C17.5301 19.924 16.9779 20.3482 16.3978 20.7349L16.2867 20.8089C16.1059 20.9295 15.8794 20.9599 15.6732 20.8911C13.9904 20.3302 12.6699 19.0097 12.109 17.3269C12.0403 17.1207 12.0706 16.8943 12.1912 16.7134L12.2652 16.6023C12.6519 16.0223 13.0761 15.47 13.5346 14.9488L8.07396 9.48818C7.63987 9.86349 7.18189 10.2122 6.7024 10.5318L6.51706 10.6554Z"
+                    fill="black" />
+            </svg><br><br>
+            Fitness Tasks
+        </h1>
 
-        <div class="container taskCards">
-
+        <div class="container taskCards" style="margin-top: 50px;">
             <% if (noRerolls) { %>
                 <h1 class="error">Lacking Rerolls</h1>
                 <% } %>
-                    <h1>Points: <%= points %>
+                    <h1 class="text-center">Points: <%= points %>
                     </h1>
-                    <div class="card">
-                        <div class="card-body">
+
+                    <div class="card" id="taskCard1">
+                        <div class="card-body" id="taskBody1">
                             <%= task1 %>
                         </div>
                         <span>
-                            <form method="post" action="/addPointFit" style="display: inline">
+                            <form method="post" action="/addPointFit" style="display: inline" id="doneForm1">
                                 <input type="text" name="task" value="<%= task1 %>" hidden>
-                                <button class="btn btnz btn-primary float-right" type="submit">Done</button>
+                                <button class="btn btnz btn-primary float-right" type="submit"
+                                    id="doneButton1">Done</button>
                             </form>
                             <form method="post" action="/rerollFit" style="display: inline">
                                 <input type="text" name="number" value="1" hidden>
@@ -49,14 +62,16 @@
                             </form>
                         </span>
                     </div>
-                    <div class="card">
-                        <div class="card-body">
+
+                    <div class="card" id="taskCard2">
+                        <div class="card-body" id="taskBody2">
                             <%= task2 %>
                         </div>
                         <span>
-                            <form method="post" action="/addPointFit" style="display: inline">
+                            <form method="post" action="/addPointFit" style="display: inline" id="doneForm2">
                                 <input type="text" name="task" value="<%= task2 %>" hidden>
-                                <button class="btn btnz btn-primary float-right" type="submit">Done</button>
+                                <button class="btn btnz btn-primary float-right" type="submit"
+                                    id="doneButton2">Done</button>
                             </form>
                             <form method="post" action="/rerollFit" style="display: inline">
                                 <input type="text" name="number" value="2" hidden>
@@ -65,14 +80,16 @@
                             </form>
                         </span>
                     </div>
-                    <div class="card">
-                        <div class="card-body">
+
+                    <div class="card" id="taskCard3">
+                        <div class="card-body" id="taskBody3">
                             <%= task3 %>
                         </div>
                         <span>
-                            <form method="post" action="/addPointFit" style="display: inline">
+                            <form method="post" action="/addPointFit" style="display: inline" id="doneForm3">
                                 <input type="text" name="task" value="<%= task3 %>" hidden>
-                                <button class="btn btnz btn-primary float-right" type="submit">Done</button>
+                                <button class="btn btnz btn-primary float-right" type="submit"
+                                    id="doneButton3">Done</button>
                             </form>
                             <form method="post" action="/rerollFit" style="display: inline">
                                 <input type="text" name="number" value="3" hidden>
@@ -84,8 +101,10 @@
 
         </div>
         <div>
-            <% if(boostActive > 0) { %>
+            <% if(boostActive> 0) { %>
                 <div class="boostActive">You have <%= boostActive %> minutes of boost time left.</div>
-              <% } %>
-            </div>
-        <%- include("templates/footer") %>
+                <% } %>
+        </div>
+
+
+        <%- include("templates/end") %>

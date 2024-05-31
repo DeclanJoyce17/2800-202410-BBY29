@@ -1,4 +1,4 @@
-
+/* Universal styling for index, login, signup, reset-email, reset-password */
 .button {
     border-radius: 25px;
     margin-top: 20px;
@@ -11,7 +11,7 @@
     margin-right: 810px;
     color: black;
     font-size: 40px;
-    background-color: #d4d5d6;
+    background-color: #d4d5d6; 
     border: none;
     cursor: pointer;
     transition-duration: 0.4s;
@@ -26,8 +26,18 @@
 }
 
 .title {
-    margin-top: 100px;
+  margin-top: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 250px; /* Ensure the height is set to match the image height */
 }
+
+.title img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
 
 .custom-btn {
     background-color: #FF8624;
@@ -54,7 +64,7 @@
 .index-btn {
     border-radius: 25px;
     margin-top: 20px;
-    width: 40%;
+    width: 100px;
     padding-top: 10px;
     padding-bottom: 10px;
     text-align: center;
@@ -73,13 +83,11 @@
     padding-right: 10%;
     height: 100%;
     width: 80%;
-    display: flex; /* Use flexbox */
+    display: flex; /* Use flexbox *
     justify-content: space-between; /* Space items evenly */
 }
 
 .resize {
-    font-size: 10px;
+    font-size: 15px;
 
 }
-
-

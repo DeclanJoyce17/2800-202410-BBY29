@@ -18,20 +18,24 @@ checkboxes.forEach((checkbox) => {
 
 function updateProgressBar() {
     const progress = (checkedCheckboxes / totalCheckboxes) * 100;
-    progressBar.value = progress;
+    progressBar.innerHTML = progress.toFixed(2) + '%';
+    progressBar.innerHTML = progress + '%';
+    progressBar.style.setProperty('--bs-progress-bar-bg', '#FF8624', 'width', '25%');
 }
 
 var textContent = " I am interested in ";
 
-// Get the value of the selected button
-document.getElementById('topic').addEventListener('click', function (event) {
-    const clickedContainer = event.target.closest('.icon-container');
-    if (clickedContainer) {
-        textContent += clickedContainer.querySelector('.topic-text').textContent;
-        console.log(textContent); // save the text content
-    }
-});
+// Function to update textContent with toggled divs' inner HTML content
+function updateTextContent() {
+    textContent = " I am interested in "; // Reset the textContent
+    const activeDivs = document.querySelectorAll('.icon-container.active');
 
+    activeDivs.forEach(div => {
+        textContent += div.querySelector('.topic-text').innerHTML + ", ";
+    });
+
+    console.log(textContent); // Log the updated textContent
+}
 
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -58,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Get the href value of the selected link
-        var freq = "I want to work out ";
+        var freq = "I want to commit ";
         const links = document.querySelectorAll(".nav-link");
         for (let i = 0; i < links.length; i++) {
             if (links[i].classList.contains("active")) {
@@ -75,7 +79,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             body: new URLSearchParams({
                 question: "I want to have a personalized fitness training plan based on the information that I provide as follow"
-                    + goals + "\n" + age + "\n" + freq + "\n" + textContent
+                    + goals + "\n" + age + "\n" + freq + "\n" + textContent + ". Your answer should be concise. Please remove all special characters"
+                    + "asterisk (*) from your response. Please make appropriate sentences and paragraphs to ensure readibility for humans."
             }),
         });
 
@@ -90,3 +95,69 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/ai-training-scan-request';
     });
 });
+
+const homeBtn = document.getElementById('home');
+homeBtn.addEventListener('click', () => {
+    window.location.href = '/main';
+});
+
+// Toggle the age group button
+const ageGroups = document.querySelectorAll('.list-group-item');
+
+ageGroups.forEach(age => {
+    age.addEventListener('click', () => {
+        // Remove active class from all items
+        ageGroups.forEach(age => {
+            age.classList.remove('active');
+        });
+
+        // Toggle active class on the clicked item
+        age.classList.toggle('active');
+    });
+});
+
+// Toggle the frequency button
+const freqGroup = document.querySelectorAll('.nav-link');
+
+freqGroup.forEach(freq => {
+    freq.addEventListener('click', () => {
+        // Remove 'active' class from all links
+        freqGroup.forEach(freq => {
+            freq.classList.remove('active');
+        });
+
+        // Add 'active' class to the clicked link
+        freq.classList.add('active');
+    });
+});
+
+// Toggle the topic 
+const topicGroup = document.querySelectorAll('.icon-container');
+
+topicGroup.forEach(topic => {
+    topic.addEventListener('click', () => {
+            topic.classList.toggle('active');
+            updateTextContent();
+            saveToggledDivs();
+    });
+});
+
+// Save the value for the topic to toggle the topic in AI recommendation page
+function saveToggledDivs() {
+    const activeDivs = document.querySelectorAll('.icon-container.active');
+    const contentArray = [];
+
+    activeDivs.forEach(div => {
+        contentArray.push(div.querySelector('.topic-text').innerHTML);
+    });
+
+    console.log('saved content', activeDivs);
+    // Save the content array into local storage
+    localStorage.setItem('toggledDivsContent', JSON.stringify(contentArray));
+}
+
+const backBtn = document.getElementById('go-back');
+backBtn.addEventListener('click', () => {
+    console.log('click');
+  window.history.back();
+})

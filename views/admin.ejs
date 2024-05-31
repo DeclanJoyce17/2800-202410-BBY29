@@ -1,4 +1,4 @@
-<%- include("templates/header") %>
+<%- include("templates/headerOld") %>
    <style>
     /* Basic Reset */
 * {
@@ -79,10 +79,28 @@ body {
     font-size: 1.2em;
     color: #333;
 }
+.back-button {
+            position: absolute;
+            top: 19px;
+            left: 45px;
+            background-color: #FF8246;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 13px;
+            font-size: 10pt;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background-color: #ee6525;
+        }
 
 
    </style> 
     <div class="container">
+        <a href="/profile" class="back-button">Back to Profile</a>
         <h1 class="title">Users</h1>
         <hr class="divider">
         
@@ -93,4 +111,4 @@ body {
         </ol>
     </div>
     
-    <%- include("templates/footer") %>
+    <%- include("templates/end") %>

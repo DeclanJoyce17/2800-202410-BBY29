@@ -1,7 +1,22 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 16pt;
+    /* background-color: #000000 ; */
+}
+
 nav {
     width: 100%;
     /* position: fixed; */
     top: 20px;
+}
+
+.py-5 {
+    padding: 0 !important;
+}
+
+.my-5 {
+    margin: 0 0 180px !important
 }
 
 .navButton {
@@ -12,19 +27,20 @@ nav {
 }
 
 .navText {
-    position: relative; top: 20px;
+    position: relative;
+    top: 20px;
     padding: 14px 0;
     margin-left: 20px;
     font-size: 30px;
 }
 
-#chart{
+#chart {
     align-content: center;
     text-align: center;
     align-items: center;
 }
 
-#tropohy{
+#tropohy {
     width: 20%;
 }
 
@@ -37,32 +53,15 @@ nav {
 }
 
 .task-entry {
-    width: 80%; 
-    min-height: 100px; 
-    background-color: #f9f9f9; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    width: 80%;
+    min-height: 100px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    margin-bottom: 20px; 
-    border-radius: 5px; 
+    margin-bottom: 20px;
+    border-radius: 5px;
 }
 
-footer{
-    position: fixed;
-    bottom: 0px;
-    left: 0px;  
-    width: 100%;
-    background-color: #d9d9d9;
-}
-
-.footerButton {
-    margin-left: 25px;
-    margin-right: 25px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    padding: 0;
-    border: none;
-    text-decoration: none;
-}
 
 
 /* leader board */
@@ -78,13 +77,12 @@ main {
     border-radius: 0.5rem;
     align-items: center;
     justify-content: center;
+    margin: 0;
+    width: 100%;
 }
 
 #header {
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 2.5rem 2rem;
 }
 
@@ -114,13 +112,54 @@ h1 {
     color: #141a39;
     text-transform: uppercase;
     cursor: default;
+    font-weight: bold;
 }
 
 #leaderboard {
-    width: 100%;
+    width: 95%;
     position: relative;
+    margin: 0 0 0 10px;
 }
+  
+  @keyframes sparkle {
+    0% {
+      opacity: 0;
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-50px) rotate(180deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(0) rotate(360deg);
+    }
+  }
 
+  /* Adjust the size and position of the fireworks */
+  .firework {
+    position: absolute;
+    width: 10px; /* Increase particle size */
+    height: 10px; /* Increase particle size */
+    border-radius: 50%;
+    animation: firework 1s ease-in-out infinite;
+  }
+
+  @keyframes firework {
+    0% {
+      opacity: 0;
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-100px) rotate(180deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(0) rotate(360deg);
+    }
+  }
+  
 table {
     width: 100%;
     border-collapse: collapse;
@@ -167,6 +206,7 @@ td {
 .name {
     text-align: left;
     font-size: 1.2rem;
+    padding-left: 0;
 }
 
 .points {
@@ -192,42 +232,10 @@ td {
     top: -0.5rem;
     background-color: #353741;
     position: absolute;
-    left: -1rem;
+    left: 0px;
     -webkit-box-shadow: 0px 15px 11px -6px #7a7a7d;
     box-shadow: 0px 15px 11px -6px #7a7a7d;
 }
-
-/* @media (max-width: 3000px) {
-    .ribbon {
-        width: 100%;
-        height: 12vh;
-        max-height: 7rem; 
-        -webkit-box-shadow: 0px 1rem 1rem -0.5rem #7a7a7d;
-        box-shadow: 0px 1rem 1rem -0.5rem #7a7a7d;
-    }
-}
-
-
-
-@media (max-width: 768px) {
-    .ribbon {
-        width: 95%;
-        height: 12vh;
-        max-height: 7rem; 
-        -webkit-box-shadow: 0px 1rem 1rem -0.5rem #7a7a7d;
-        box-shadow: 0px 1rem 1rem -0.5rem #7a7a7d;
-    }
-}
-
-@media (max-width: 480px) {
-    .ribbon {
-        width: 100%; 
-        height: 15vh;
-        max-height: 6rem; 
-        -webkit-box-shadow: 0px 0.5rem 0.5rem -0.3rem #7a7a7d;
-        box-shadow: 0px 0.5rem 0.5rem -0.3rem #7a7a7d;
-    }
-} */
 
 .ribbon::before {
     content: "";
@@ -261,56 +269,909 @@ td {
     gap: 2rem;
 }
 
-@media (max-width: 740px) {
-    * {
-        font-size: 70%;
-    }
-}
-
-@media (max-width: 500px) {
-    * {
-        font-size: 55%;
-    }
-}
-
-@media (max-width: 390px) {
-    * {
-        font-size: 45%;
-    }
-}
-
-/* task container */
-ul {
-    border: 2px solid rgb(3, 3, 3);
-    padding: .2em;
-    list-style-type: none;
-}
-
-.task-item {
-    text-align: center;
-    color: green;
-    font-size: 15px;
-}
-
-/* footer */
-footer {
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
-    width: 100%;
-    background-color: #d9d9d9;
-}
- 
-.footerButton {
-    margin-left: 25px;
-    margin-right: 25px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    padding: 0;
-    border: none;
-    text-decoration: none;
-}
-
 .taskplace_holder {
     font-size: 30px;
+}
+
+
+.button {
+    border-radius: 25px;
+    margin-top: 20px;
+    width: 40%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    text-decoration: none;
+    margin-left: 125px;
+    margin-right: 810px;
+    color: black;
+    font-size: 40px;
+    background-color: #d4d5d6;
+    border: none;
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+.shopitems {
+    font-size: 25pt;
+}
+
+.button:hover {
+    background-color: #9fa5a7;
+}
+
+.title {
+    margin-top: 100px;
+}
+
+.custom-btn {
+    background-color: #FF8624;
+    color: #fff;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.login {
+    font-size: 30px;
+}
+
+.index-form {
+    padding: 12px 24px;
+    font-size: 16px;
+
+}
+
+.index-btn {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    background-color: #FF8624;
+    bottom: 60px;
+    right: 20px;
+}
+
+.task-nav {
+    padding-left: 10%;
+    padding-right: 10%;
+    height: 100%;
+    width: 80%;
+    display: flex;
+    /* Use flexbox */
+    justify-content: space-between;
+    /* Space items evenly */
+}
+
+.resize {
+    font-size: 10px;
+
+}
+
+#get-started-ai {
+    position: absolute;
+    left: 20px;
+    bottom: 70px;
+    color:white;
+    
+}
+footer {
+    display: flex;
+    position: fixed;
+    bottom: -40px;
+    width: 100%;
+    height: 130px;
+}
+
+#home-weight {
+    height: 120px;
+    width: 180px;
+    background-color: white;
+    border-radius: 20px;
+}
+
+#home {
+    background-color: rgb(225, 225, 225);
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    position: absolute;
+    left: 20px;
+    bottom: 60px;
+    border-bottom: solid #FF8624;
+}
+
+#home-icon {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+}
+
+#weight {
+    background-color: rgb(225, 225, 225);
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    position: absolute;
+    left: 100px;
+    bottom: 60px;
+    opacity: 0.6;
+}
+
+#weight-icon {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+}
+
+#plus {
+    
+    position: absolute;
+    left: 180px;
+    bottom: 90px;
+    background-color: #FF8624;
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+}
+
+#plus-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15%;
+    width: 50px;
+    height: auto;
+}
+
+#diet-user {
+    height: 130px;
+    width: 180px;
+    background-color: white;
+    border-radius: 20px;
+    position: absolute;
+    right: 0;
+    bottom: 0px;
+}
+
+#diet {
+    background-color: rgb(225, 225, 225);
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    position: absolute;
+    right: 100px;
+    bottom: 60px;
+    opacity: 0.6;
+}
+
+#diet-icon {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+}
+
+#user {
+    background-color: rgb(225, 225, 225);
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    position: absolute;
+    right: 20px;
+    bottom: 60px;
+    opacity: 0.6;
+}
+
+#user-icon {
+    position: absolute;
+    left: 13px;
+    top: 13px;
+}
+
+
+#fill {
+    position: absolute;
+    left: 170px;
+    bottom: 40px;
+    background-color: white;
+    width: 90px;
+    height: 50px;
+}
+
+#header-top {
+    position: relative;
+    height: 250px;
+    color: white;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+    background-image: url('/img/wallpaper-header.png');
+}
+
+#header-top video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+}
+
+#header-top #date {
+    position: absolute;
+    top: 30%;
+    left: 20px;
+    z-index: 1;
+    font-size: 14pt;
+    opacity: 0.8;
+}
+
+#calendar {
+    opacity: 0.8;
+}
+
+#hello-container {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    font-size: 18pt;
+    width: 90%;
+}
+
+#avatar {
+    background-color: white;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    overflow: hidden; /* Ensure the image does not exceed the container */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#main-pfp {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensure the image fits within the container without being cropped */
+    border-radius: 50%; /* Ensure the image takes the circular shape of the container */
+}
+
+#hello-user {
+    position: absolute;
+    left: 100px;
+    top: 25%;
+}
+
+#health-icon {
+    position: absolute;
+    left: 100px;
+    top: 105%;
+}
+
+#health-metrics {
+    font-size: 14pt;
+    position: absolute;
+    left: 130px;
+    bottom: -40px;
+}
+
+#notification {
+    display: block;
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(0, 0, 0);
+    opacity: 0.4;
+    z-index: -0;
+}
+
+#notification-icon {
+    position: absolute;
+    color: white;
+    right: 15px;
+    top: 15px;
+}
+
+
+
+#notification-metric {
+    width: 12px;
+    height: 12px;
+    border-radius: 5px;
+    background-color: #FF8624;
+    position: absolute;
+    top: 85px;
+    right: 38px;
+}
+
+#rank {
+    font-size: 14pt;
+
+}
+
+.todo {
+    font-size: 24pt;
+    font-weight: bold;
+    margin: 20px;
+}
+
+#fit-task-container {
+    width: 90%;
+    border-radius: 20px;
+    margin: 20px auto;
+    align-items: center;
+    position: relative;
+}
+
+
+.task-item {
+    width: 100%;
+    height: 100px;
+    /* background-color: #ececec; */
+    background-color: rgb(0, 0, 0);
+    color: white;
+    font-size: 16pt;
+    border-radius: 20px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+    position: relative;
+    padding: 0 60px;
+}
+
+.task-icon-container {
+    position: absolute;
+    left: 20px;
+    top: 30%;
+}
+
+.view-task {
+    position: absolute;
+    right: 20px;
+    top: 30%;
+}
+
+#diet-task-container {
+    width: 90%;
+    border-radius: 20px;
+    margin: 20px auto;
+    align-items: center;
+    position: relative;
+}
+
+
+/* ================ AI chat Config ===========================*/
+
+#ai-chat-container {
+    margin: 30px 20px;
+    font-size: 24pt;
+    font-weight: bold;
+    position: relative;
+}
+
+#ai-chat {
+    width: 90%;
+    margin: auto 20px;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+}
+
+#configure-text {
+    margin: auto 20px;
+}
+
+#ai-chat-bg {
+    height: 250px;
+    width: 100%;
+    border-radius: 40px;
+    background-image: url('/img/ai-humannoid.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#new-chat {
+    color: white;
+    font-size: 14pt;
+    position: absolute;
+    bottom: -220px;
+    left: 20px;
+}
+
+.card-body {
+    border: solid 2px #FF8624;
+    border-radius: 50px;
+    height: 400px;
+    overflow-y: scroll;
+}
+
+#topic {
+    position: relative;
+    /* margin: 10px; */
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+#topic-form {
+    position: absolute;
+}
+
+#topic-input {
+    width: 100%;
+    height: 50px;
+    border-radius: 20px;
+    border: thin solid gray;
+    padding: 10px 50px;
+    margin-top: 10px;
+    background-color: rgb(245, 245, 245);
+}
+
+#browse-file {
+    position: absolute;
+    left: 10px;
+    top: 45px;
+}
+
+#pencil {
+    position: absolute;
+    right: 10px;
+    top: 45px;
+}
+
+#ai-model {
+    margin: 30px 0px 20px;
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 14pt;
+}
+
+#label {
+    margin-bottom: 10px;
+}
+
+#ai-model-selection {
+    position: absolute;
+    height: auto;
+}
+
+#ai-model-name {
+    width: 100%;
+    height: 50px;
+    border-radius: 20px;
+    padding-left: 50px;
+}
+
+#robot {
+    position: absolute;
+    top: 45px;
+    left: 10px;
+    opacity: 0.6;
+}
+
+#drop-down {
+    position: absolute;
+    right: 15px;
+    top: 45px;
+    opacity: 0.6;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+    background-color: rgb(245, 245, 245);
+}
+
+#llm-range {
+    margin: 10px 0px 20px;
+    position: relative;
+    font-size: 14pt;
+}
+
+#llm-range-value {
+    width: 100%;
+}
+
+
+
+.form-range::-webkit-slider-thumb {
+    background-color: orange;
+    /* change this to your desired color */
+}
+
+#tensor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: gray
+}
+
+#topic-icons {
+    width: 100%;
+}
+
+#topic-selection {
+    margin-bottom: 10px;
+    font-size: 14pt;
+
+}
+
+#btm-nav-container {
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+    background-color: white;
+    height: 100px;
+    overflow-x: scroll;
+}
+
+#weight-ai {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    opacity: 0.6;
+}
+
+#weight-ai-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#walking {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 80px;
+    opacity: 0.6;
+}
+
+#walking-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#running {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: #FF8624;
+    position: absolute;
+    bottom: 40px;
+    left: 160px;
+}
+
+#running-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#cycling {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 240px;
+    opacity: 0.6;
+}
+
+#cycling-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#hiking {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 320px;
+    opacity: 0.6;
+}
+
+#hiking-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#karate {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 400px;
+    opacity: 0.6;
+}
+
+#karate-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#skating {
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgb(228, 226, 226);
+    position: absolute;
+    bottom: 40px;
+    left: 480px;
+    opacity: 0.6;
+
+}
+
+#skating-icon {
+    position: absolute;
+    left: 12px;
+    bottom: 14px;
+}
+
+#styling-bar {
+    background-color: black;
+    height: 5px;
+    width: 50%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px;
+    bottom: 5px;
+}
+
+#preferred-name {
+    position: relative;
+    top: -10px;
+    font-size: 14pt;
+}
+
+#name-input {
+    width: 100%;
+    height: 50px;
+    border-radius: 20px;
+    border: thin solid gray;
+    padding: 20px 50px;
+    margin-top: 10px;
+    background-color: rgb(245, 245, 245);
+}
+
+#user-ai {
+    position: absolute;
+    top: 45px;
+    left: 10px;
+    opacity: 0.6;
+}
+
+#pencil-1 {
+    position: absolute;
+    top: 45px;
+    right: 10px;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+#start-chat-container {
+    width: 90%;
+    height: 70px;
+    padding-top: 15px;
+    padding-bottom: 20px;
+    border-radius: 50px;
+    background-color: black;
+    color: #FF8624;
+    font-size: 20pt;
+    text-align: center;
+    margin: 20px auto;
+    position: relative;
+}
+
+#start-chat {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    opacity: 0.6;
+    position: absolute;
+    right: 20px;
+    border-radius: 50%;
+    bottom: 15px;
+}
+
+#start-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 5px;
+}
+
+#training-plan {
+    margin: 10px 0 10px 20px;
+    font-weight: bold;
+}
+
+#training-card-container {
+    display: flex;
+    overflow-x: scroll;
+    gap: 16px;
+    margin: 0 20px;
+    width: 90%;
+}
+
+.training-card {
+    width: 300px;
+    height: 250px;
+    /* background-color: #FF8624; */
+    border-radius: 40px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: solid 1px #FF8624;
+}
+
+#ai-rec-initiate {
+    background-image: url('/img/workout-paperwall-4.png');
+    background-size: cover;
+    position: relative;
+}
+
+.training-plan-text {
+    position: absolute;
+    bottom: 20px;
+    right: 10px;
+    font-weight: bold;
+    color: white;
+}
+
+#start-training-plan {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    background-color: #FF8624;
+    bottom: 10px;
+    left: 30px;
+    border-radius: 20px;
+}
+
+.start-training-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 25%;
+}
+
+h2 {
+    height: 40px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+#chest {
+    background-image: url('/img/chest-benchpress.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#back {
+    background-image: url('/img/back-seated-cable.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#intensive-cardio {
+    background-image: url('/img/moutain-climb.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#light-cardio {
+    background-image: url('/img/ai-training-scan.png');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#basic-boxing {
+    background-image: url('/img/boxing-basic.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#agility {
+    background-image: url('/img/agility.gif');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#diet-nutrition {
+    margin: 30px 20px 0;
+    font-weight: bold;
+}
+
+#diet-card-container {
+    display: flex;
+    overflow-x: scroll;
+    gap: 16px;
+    margin: 0 20px;
+    width: 90%;
+    margin: 10px 20px 30px;
+}
+
+#diet-rec-initiate {
+    background-image: url('/img/diet-nutrition.png');
+    background-size: cover;
+    position: relative;
+}
+
+
+
+#start-diet-plan {
+    display:block;
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    background-color: #FF8624;
+    bottom: 10px;
+    left: 30px;
+    border-radius: 20px;
+}
+
+#low-carb {
+    background-image: url('/img/low-carbs.png');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#bulking {
+    background-image: url('/img/bulking-diet.jpg');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
+}
+
+#healthy-meal {
+    background-image: url('/img/healthy-meal.png');
+    background-size: cover;
+    background-position: center center;
+    width: 110%;
+    height: 100%;
 }

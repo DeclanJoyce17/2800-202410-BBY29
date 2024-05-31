@@ -8,6 +8,9 @@
     integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
     crossorigin="anonymous"></script>
 
+  <!-- favicon -->
+  <link rel="icon" href="/img/fitup.png">
+
   <link rel="stylesheet" href="/styles/aichat-log.css">
 
 </head>
@@ -16,6 +19,9 @@
 
   <div id="content-container">
     <div id="top-nav">
+      <video loop="" autoplay="" muted="" playsinline="">
+        <source src="/img/friendly-bot.mp4" type="video/mp4">
+      </video>
       <div id="go-back">
         <svg id="go-back-icon" width="32" height="32" viewBox="0 0 24 24" fill="none"
           xmlns="http://www.w3.org/2000/svg">
@@ -25,8 +31,7 @@
         </svg>
       </div>
       <div id="coach-info">
-        Coach Mixtral.AI
-        <p id="ai-info">mixtral-8x7b-32768</p>
+        Mixtral.AI Assistant
       </div>
       <div id="setting">
         <svg id="setting-icon" width="32" height="32" viewBox="0 0 24 24" fill="none"
@@ -52,27 +57,19 @@
       </div>
       <div id="limit">Limitations</div>
       <div id="limit-noti">
-        No chatbots is perfect. Just like human being, <span id='ai-model-name'>Mixtral AI</span>'s knowledge is limited
+        No chatbot is perfect. Just like human beings, <span id='ai-model-name'>Mixtral AI</span>'s knowledge is limited
         to 2053.
       </div>
     </div>
 
-
     <div id="chat-log-here">
-      <div id="user-input-test"></div>
-      <div id="ai-response-test"></div>
     </div>
 
-
-    <template>
-      <div id="user">
-        <div id="user-avatar"></div>
-        <div id="user-input"></div>
-      </div>
-      <div id="ai">
-        <div id="ai-avatar"></div>
-        <div id="ai-response"></div>
-      </div>
+    <template id="chat-log-template">
+      <div class="chat-message">
+        <img class="avatar">
+        <div class="chat-text">
+        </div>
     </template>
 
 
@@ -99,7 +96,8 @@
     </form>
   </div>
 
-  <footer>  <div id="audio-container"></div>
+  <footer>
+    <div id="audio-container"></div>
   </footer>
 
   <script src="/scripts/aichat-log.js"></script>
