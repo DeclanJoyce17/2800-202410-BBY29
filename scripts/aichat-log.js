@@ -124,5 +124,5 @@ async function textToSpeech(text) {
 
 const backBtn = document.getElementById('go-back');
 backBtn.addEventListener('click', () => {
-  window.history.back();
+  window.location.href = "/"
 })

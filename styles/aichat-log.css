@@ -24,11 +24,12 @@ body {
 }
 
 #setting {
+    display:block;
     position: absolute;
     right: 20px;
     top: 50px;
-    background-color: rgb(221, 218, 218);
-    opacity: 0.;
+    background-color: rgb(255, 255, 255);
+    opacity: 0.5;
     border-radius: 20px;
     width: 60px;
     height: 60px;
@@ -36,9 +37,11 @@ body {
 
 #setting-icon {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 15px;
+    left:5px;
+    top:5px;
+    width:50px;
+    height:50px;
+    
 }
 
 #top-nav {
