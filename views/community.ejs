@@ -38,6 +38,7 @@
 <body>
     <div class="header">
         <p class="headerTitle">Community posts</p>
+        <a id="go-back" onclick="goBack()">Back</a>
     </div>
 
     <div class="header2">
@@ -180,6 +181,13 @@
             </script>
 
             <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+
+            <!-- going back function -->
+            <script>
+                function goBack() {
+                    window.location.href = 'main';
+                }
+            </script>
 
             <!-- Google Maps API -->
             <script
