@@ -1140,6 +1140,7 @@ h2 {
 
 
 #start-diet-plan {
+    display:block;
     position: absolute;
     width: 70px;
     height: 70px;
