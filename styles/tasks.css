@@ -49,10 +49,10 @@ body {
     left: 20px;
     background-color: #FF8624;
     color: #ffffff;
-    border: none;
+    border: none;   
     border-radius: 10px;
-    padding: 15px 30px;
-    font-size: 1.5em;
+    padding: 9px 26px;
+    font-size: 12pt;
     cursor: pointer;
     text-decoration: none;
 }
@@ -152,7 +152,7 @@ footer {
     padding-right: 10px;
     border-radius: 20px;
     margin-top: 20px;
-    margin-left: 340px;
+    margin-left: 330px;
     border: none;
 }
 
