@@ -1721,7 +1721,11 @@ async function connectToMongo() {
 
 		/****************** community posts *************************/
 
-		// Define the route to render the postImgtest.ejs file
+		/**
+		 * Community Page
+		 *	
+		 * Define the route to render the postImgtest.ejs file
+		 */
 		app.get('/community', async (req, res) => {
 			if (!req.session.userId) {
 				return res.status(401).send('Unauthorized');
@@ -1772,7 +1776,11 @@ async function connectToMongo() {
 			}
 		});
 
-		// Define the route for the '/communityPost' endpoint
+		/**
+		 * Community post page
+		 * 
+		 * Define the route for the '/communityPost' endpoint
+		 */
 		app.get('/communityPost', async (req, res) => {
 			if (!req.session.userId) {
 				return res.status(401).send('Unauthorized');
@@ -1785,7 +1793,11 @@ async function connectToMongo() {
 			res.render('communityPost', { errorMessage });
 		});
 
-		// Route to get posts by tag
+		/**
+		 * Post by tag page
+		 * 
+		 * Route to get posts by tag
+		 */
 		app.get('/posts/:tag', async (req, res) => {
 			const tag = req.params.tag;
 			try {
@@ -1798,7 +1810,9 @@ async function connectToMongo() {
 			}
 		});
 
-		// Updated POST route to handle post creation - max 4 images can be uploaded
+		/**
+		 * Updated POST route to handle post creation - max 4 images can be uploaded
+		 */ 
 		app.post('/communityPost/post', upload.array('images', 4), async (req, res) => {
 			console.log('POST /communityPost/post');
 
@@ -1883,7 +1897,9 @@ async function connectToMongo() {
 			}
 		});
 
-		// Route to handle delete post request
+		/**
+		 * Route to handle delete post request
+		 */
 		app.post('/community/delete/:id', async (req, res) => {
 			if (!req.session.userId) {
 				return res.status(401).send('Unauthorized');
@@ -1927,11 +1943,19 @@ async function connectToMongo() {
 
 		/****************** Changing User Info *************************/
 
-		//ChangeEmail Page
+		/**
+		 * change Email page
+		 */
 		app.get('/changeEmail', sessionValidation, async (req, res) => {
 			res.render('changeEmail', { issue: false, issue2: false });
 		});
 
+		/**
+		 * Change email
+		 *
+		 * check to see if users with same username exist
+		 * if they do not exist then change email
+		 */
 		app.post('/changeEmail', sessionValidation, async (req, res) => {
 			const filter = { username: req.session.username };
 			const email = req.body.email;
@@ -1975,11 +1999,16 @@ async function connectToMongo() {
 
 		});
 
-		//ChangePassword Page
+		/**
+		 * Change password page
+		 */
 		app.get('/changePassword', sessionValidation, async (req, res) => {
 			res.render('changePassword', { issue: false });
 		});
 
+		/**
+		 * Change password make sure it is a valid password using JOI
+		 */
 		app.post('/changePassword', sessionValidation, async (req, res) => {
 			const filter = { username: req.session.username };
 			const password = req.body.password;
@@ -2011,10 +2040,16 @@ async function connectToMongo() {
 
 		});
 
+		/**
+		 * Change username page
+		 */
 		app.get('/changeUsername', sessionValidation, async (req, res) => {
 			res.render('changeUsername', { issue: false, issue2: false });
 		});
 
+		/**
+		 * Change username using JOI validation and checking to see if an existing user with this email/name exists.
+		 */
 		app.post('/changeUsername', sessionValidation, async (req, res) => {
 			const filter = { email: req.session.email };
 			const username = req.body.username;
@@ -2058,7 +2093,9 @@ async function connectToMongo() {
 		});
 
 
-		// Route to upload profile images
+		/**
+		 * Route for uploading images
+		 */
 		app.post('/profile-upload', upload.single('image'), async (req, res) => {
 			if (!req.file) {
 				return res.status(400).send('No file uploaded.');
@@ -2079,11 +2116,12 @@ async function connectToMongo() {
 			}
 		});
 
-		// ----------------------------------------------------------
-		// This code is partially provided in the Google Speech to Text API, 
+
+		/**
+		 * This code is partially provided in the Google Speech to Text API, 
 		// which is modified with the help of GroqCloud AI API to connect 
 		// client side to handle audio streaming from the client side.
-
+		 */
 		app.post('/transcribe', async (req, res) => { // This is the end point for posting to the Google Speech API
 			const audioStream = req.pipe(require('stream')); // Create a transcription request by piping the incoming request stream 
 			// to a stream created by the 'stream' package
@@ -2111,6 +2149,9 @@ async function connectToMongo() {
 			res.json({ transcription });
 		});
 
+		/**
+		 * Audio post
+		 */
 		app.post('/audio', (req, res) => { // This is the end point for receiving audio and initiating transcription
 			const audioStream = req.pipe(fs.createWriteStream('audio.wav')); // Create a writable stream for the audio file named 'audio.wav' to save the incoming request data
 
@@ -2124,7 +2165,11 @@ async function connectToMongo() {
 			res.json({ status: 'received' });
 		});
 
-		// Initiates a transcription request using the Google Cloud Speech-to-Text API
+		/**
+		 * getTranscription function
+		 * 
+		 *  Initiates a transcription request using the Google Cloud Speech-to-Text API
+		 */
 		function getTranscription() {
 			const audioStream = fs.createReadStream('audio.wav'); // Create a readable stream for the previously saved 'audio.wav' file
 
@@ -2154,6 +2199,7 @@ async function connectToMongo() {
 				});
 		}
 
+		/******************** ALL AI HTML PAGES CONFIGURED ********************/
 		app.get('/ai-training-home', (req, res) => {
 			var doc = fs.readFileSync('./html/ai-training-home.html', 'utf-8');
 			res.send(doc);
@@ -2199,19 +2245,17 @@ async function connectToMongo() {
 			res.send(doc);
 		});
 
-		app.get('/map', (req, res) => {
-			var doc = fs.readFileSync('./html/map.html', 'utf-8');
+		app.get('/body-motion-capture', (req, res) => {
+			var doc = fs.readFileSync('./html/body-motion-capture.html', 'utf-8');
 			res.send(doc);
 		});
 
 
-		//-------------------------------------------------------------------------------
-		// Text to Speech
-		// This code is provided by the Google Text to Speech client libraries with modification
-		// our project
-		//------------------------------------------------------------------------------
-
-
+		/**
+		 * Text to Speech
+		 * 
+		 * This code is provided by the Google Text to Speech client libraries with modification to our project
+		 */
 		app.post("/text-to-speech", async (req, res) => {
 			const text = req.body.text;
 
@@ -2246,15 +2290,14 @@ async function connectToMongo() {
 			}
 		});
 
+		/**
+		 * Map page
+		 */
 		app.get('/map', (req, res) => {
 			var doc = fs.readFileSync('./html/map.html', 'utf-8');
 			res.send(doc);
 		});
 
-		app.get('/body-motion-capture', (req, res) => {
-			var doc = fs.readFileSync('./html/body-motion-capture.html', 'utf-8');
-			res.send(doc);
-		});
 
 		// Route for handling 404 Not Found
 		app.get('*', (req, res) => {
