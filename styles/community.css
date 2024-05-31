@@ -1,19 +1,23 @@
 .header {
     position: relative;
     background-color: #FF8624;
-    color: #fff;
-    padding: 20px;
+    padding: 0px;
+    margin: 0px;
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
-    height: 100px;
+    height : 100px;
+    width: 105%;
+    left: -10px;
     box-shadow: 0 2px 4px rgba(225, 97, 18, 0.961);
 }
 
 .headerTitle {
-    padding-top: 5%;
+    padding-top: 25px;
     text-align: center;
     font-size: 24px;
     font-weight: bold;
+    margin-bottom: 0px;
+    color: white;
 }
 
 .header2 {
@@ -22,7 +26,8 @@
 }
 
 .add-post-container {
-    display: flex wrap;
+    display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     margin-right: auto;
 }
@@ -161,6 +166,25 @@
     font-size: 18px;
 }
 
+.alert-success {
+    color:#FF8624;
+    background-color:#f5f5f5;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 4px rgba(225, 97, 18, 0.961);
+    border-radius: 4px; 
+    font-weight: bold;
+    text-align: center;
+    position: fixed;
+    top: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000; 
+    width: 100%; 
+    font-size: 1.8rem;
+}
+
 /* Modal CSS */
 .modal {
     display: none;
@@ -219,4 +243,21 @@
     background-color: #efefef;
     color: rgb(0, 0, 0);
     border: none;
+}
+
+#go-back {
+    position: absolute;
+    background-color:#FF8624;
+    color: white;
+    opacity: 0.9;
+    border-radius: 20px;
+    font-size: 20px;
+    border: none;
+    left: 20px;
+}
+
+#go-back:hover {
+    color: white;
+    background-color: white;
+    cursor: pointer;
 }
