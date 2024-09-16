@@ -1611,7 +1611,7 @@ async function connectToMongo() {
 					// how it should behave throughout the conversation.
 					{
 						role: "system",
-						content: "you are a helpful assistant. Your answer should be concise. Please remove all "
+						content: "you are a helpful assistant to a fitness user. Your answer should be concise and directly address the question. Please remove all "
 							+ "asterisk (*) from your response. Please make appropriate sentences and paragraphs to ensure readibility for humans."
 					},
 					// Set a user message for the assistant to respond to.
