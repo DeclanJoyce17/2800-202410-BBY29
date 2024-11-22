@@ -6,7 +6,7 @@
     <img src="/img/logo.png" alt="FitUp Logo" width="250" height="250">
 </div>
 
-<div class="reset-password bg-light">
+<div class="reset-password">
     <!-- Display error message -->
     <% if (errorMessage) { %>
         <div class="alert alert-danger resize">
@@ -19,12 +19,12 @@
         <button type="button" onclick="location.href='/login'" class="index-btn" style="margin-left: 10px;">Login</button>
         <br><br><br>
  <% } else { %>
-        <form action="/reset-email" method="POST" class="index-form center">
+        <form class="login" action="/reset-email" method="POST" class="index-form center">
                 <h1 for="email" class="resize h1-label">Enter your email:</h1>
                 <input type="email" id="email" name="email" placeholder="Email" required>
                 <div class="button-container centered-buttons">
                     <button type="submit" class="index-btn increased-width">Reset Password</button>
-                    <button type="button" onclick="location.href='/'" class="index-btn increased-width">Return to Index</button>
+                    <button type="button" onclick="location.href='/'" class="index-btn increased-width">Cancel</button>
                 </div>
             </form>
     <% } %>
@@ -50,6 +50,18 @@
         align-items: center;
         gap: 10px; /* Adjust the space between buttons */
         margin-top: 20px; /* Adjust the top margin as needed */
-        margin-left: 195px;
     }
+
+    input {
+	border-radius: 20px;
+	height: 50px;
+}
+
+input::placeholder {
+	font-size: 20px; /* Adjust the font size as needed */
+	color: grey; /* Optional: Change the color of the placeholder text */
+	font-style: italic; /* Optional: Change the font style */
+    padding-left: 20px;
+    padding-bottom: 5px;
+}
 </style>

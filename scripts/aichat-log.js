@@ -2,6 +2,7 @@
 // Gets user input and send it to the API for processing
 
 const app = document.querySelector('#chat-completion');
+
 async function getGroqChatCompletion(userInput) {
     return groq.chat.completions.create({
         messages: [
@@ -21,9 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const warning = document.getElementById('warning');
     const form = document.getElementById('chat-input-form');
     const questionInput = document.getElementById('chat-question');
-    const responseDiv = document.getElementById('ai-response-test');
-    const userInputDisplay = document.getElementById('user-input-test');
-    
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault(); // Prevent the form from submitting normally
@@ -59,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector('.user-message').style.display = 'block';
         document.querySelector('.ai-response').style.display = 'block';
         questionInput.value = "";
-        // textToSpeech(aiResponse);
+        textToSpeech(aiResponse);
     });
 });
 

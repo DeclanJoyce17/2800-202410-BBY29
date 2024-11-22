@@ -1,69 +1,183 @@
 /* Modal CSS */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
-    padding-top: 60px;
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4);
+	padding-top: 60px;
 }
 
 .modal.show {
-    display: block;
+	display: block;
 }
 
 .change-form {
-    padding: 12px 0px;
-    font-size: 16px;
-    
+	padding: 12px 0px;
+	font-size: 16px;
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 5% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    text-align: center;
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; 
+	background-color: #fefefe;
+	margin: 5% auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
+	text-align: center;
+	opacity: 0;
+	transform: scale(0.9);
+	transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
 .modal-content p {
-    font-size: 18px;
+	font-size: 18px;
 }
 
 .modal-content.show {
-    opacity: 1;
-    transform: scale(1);
+	opacity: 1;
+	transform: scale(1);
 }
 
-#confirmBtn, #cancelBtn {
-    font-size: 18px;
-    padding: 10px 20px;
-    margin: 10px;
-    cursor: pointer;
+#confirmBtn,
+#cancelBtn {
+	font-size: 18px;
+	padding: 10px 20px;
+	margin: 10px;
+	cursor: pointer;
 }
 
 #confirmBtn {
-    font-size: 18px;
-    background-color: #f44336;
-    color: white;
-    border: none;
+	font-size: 18px;
+	background-color: #f44336;
+	color: white;
+	border: none;
 }
 
 #cancelBtn {
-    font-size: 18px;
-    background-color: #efefef;
-    color: rgb(0, 0, 0);
-    border: none;
+	font-size: 18px;
+	background-color: #efefef;
+	color: rgb(0, 0, 0);
+	border: none;
 }
 
 .border {
-    background-color: #EB7579;
+	background-color: #eb7579;
+}
+
+/* Universal styling for index, login, signup, reset-email, reset-password */
+body {
+	background-color: rgb(38, 36, 36);
+}
+.button {
+	border-radius: 25px;
+	margin-top: 20px;
+	width: 40%;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	text-align: center;
+	text-decoration: none;
+	margin-left: 125px;
+	margin-right: 810px;
+	color: black;
+	font-size: 40px;
+	background-color: #d4d5d6;
+	border: none;
+	cursor: pointer;
+	transition-duration: 0.4s;
+}
+
+.shopitems {
+	font-size: 25pt;
+}
+
+.button:hover {
+	background-color: #9fa5a7;
+}
+
+.title {
+	margin-top: 100px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 250px; /* Ensure the height is set to match the image height */
+}
+
+.title img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.custom-btn {
+	background-color: #ff8624;
+	/* color: #fff; */
+}
+
+.center {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 50%;
+}
+
+.login {
+	font-size: 30px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
+}
+
+input {
+	border-radius: 20px;
+	height: 50px;
+}
+
+input::placeholder {
+	font-size: 16px; /* Adjust the font size as needed */
+	color: grey; /* Optional: Change the color of the placeholder text */
+	font-style: italic; /* Optional: Change the font style */
+    padding-left: 20px;
+    padding-bottom: 40px;
+	
+}
+
+.index-form {
+	display: flex;
+	justify-content: center;
+	padding: 12px 24px;
+	font-size: 16px;
+	width: 100%;
+}
+
+.index-btn {
+	border-radius: 25px;
+	margin-top: 20px;
+	width: 40%;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	text-align: center;
+	text-decoration: none;
+	color: rgb(255, 255, 255);
+	font-size: 15px;
+	background-color: #ff8624;
+	border: none;
+	cursor: pointer;
+	transition-duration: 0.4s;
+}
+
+.task-nav {
+	padding-left: 10%;
+	padding-right: 10%;
+	height: 100%;
+	width: 80%;
+	display: flex; /* Use flexbox *
+    justify-content: space-between; /* Space items evenly */
+}
+
+.resize {
+	font-size: 15px;
 }
